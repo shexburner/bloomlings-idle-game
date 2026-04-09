@@ -7,24 +7,26 @@
 
 ## Expo SDK Version
 
-**Expo SDK 52** (latest stable as of April 2026).
+**Expo SDK 54** (ships with `create-expo-app@latest` default template as of April 2026).
 
 Reasoning:
-- SDK 52 is the current stable release with the best community support
-- Ships with React Native 0.76+, Expo Router v4, and the New Architecture enabled by default
-- TypeScript template included out of the box
+- `create-expo-app@latest --template default` produces an SDK 54 project (`expo@~54.0.33`)
+- Ships with React Native 0.81.5, React 19.1, and the New Architecture enabled by default
+- Default template includes TypeScript, expo-router v6, and file-based routing out of the box
+- Full community support and compatible dependency ecosystem
+- SDK 55 exists on npm but the default template has not yet been updated to use it
 
 ---
 
 ## Project Initialization
 
 ```bash
-npx create-expo-app@latest . --template blank-typescript
+npx create-expo-app@latest . --template default
 ```
 
-- Uses the `blank-typescript` template for a clean starting point with TypeScript
+- Uses the `default` template which includes TypeScript and expo-router (SDK 55+)
 - Initialized in the current directory (`.`) to preserve existing `.git`, `.claude`, and `docs` folders
-- Expo Router will be added as a dependency (the `blank-typescript` template is minimal)
+- Expo Router is included with the default template — no separate install needed
 
 ---
 
@@ -34,23 +36,22 @@ npx create-expo-app@latest . --template blank-typescript
 
 | Package | Version | Purpose | Install Command |
 |---|---|---|---|
-| `zustand` | ^5.x | Lightweight state management — stores game state with slices | `npx expo install zustand` |
-| `react-native-reanimated` | ^3.x | High-performance animations for Bloomling evolution, tap effects, combo meter | `npx expo install react-native-reanimated` |
-| `react-native-gesture-handler` | ^2.x | Tap detection with precise timing for combo system | `npx expo install react-native-gesture-handler` |
-| `react-native-mmkv` | ^3.x | Fast synchronous key-value storage for save/load (10x faster than AsyncStorage) | `npx expo install react-native-mmkv` |
-| `expo-router` | ^4.x | File-based navigation between Garden, Shop, Collection, Prestige screens | `npx expo install expo-router expo-linking expo-constants` |
-| `expo-haptics` | ^14.x | Haptic feedback on taps, critical hits, evolution events | `npx expo install expo-haptics` |
-| `expo-notifications` | ^0.29.x | Local notifications for offline earnings, streak reminders | `npx expo install expo-notifications` |
+| `zustand` | ^5.0.12 | Lightweight state management — stores game state with slices, selectors, middleware | `npm install zustand` |
+| `react-native-reanimated` | ~4.1.1 | High-performance UI-thread animations for tap effects, combo meter, evolution sequences | Included with template |
+| `react-native-gesture-handler` | ~2.28.0 | Precise tap detection and gesture tracking for the combo system | Included with template |
+| `react-native-mmkv` | ^4.3.1 | Ultra-fast synchronous KV storage for save/load (10x faster than AsyncStorage) | `npm install react-native-mmkv` |
+| `expo-haptics` | ~15.0.8 | Haptic feedback on taps, critical hits, evolution events | Included with template |
+| `expo-notifications` | ^55.0.18 | Local notifications for offline earnings, streak reminders | `npm install expo-notifications` |
 
-### Ad SDK (Deferred)
+### Ad SDK
 
 | Package | Version | Purpose | Notes |
 |---|---|---|---|
-| `react-native-google-mobile-ads` | ^14.x | AdMob rewarded video ads for all 7 ad touchpoints | Requires a config plugin and an AdMob account. Will be installed later when ad integration begins. Noted here for planning purposes. |
+| `react-native-google-mobile-ads` | ^16.3.2 | AdMob rewarded video ads for all 7 ad touchpoints | Requires config plugin and AdMob App ID in app.json. Needs development build (not Expo Go). Install now, configure later. |
 
-**Note**: `react-native-google-mobile-ads` requires native configuration (AdMob App ID in `app.json` config plugin). We will add this dependency in a later task dedicated to ad integration to avoid blocking the scaffold.
+**Note**: `react-native-google-mobile-ads` requires native configuration (AdMob App ID in `app.json` config plugin) and a development build via EAS. We install the package now so it is in the dependency tree, but defer AdMob configuration to the ad integration task. If installation fails in this environment, we note the failure and continue.
 
-### Dev Dependencies
+### Dev Dependencies (Included with Template)
 
 | Package | Purpose |
 |---|---|
@@ -65,16 +66,16 @@ npx create-expo-app@latest . --template blank-typescript
 
 ```bash
 # 1. Initialize the Expo project
-npx create-expo-app@latest . --template blank-typescript
+npx create-expo-app@latest . --template default
 
 # 2. Install core gameplay dependencies
 npx expo install zustand react-native-reanimated react-native-gesture-handler react-native-mmkv
 
 # 3. Install Expo modules
-npx expo install expo-router expo-linking expo-constants expo-haptics expo-notifications
+npx expo install expo-haptics expo-notifications
 
-# 4. Install expo-status-bar (likely comes with template, ensure present)
-npx expo install expo-status-bar
+# 4. Install ad SDK (may require config plugin setup later)
+npx expo install react-native-google-mobile-ads
 ```
 
 ---
@@ -89,12 +90,12 @@ The template provides a base `tsconfig.json` that extends Expo's config. We enfo
   "compilerOptions": {
     "strict": true,
     "noUncheckedIndexedAccess": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true,
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./*"],
+      "~/*": ["./src/*"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"]
@@ -104,7 +105,10 @@ The template provides a base `tsconfig.json` that extends Expo's config. We enfo
 Key decisions:
 - `strict: true` — enables all strict type checks (noImplicitAny, strictNullChecks, etc.)
 - `noUncheckedIndexedAccess` — forces undefined checks on array/object index access
-- `paths` alias `@/*` maps to `src/*` for clean imports
+- `noImplicitReturns` — all code paths in a function must return a value
+- `noFallthroughCasesInSwitch` — prevents accidental switch fallthrough
+- `@/*` maps to root (used by Expo template code in `app/`, `components/`, `hooks/`, `constants/`)
+- `~/*` maps to `src/*` for game-specific imports (engine, state, types, services)
 
 ---
 
@@ -113,14 +117,23 @@ Key decisions:
 ```
 src/
 ├── engine/             # Core game loop, tick system, tap handler, production calculator
+│   └── .gitkeep
 ├── state/              # Zustand store and state management
-│   └── slices/         # Individual store slices (resources, bloomlings, upgrades, etc.)
+│   ├── slices/         # Individual store slices (resources, bloomlings, upgrades, etc.)
+│   │   └── .gitkeep
+│   └── .gitkeep
 ├── services/           # Save/load manager, ad service, notification service
+│   └── .gitkeep
 ├── types/              # TypeScript interfaces, enums, type definitions
+│   └── .gitkeep
 ├── hooks/              # Custom React hooks (useGameLoop, useTap, useBloomling, etc.)
+│   └── .gitkeep
 ├── components/         # Reusable UI components (BloomlingCard, CurrencyDisplay, etc.)
+│   └── .gitkeep
 ├── constants/          # Game balance constants, formulas, feature unlock thresholds
+│   └── .gitkeep
 └── utils/              # Pure utility functions (formatting, math helpers, etc.)
+    └── .gitkeep
 ```
 
 ### Folder Purposes
@@ -141,14 +154,11 @@ src/
 
 ## ESLint Configuration
 
-Use Expo's default ESLint configuration which comes preconfigured:
+Use Expo's default ESLint configuration which comes preconfigured with the template:
 
 ```js
-// .eslintrc.js (or eslint.config.js if using flat config)
+// eslint.config.js (flat config, SDK 55 default)
 // Expo's default config handles React, React Native, TypeScript, and import rules
-module.exports = {
-  extends: ["expo"],
-};
 ```
 
 No additional Prettier config for now — Expo's ESLint preset handles formatting rules. Can add Prettier later if the team wants it.
@@ -163,18 +173,17 @@ After scaffold is complete, verify with:
 npx tsc --noEmit
 ```
 
-This ensures TypeScript compilation passes without generating output files. If `tsc` is not directly available, use:
-
-```bash
-npx expo export --platform web
-```
+This ensures TypeScript compilation passes without generating output files.
 
 ---
 
 ## What's NOT in This Scaffold
 
 These will be added in later tasks:
-- `react-native-google-mobile-ads` — requires AdMob account setup (Task TBD)
-- `@react-native-firebase/*` — analytics, if needed (post-launch)
+- AdMob native configuration (requires AdMob account + EAS build setup)
+- App icons, splash screens, app.json branding
+- Environment variables / `.env` setup
+- EAS build configuration (`eas.json`)
 - Testing libraries (`jest`, `@testing-library/react-native`) — added when test tasks begin
 - CI/CD configuration — separate infrastructure task
+- Firebase / analytics — post-launch consideration
