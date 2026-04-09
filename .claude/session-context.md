@@ -46,6 +46,7 @@ Living, conscious plant creatures called **Bloomlings**. Each Bloomling has a un
 4. Engine Developer (`engine-developer.md`)
 5. Content Creator (`content-creator.md`)
 6. QA Tester (`qa-tester.md`)
+7. Project Manager (`project-manager.md`)
 
 ## Game Design Document (Complete)
 Located in `docs/design/`, split into 6 sections:
