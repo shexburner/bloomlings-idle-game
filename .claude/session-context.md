@@ -99,3 +99,9 @@ Located in `docs/design/`, split into 6 sections:
 - Designed 2-layer prestige: Rebirth (Nectar) and Transcendence (Essence)
 - Designed ad economy: 7 touchpoints, Dewdrop shop, monetization philosophy
 - Designed retention: dailies, streaks, achievements, notifications, "just one more" hooks
+- Added Project Manager persona
+- Created roadmap.md, status.md, and task breakdowns for Economy + Engine
+- **Economy Balancer Tasks 1-3 COMPLETE**: currency rates, upgrade costs (12 upgrades), Bloomling stats (all rarities, synergy math verified)
+- **Engine Developer Tasks 1-3 COMPLETE**: Expo SDK 54 scaffold (boots clean, tsc passes), 694-line type definitions (10 enums, 21 interfaces, 3 computed types)
+- Phase 1 Foundation: COMPLETE
+- Phase 2 Core Engine: IN PROGRESS

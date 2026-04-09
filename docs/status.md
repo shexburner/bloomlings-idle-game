@@ -3,34 +3,44 @@
 > Updated every work session. Read this first to know where things stand.
 
 ## Current Phase
-**Phase 1: Foundation** (50% complete) + **Phase 2: Economy** (starting in parallel)
+**Phase 1: Foundation** — COMPLETE
+**Phase 2: Core Engine** — IN PROGRESS (Economy 50%, Engine 43%)
 
-## Active Workstreams
+## Completed Work
 
-### Workstream A: Engine Developer — Project Scaffolding
-**Status**: NOT STARTED
-**Tasks** (each saves to its own file):
-1. `docs/engine/01-scaffold-plan.md` — Expo project init, dependency list, folder structure
-2. `src/types/game.ts` — All TypeScript interfaces
-3. Verify build runs on iOS + Android sim
+### Workstream A: Engine Developer — Project Scaffolding (Tasks 1-3 DONE)
+1. `docs/engine/01-scaffold-plan.md` — DONE — Expo SDK 54, full dependency list, folder structure
+2. Scaffold executed — DONE — Expo project boots, `npx tsc --noEmit` passes, all deps installed
+3. `src/types/game.ts` — DONE — 694 lines, 10 enums, 21 interfaces, 3 computed types, zero `any`
 
-### Workstream B: Economy Balancer — Balance Sheets
-**Status**: NOT STARTED
-**Tasks** (each saves to its own file):
-1. `docs/economy/01-currency-rates.md` — Production rates, tap values, idle rates at milestones
-2. `docs/economy/02-upgrade-costs.md` — All upgrade cost curves with formulas and tables
-3. `docs/economy/03-bloomling-stats.md` — Per-rarity base stats, per-level scaling, evolution multipliers
-4. `docs/economy/04-prestige-math.md` — Nectar formula tuning, Essence formula tuning, optimal reset points
-5. `docs/economy/05-ad-reward-values.md` — Exact reward per touchpoint at progression milestones
-6. `docs/economy/06-pacing-sheet.md` — Expected player state at 1hr, 4hr, 1day, 3day, 1week, 2week
+### Workstream B: Economy Balancer — Balance Sheets (Tasks 1-3 DONE)
+1. `docs/economy/01-currency-rates.md` — DONE — Tap/idle rates, combo math, crit scaling, active:idle ratios
+2. `docs/economy/02-upgrade-costs.md` — DONE — 12 upgrades with full cost tables, evolution costs, Buy-Max formula
+3. `docs/economy/03-bloomling-stats.md` — DONE — All rarity production tables, synergy verification, Garden examples
+
+## Remaining Work
+
+### Economy Balancer Tasks 4-6
+4. `docs/economy/04-prestige-math.md` — NOT STARTED — Nectar/Essence formulas, optimal reset points
+5. `docs/economy/05-ad-reward-values.md` — NOT STARTED — Exact rewards per ad touchpoint
+6. `docs/economy/06-pacing-sheet.md` — NOT STARTED — Full player timeline, dead zone check
+
+### Engine Developer Tasks 4-7
+4. `src/state/store.ts` — NOT STARTED — Zustand store with slices and actions
+5. `src/engine/gameLoop.ts` — NOT STARTED — Delta-time tick system
+6. `src/engine/tapSystem.ts` — NOT STARTED — Taps, combos, crits
+7. `src/services/saveManager.ts` — NOT STARTED — MMKV save/load
 
 ## Blockers
-None currently.
+None.
 
-## Recent Decisions
-- Economy Balancer and Engine Developer work in parallel (no dependency between them until `calculations.ts`)
-- All work broken into sections saved as individual MD files for token resilience
+## Dependencies
+- Engine Task 4 (store) depends on Engine Task 3 (types) — RESOLVED
+- Engine Tasks 5-7 depend on Engine Task 4 (store) — WAITING
+- Engine Tasks 5-6 benefit from Economy Tasks 1-3 for exact constants — AVAILABLE
+- Economy Tasks 4-6 depend on Economy Tasks 1-3 — RESOLVED
 
-## Next Up After Current Workstreams
-- Engine Developer implements game loop using Economy Balancer's numbers
-- Content Creator begins Bloomling species design (can start anytime, no code dependency)
+## Next Actions
+1. **Economy Balancer**: Tasks 4-6 (prestige math, ad values, pacing sheet)
+2. **Engine Developer**: Tasks 4-7 (store, game loop, tap system, save/load)
+3. **Content Creator**: Can begin Bloomling species design (no code dependency)
