@@ -4,43 +4,46 @@
 
 ## Current Phase
 **Phase 1: Foundation** — COMPLETE
-**Phase 2: Core Engine** — IN PROGRESS (Economy 50%, Engine 43%)
+**Phase 2: Core Engine** — COMPLETE
 
 ## Completed Work
 
-### Workstream A: Engine Developer — Project Scaffolding (Tasks 1-3 DONE)
-1. `docs/engine/01-scaffold-plan.md` — DONE — Expo SDK 54, full dependency list, folder structure
-2. Scaffold executed — DONE — Expo project boots, `npx tsc --noEmit` passes, all deps installed
-3. `src/types/game.ts` — DONE — 694 lines, 10 enums, 21 interfaces, 3 computed types, zero `any`
+### Economy Balancer — All 6 Tasks DONE
+1. `docs/economy/01-currency-rates.md` — DONE — Tap/idle rates, combo math, crit scaling
+2. `docs/economy/02-upgrade-costs.md` — DONE — 12 upgrades with full cost tables, evolution costs
+3. `docs/economy/03-bloomling-stats.md` — DONE — All rarity production tables, synergy verification
+4. `docs/economy/04-prestige-math.md` — DONE — Nectar/Essence formulas tuned, optimal reset analysis
+5. `docs/economy/05-ad-reward-values.md` — DONE — Exact rewards per touchpoint at all stages
+6. `docs/economy/06-pacing-sheet.md` — DONE — Full player timeline, 2 dead zones flagged with fixes
 
-### Workstream B: Economy Balancer — Balance Sheets (Tasks 1-3 DONE)
-1. `docs/economy/01-currency-rates.md` — DONE — Tap/idle rates, combo math, crit scaling, active:idle ratios
-2. `docs/economy/02-upgrade-costs.md` — DONE — 12 upgrades with full cost tables, evolution costs, Buy-Max formula
-3. `docs/economy/03-bloomling-stats.md` — DONE — All rarity production tables, synergy verification, Garden examples
+### Engine Developer — All 7 Tasks DONE
+1. `docs/engine/01-scaffold-plan.md` — DONE — Expo SDK 54 plan
+2. Scaffold executed — DONE — App boots, tsc passes
+3. `src/types/game.ts` — DONE — 694 lines, 10 enums, 21 interfaces, 3 computed types
+4. `src/state/store.ts` + `src/state/slices/` — DONE — Zustand store with 6 slices + MetaSlice
+5. `src/engine/gameLoop.ts` — DONE — Delta-time ticks, offline progress, AppState handling
+6. `src/engine/tapSystem.ts` — DONE — Combo, crits, anti-autoclicker
+7. `src/services/saveManager.ts` — DONE — MMKV save/load, auto-save, export/import
 
-## Remaining Work
+## Balance Issues Identified (from Pacing Sheet)
+1. **Zone 30-40 dead zone** (~45 min gap) — Fix: move 4th Garden slot to Zone 35
+2. **Zone 40-50 dead zone** (~80 min gap) — Fix: show Nectar preview at Zone 40, add mini-boss at Zone 45
+3. **Evolution production dip** — Fix: grant 5 free levels on evolution
+4. **Auto-Tap cost too high** — Fix: reduce from 50 to 40 Dewdrops
 
-### Economy Balancer Tasks 4-6
-4. `docs/economy/04-prestige-math.md` — NOT STARTED — Nectar/Essence formulas, optimal reset points
-5. `docs/economy/05-ad-reward-values.md` — NOT STARTED — Exact rewards per ad touchpoint
-6. `docs/economy/06-pacing-sheet.md` — NOT STARTED — Full player timeline, dead zone check
+## What's Next: Phase 3 (Content & UI)
 
-### Engine Developer Tasks 4-7
-4. `src/state/store.ts` — NOT STARTED — Zustand store with slices and actions
-5. `src/engine/gameLoop.ts` — NOT STARTED — Delta-time tick system
-6. `src/engine/tapSystem.ts` — NOT STARTED — Taps, combos, crits
-7. `src/services/saveManager.ts` — NOT STARTED — MMKV save/load
+### Can run in parallel:
+**Content Creator** (no code dependency):
+- First batch of Bloomlings (species, lore, stats for Biomes 1-2)
+- Upgrade names and flavor text
+- Achievement names and descriptions
+
+**UI/UX Developer** (depends on engine being done — it is):
+- Main game screen (tap area, Bloomling display, currency bar)
+- Upgrade shop screen
+- Zone progression UI
+- Bloomling collection screen
 
 ## Blockers
 None.
-
-## Dependencies
-- Engine Task 4 (store) depends on Engine Task 3 (types) — RESOLVED
-- Engine Tasks 5-7 depend on Engine Task 4 (store) — WAITING
-- Engine Tasks 5-6 benefit from Economy Tasks 1-3 for exact constants — AVAILABLE
-- Economy Tasks 4-6 depend on Economy Tasks 1-3 — RESOLVED
-
-## Next Actions
-1. **Economy Balancer**: Tasks 4-6 (prestige math, ad values, pacing sheet)
-2. **Engine Developer**: Tasks 4-7 (store, game loop, tap system, save/load)
-3. **Content Creator**: Can begin Bloomling species design (no code dependency)

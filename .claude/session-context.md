@@ -105,3 +105,7 @@ Located in `docs/design/`, split into 6 sections:
 - **Engine Developer Tasks 1-3 COMPLETE**: Expo SDK 54 scaffold (boots clean, tsc passes), 694-line type definitions (10 enums, 21 interfaces, 3 computed types)
 - Phase 1 Foundation: COMPLETE
 - Phase 2 Core Engine: IN PROGRESS
+- **Economy Balancer Tasks 4-6 COMPLETE**: prestige math tuned (Nectar/Essence formulas, optimal reset analysis), ad reward values at all progression stages, full pacing sheet with 2 dead zones identified and fixes proposed
+- **Engine Developer Tasks 4-7 COMPLETE**: Zustand store with 6 slices + MetaSlice + selectors, delta-time game loop with offline progress, tap system with combo/crits/anti-autoclicker, MMKV save/load with auto-save and export/import
+- Phase 2 Core Engine: COMPLETE
+- Ready for Phase 3: Content & UI
