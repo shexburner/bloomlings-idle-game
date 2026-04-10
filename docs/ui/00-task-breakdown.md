@@ -43,7 +43,7 @@
 - Affordability states: green (can afford), gray (can't afford), with cost display
 - Connects to Zustand store for upgrade state and buy actions
 - Wire into `app/(tabs)/shop.tsx`
-**Status**: NOT STARTED
+**Status**: DONE
 
 ## Task 4: Collection + Zone UI (`src/components/`)
 **Objective**: Build Bloomling collection grid and zone progression display.
@@ -53,4 +53,4 @@
 - `collection/BloomlingDetail.tsx` — Modal/screen for single Bloomling: lore, stats, ability, evolution progress
 - `zones/ZoneInfo.tsx` — Expanded zone info: current biome name, zone number, threshold, gate indicator
 - Wire collection into `app/(tabs)/collection.tsx`
-**Status**: NOT STARTED
+**Status**: DONE
