@@ -2,9 +2,13 @@
 // Bloomling Slice — Bloomling collection, leveling, evolution, garden management
 // =============================================================================
 import type { StateCreator } from "zustand";
-import type { Bloomling, EvolutionStage } from "~/types/game";
-import { EvolutionStage as EvolutionStageEnum } from "~/types/game";
+import type { Bloomling } from "~/types/game";
 import type { GameStore } from "../store";
+import {
+  canEvolve,
+  getEvolutionCost,
+  evolveBloomling as evolveBloomlingPure,
+} from "~/engine/evolution";
 
 export interface BloomlingSlice {
   bloomlings: Record<string, Bloomling>;
@@ -31,20 +35,6 @@ export const initialGarden = {
   activeSynergyIds: [] as string[],
   specialMeterProgress: 0,
 };
-
-/** Returns the next evolution stage, or null if already at Elder. */
-function getNextEvolutionStage(
-  current: EvolutionStage
-): EvolutionStage | null {
-  switch (current) {
-    case EvolutionStageEnum.Sprout:
-      return EvolutionStageEnum.Bloom;
-    case EvolutionStageEnum.Bloom:
-      return EvolutionStageEnum.Elder;
-    case EvolutionStageEnum.Elder:
-      return null;
-  }
-}
 
 export const createBloomlingSlice: StateCreator<
   GameStore,
@@ -96,21 +86,32 @@ export const createBloomlingSlice: StateCreator<
   evolveBloomling: (instanceId: string) =>
     set((state) => {
       const bloomling = state.bloomlings[instanceId];
-      if (!bloomling || bloomling.level < 100) {
+      if (!bloomling) {
         return state;
       }
-      const nextStage = getNextEvolutionStage(bloomling.evolutionStage);
-      if (nextStage === null) {
+
+      // Check eligibility using the evolution engine
+      if (!canEvolve(bloomling, state.resources)) {
         return state;
       }
+
+      // Calculate and deduct costs
+      const cost = getEvolutionCost(bloomling);
+      const newSunlight = state.resources.sunlight - cost.sunlight;
+      const newNectar = state.resources.nectar - cost.nectar;
+
+      // Apply evolution transformation
+      const evolved = evolveBloomlingPure(bloomling);
+
       return {
         bloomlings: {
           ...state.bloomlings,
-          [instanceId]: {
-            ...bloomling,
-            level: 1,
-            evolutionStage: nextStage,
-          },
+          [instanceId]: evolved,
+        },
+        resources: {
+          ...state.resources,
+          sunlight: newSunlight,
+          nectar: newNectar,
         },
       };
     }),
