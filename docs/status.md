@@ -5,45 +5,46 @@
 ## Current Phase
 **Phase 1: Foundation** — COMPLETE
 **Phase 2: Core Engine** — COMPLETE
+**Phase 3: Content & UI** — COMPLETE
 
 ## Completed Work
 
-### Economy Balancer — All 6 Tasks DONE
-1. `docs/economy/01-currency-rates.md` — DONE — Tap/idle rates, combo math, crit scaling
-2. `docs/economy/02-upgrade-costs.md` — DONE — 12 upgrades with full cost tables, evolution costs
-3. `docs/economy/03-bloomling-stats.md` — DONE — All rarity production tables, synergy verification
-4. `docs/economy/04-prestige-math.md` — DONE — Nectar/Essence formulas tuned, optimal reset analysis
-5. `docs/economy/05-ad-reward-values.md` — DONE — Exact rewards per touchpoint at all stages
-6. `docs/economy/06-pacing-sheet.md` — DONE — Full player timeline, 2 dead zones flagged with fixes
+### Phase 1-2 (Foundation + Engine)
+- Expo SDK 54 scaffold, all dependencies, TypeScript strict
+- 694-line type definitions (10 enums, 21 interfaces)
+- Zustand store with 6 slices + MetaSlice + selectors
+- Game loop (delta-time, offline progress, AppState handling)
+- Tap system (combo, crits, anti-autoclicker)
+- Save/load (MMKV, auto-save, export/import)
+- Economy balance sheets (6 docs: rates, costs, stats, prestige, ads, pacing)
 
-### Engine Developer — All 7 Tasks DONE
-1. `docs/engine/01-scaffold-plan.md` — DONE — Expo SDK 54 plan
-2. Scaffold executed — DONE — App boots, tsc passes
-3. `src/types/game.ts` — DONE — 694 lines, 10 enums, 21 interfaces, 3 computed types
-4. `src/state/store.ts` + `src/state/slices/` — DONE — Zustand store with 6 slices + MetaSlice
-5. `src/engine/gameLoop.ts` — DONE — Delta-time ticks, offline progress, AppState handling
-6. `src/engine/tapSystem.ts` — DONE — Combo, crits, anti-autoclicker
-7. `src/services/saveManager.ts` — DONE — MMKV save/load, auto-save, export/import
+### Phase 3: Content & UI (ALL DONE)
 
-## Balance Issues Identified (from Pacing Sheet)
-1. **Zone 30-40 dead zone** (~45 min gap) — Fix: move 4th Garden slot to Zone 35
-2. **Zone 40-50 dead zone** (~80 min gap) — Fix: show Nectar preview at Zone 40, add mini-boss at Zone 45
-3. **Evolution production dip** — Fix: grant 5 free levels on evolution
-4. **Auto-Tap cost too high** — Fix: reduce from 50 to 40 Dewdrops
+**Content Creator (4/4 tasks):**
+1. `docs/content/01-biome1-bloomlings.md` — 4 Bloomlings (Fernley, Mosswick, Petaline, Thornwick) + 3 synergies
+2. `docs/content/02-biome2-bloomlings.md` — 4 Bloomlings (Solara, Dapplebark, Honeyveil, Briarthorn) + 3 synergies + 2 cross-biome
+3. `docs/content/03-upgrades-flavor.md` — 31 upgrades with flavor text (6 tap, 6 idle, 10 Nectar, 9 Essence)
+4. `docs/content/04-achievements.md` — 36 achievements (8 Growth, 9 Power, 7 Journey, 6 Rebirth, 6 Hidden)
 
-## What's Next: Phase 3 (Content & UI)
+**UI/UX Developer (4/4 tasks):**
+1. Navigation: Expo Router with 4-tab dark theme layout, game loop + auto-save wired in root layout
+2. Garden screen: CurrencyBar, TapArea, TapFeedback (pool of 8 animated labels), ComboMeter (glow at 50+), ZoneProgress, BloomlingDisplay
+3. Shop screen: ShopScreen (tab-based), UpgradeCard (affordability states), BuyMultiplierToggle (x1/x10/x25/x100/Max)
+4. Collection: CollectionGrid (3-column FlatList), BloomlingCard (rarity borders), BloomlingDetail (modal with lore/stats/evolution/synergy), ZoneInfo (expandable panel), BloomlingTemplates data file (8 Bloomlings)
 
-### Can run in parallel:
-**Content Creator** (no code dependency):
-- First batch of Bloomlings (species, lore, stats for Biomes 1-2)
-- Upgrade names and flavor text
-- Achievement names and descriptions
+## What's Next: Phase 4 (Progression Systems)
 
-**UI/UX Developer** (depends on engine being done — it is):
-- Main game screen (tap area, Bloomling display, currency bar)
-- Upgrade shop screen
-- Zone progression UI
-- Bloomling collection screen
+### Engine Developer tasks:
+1. Evolution system — Level-to-100 triggers, stage transitions, stat multipliers
+2. Garden management — Add/remove Bloomlings, slot limits, validation
+3. Synergy system — Tag matching, bonus calculation, discovery tracking
+4. Rebirth (Prestige 1) — Nectar calculation, state reset, permanent upgrades
+5. Nectar shop UI — Prestige upgrade purchasing screen
+
+### Dependencies:
+- All engine work can reference existing economy docs for exact formulas
+- Bloomling templates data file exists for content integration
+- Synergy pairs defined in content docs
 
 ## Blockers
 None.
