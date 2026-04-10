@@ -1,36 +1,49 @@
 // =============================================================================
-// Garden Screen — Main game tab (placeholder with currency display)
+// Garden Screen — Main game tap screen with currency bar, bloomling, and combo
 // =============================================================================
 
-import { StyleSheet, Text, View } from "react-native";
+import { useCallback } from "react";
+import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { useGameStore } from "~/state/store";
-import { formatNumber } from "~/utils/formatNumber";
+import { CurrencyBar } from "~/components/garden/CurrencyBar";
+import { TapArea } from "~/components/garden/TapArea";
+import { TapFeedback, useTapFeedback } from "~/components/garden/TapFeedback";
+import { ComboMeter } from "~/components/garden/ComboMeter";
+import { ZoneProgress } from "~/components/garden/ZoneProgress";
+import { BloomlingDisplay } from "~/components/garden/BloomlingDisplay";
+import type { TapResult } from "~/engine/tapSystem";
 
 export default function GardenScreen() {
   const insets = useSafeAreaInsets();
-  const sunlight = useGameStore((s) => s.resources.sunlight);
-  const nectar = useGameStore((s) => s.resources.nectar);
-  const dewdrops = useGameStore((s) => s.resources.dewdrops);
+  const { entries, spawn } = useTapFeedback();
+
+  const handleTapResult = useCallback(
+    (result: TapResult) => {
+      spawn(result.sunlight, result.isCritical);
+    },
+    [spawn]
+  );
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.currencyRow}>
-        <Text style={styles.sunlightLabel}>
-          {"\u2600"} {formatNumber(sunlight)}
-        </Text>
-        <Text style={styles.nectarLabel}>
-          {"\u2727"} {formatNumber(nectar)}
-        </Text>
-        <Text style={styles.dewdropLabel}>
-          {"\u25C6"} {formatNumber(dewdrops)}
-        </Text>
+      {/* Currency display bar */}
+      <CurrencyBar />
+
+      {/* Zone progress */}
+      <View style={styles.zoneRow}>
+        <ZoneProgress />
       </View>
 
-      <View style={styles.center}>
-        <Text style={styles.title}>Garden</Text>
-        <Text style={styles.subtitle}>Tap to earn Sunlight</Text>
+      {/* Main tap area with bloomling and feedback */}
+      <TapArea onTapResult={handleTapResult}>
+        <BloomlingDisplay />
+        <TapFeedback entries={entries} />
+      </TapArea>
+
+      {/* Combo meter positioned above the tab bar */}
+      <View style={styles.comboRow}>
+        <ComboMeter />
       </View>
     </View>
   );
@@ -41,43 +54,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#0d1117",
   },
-  currencyRow: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    backgroundColor: "#1a1a2e",
-    borderBottomWidth: 1,
-    borderBottomColor: "#2d4a3e",
+  zoneRow: {
+    paddingVertical: 8,
   },
-  sunlightLabel: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#ffd700",
-  },
-  nectarLabel: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#e040fb",
-  },
-  dewdropLabel: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#4fc3f7",
-  },
-  center: {
-    flex: 1,
+  comboRow: {
     alignItems: "center",
-    justifyContent: "center",
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#e8f5e9",
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: "#8a9b8e",
+    paddingBottom: 12,
   },
 });
