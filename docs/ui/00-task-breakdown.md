@@ -19,7 +19,7 @@
 - `app/(tabs)/settings.tsx` — Settings screen (placeholder)
 - Tab bar styling: dark theme, plant-themed icons, bottom navigation
 - Game loop starts on app mount, auto-save runs
-**Status**: NOT STARTED
+**Status**: DONE
 
 ## Task 2: Main Game Screen (`src/components/garden/`)
 **Objective**: Build the core tap-to-play screen.
@@ -32,7 +32,7 @@
 - `BloomlingDisplay.tsx` — Placeholder Bloomling sprite area (centered, with idle animation stub)
 - Wire everything together in `app/(tabs)/index.tsx`
 - All components use StyleSheet.create, dark theme, functional components
-**Status**: NOT STARTED
+**Status**: DONE
 
 ## Task 3: Upgrade Shop Screen (`src/components/shop/`)
 **Objective**: Build the upgrade purchasing interface.
