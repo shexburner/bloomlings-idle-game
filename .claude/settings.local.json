@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx expo:*)",
+      "Bash(ANDROID_HOME=/c/Users/sheha/AppData/Local/Android/Sdk JAVA_HOME=\"/c/Program Files/Java/jdk-17.0.12\" ./gradlew assembleDebug -PreactNativeArchitectures=arm64-v8a)",
+      "Bash(/c/Users/sheha/AppData/Local/Android/Sdk/platform-tools/adb.exe devices:*)",
+      "Bash(/c/Users/sheha/AppData/Local/Android/Sdk/platform-tools/adb.exe kill-server:*)",
+      "Bash(/c/Users/sheha/AppData/Local/Android/Sdk/platform-tools/adb.exe start-server:*)",
+      "Bash(/c/Users/sheha/AppData/Local/Android/Sdk/platform-tools/adb.exe install:*)",
+      "Bash(/c/Users/sheha/AppData/Local/Android/Sdk/platform-tools/adb.exe logcat:*)",
+      "Bash(/c/Users/sheha/AppData/Local/Android/Sdk/platform-tools/adb.exe shell:*)",
+      "Bash(ANDROID_HOME=/c/Users/sheha/AppData/Local/Android/Sdk JAVA_HOME=\"/c/Program Files/Java/jdk-17.0.12\" ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a)",
+      "Bash(ANDROID_HOME=/c/Users/sheha/AppData/Local/Android/Sdk JAVA_HOME=\"/c/Program Files/Java/jdk-17.0.12\" ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a --stacktrace)",
+      "Bash(ANDROID_HOME=/c/Users/sheha/AppData/Local/Android/Sdk JAVA_HOME=\"/c/Program Files/Java/jdk-17.0.12\" ./gradlew :app:createBundleReleaseJsAndAssets -PreactNativeArchitectures=arm64-v8a)",
+      "Bash(nvm list:*)",
+      "Bash(fnm list:*)",
+      "Bash(winget --version)",
+      "Bash(export PATH=\"/c/Program Files/nodejs:$PATH\")"
+    ]
+  }
+}
