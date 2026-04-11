@@ -102,6 +102,8 @@ export const createPrestigeSlice: StateCreator<
       },
       lastTickAt: Date.now(),
     }));
+    // Zone reset to 1 removes zone-based slot unlocks; Nectar upgrades persist.
+    get().syncGardenCapacity();
   },
 
   executeTranscendence: () => {
@@ -167,5 +169,7 @@ export const createPrestigeSlice: StateCreator<
       },
       lastTickAt: Date.now(),
     }));
+    // Full upgrade wipe removes slot-granting upgrades too; recompute capacity.
+    get().syncGardenCapacity();
   },
 });

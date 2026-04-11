@@ -12,7 +12,7 @@
 - Elder evolution requires Nectar cost (from prestige currency)
 - Integration with Zustand store action in bloomlingSlice
 **Input**: docs/economy/02-upgrade-costs.md (evolution costs), docs/design/02-bloomling-mechanics.md
-**Status**: NOT STARTED
+**Status**: DONE — `src/engine/evolution.ts` implements `canEvolve`, `getEvolutionCost`, `evolveBloomling`, `getNextEvolutionStage`. Sprout→Bloom and Bloom→Elder cost tables sourced from economy doc. `bloomlingSlice.evolveBloomling` wires the engine to state.
 
 ## Task 2: Garden Management (`src/engine/garden.ts`)
 **Objective**: Manage the active Bloomling roster with slot limits.
@@ -25,7 +25,7 @@
 - Slot sources: base (1) + zone unlocks + Nectar upgrades + Essence upgrades + Dewdrop perk
 - Integration with Zustand store
 **Input**: docs/design/02-bloomling-mechanics.md (Garden slots table)
-**Status**: NOT STARTED
+**Status**: DONE — `src/engine/garden.ts` exposes `getMaxGardenSlots`, `computeGardenSlotBreakdown`, `canAddToGarden`/`validateAddToGarden`, `placeBloomlingInSlot`, `removeBloomlingFromGarden`, `applyCapacityChange`, `getGardenBloomlings`. Slot sources: base 1 + zone unlocks at 5/15/30 + upgrade levels (`idle_garden_slots`, `nectar_garden_expansion`, `essence_eternal_garden`) + `dewdrop_bonus_slot` perk, hard-capped at 9. `bloomlingSlice` delegates all garden mutations to the engine and exposes `syncGardenCapacity()`, which is auto-called from `advanceZone`, `buyUpgrade`/`setUpgradeLevel` (for slot upgrades), `executeRebirth`, and `executeTranscendence`.
 
 ## Task 3: Synergy System (`src/engine/synergies.ts`)
 **Objective**: Calculate and track synergy bonuses between Garden Bloomlings.

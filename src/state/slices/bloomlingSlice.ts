@@ -9,6 +9,11 @@ import {
   getEvolutionCost,
   evolveBloomling as evolveBloomlingPure,
 } from "~/engine/evolution";
+import {
+  applyCapacityChange,
+  placeBloomlingInSlot,
+  removeBloomlingFromGarden,
+} from "~/engine/garden";
 
 export interface BloomlingSlice {
   bloomlings: Record<string, Bloomling>;
@@ -25,6 +30,12 @@ export interface BloomlingSlice {
   evolveBloomling: (instanceId: string) => void;
   addToGarden: (instanceId: string, slotIndex: number) => void;
   removeFromGarden: (instanceId: string) => void;
+  /**
+   * Recompute the garden's max slots from progression, upgrades, and perks,
+   * and resize the slot array accordingly. Call this after any change to
+   * zoneProgress, upgrades, or perks that could alter capacity.
+   */
+  syncGardenCapacity: () => void;
 }
 
 export const initialBloomlings: Record<string, Bloomling> = {};
@@ -118,62 +129,41 @@ export const createBloomlingSlice: StateCreator<
 
   addToGarden: (instanceId: string, slotIndex: number) =>
     set((state) => {
-      const bloomling = state.bloomlings[instanceId];
-      if (!bloomling || slotIndex < 0 || slotIndex >= state.garden.maxSlots) {
-        return state;
-      }
-      // If the slot is already occupied, remove the existing Bloomling first
-      const existingId = state.garden.slots[slotIndex];
-      const updatedBloomlings = { ...state.bloomlings };
-
-      if (existingId && updatedBloomlings[existingId]) {
-        updatedBloomlings[existingId] = {
-          ...updatedBloomlings[existingId],
-          inGarden: false,
-          gardenSlot: null,
-        };
-      }
-
-      // If this Bloomling is already in another slot, clear the old slot
-      const newSlots = [...state.garden.slots];
-      const oldSlot = newSlots.indexOf(instanceId);
-      if (oldSlot !== -1) {
-        newSlots[oldSlot] = null;
-      }
-
-      // Place the Bloomling in the new slot
-      newSlots[slotIndex] = instanceId;
-      updatedBloomlings[instanceId] = {
-        ...bloomling,
-        inGarden: true,
-        gardenSlot: slotIndex,
-      };
-
+      const result = placeBloomlingInSlot(state, instanceId, slotIndex);
+      if (result === null) return state;
       return {
-        bloomlings: updatedBloomlings,
-        garden: { ...state.garden, slots: newSlots },
+        bloomlings: result.bloomlings,
+        garden: result.garden,
       };
     }),
 
   removeFromGarden: (instanceId: string) =>
     set((state) => {
-      const bloomling = state.bloomlings[instanceId];
-      if (!bloomling || !bloomling.inGarden) {
+      const result = removeBloomlingFromGarden(state, instanceId);
+      if (result === null) return state;
+      return {
+        bloomlings: result.bloomlings,
+        garden: result.garden,
+      };
+    }),
+
+  syncGardenCapacity: () =>
+    set((state) => {
+      const result = applyCapacityChange(state);
+      if (
+        result.maxSlots === state.garden.maxSlots &&
+        result.slots === state.garden.slots &&
+        result.bloomlings === state.bloomlings
+      ) {
         return state;
       }
-      const newSlots = state.garden.slots.map((slotId) =>
-        slotId === instanceId ? null : slotId
-      );
       return {
-        bloomlings: {
-          ...state.bloomlings,
-          [instanceId]: {
-            ...bloomling,
-            inGarden: false,
-            gardenSlot: null,
-          },
+        bloomlings: result.bloomlings,
+        garden: {
+          ...state.garden,
+          maxSlots: result.maxSlots,
+          slots: result.slots,
         },
-        garden: { ...state.garden, slots: newSlots },
       };
     }),
 });

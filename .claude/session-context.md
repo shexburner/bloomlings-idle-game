@@ -3,7 +3,7 @@
 > This file is a living document. It is updated after every significant conversation to preserve context across sessions.
 
 ## Last Updated
-2026-04-09
+2026-04-11
 
 ## Project Overview
 
@@ -112,3 +112,12 @@ Located in `docs/design/`, split into 6 sections:
 - **UI/UX Developer Tasks 1-4 COMPLETE**: 4-tab dark theme navigation, Garden screen (CurrencyBar, TapArea, TapFeedback, ComboMeter, ZoneProgress, BloomlingDisplay), Shop screen (UpgradeCard, BuyMultiplierToggle), Collection (3-col grid, BloomlingDetail modal, ZoneInfo panel), BloomlingTemplates data file
 - Phase 3 Content & UI: COMPLETE
 - Ready for Phase 4: Progression Systems
+
+### Session 3 — 2026-04-11
+- PM persona continued Phase 4 progression work.
+- Confirmed **Phase 4 Task 1 (Evolution System)** was already delivered in commit `5990b23`: `src/engine/evolution.ts` provides `canEvolve`, `getEvolutionCost`, `evolveBloomling`, `getNextEvolutionStage`, with Sprout→Bloom and Bloom→Elder cost tables from the economy doc. `bloomlingSlice.evolveBloomling` wires the engine to state.
+- **Phase 4 Task 2 (Garden Management) COMPLETE.** New `src/engine/garden.ts` exposes pure functions: `getMaxGardenSlots`, `computeGardenSlotBreakdown`, `canAddToGarden`/`validateAddToGarden`, `placeBloomlingInSlot`, `removeBloomlingFromGarden`, `applyCapacityChange`, `getGardenBloomlings`, plus constants (`BASE_GARDEN_SLOTS=1`, zone thresholds `[5, 15, 30]`, `GARDEN_SLOT_HARD_CAP=9`, upgrade IDs, Dewdrop perk ID). `bloomlingSlice` now delegates all garden mutations to the engine and exposes `syncGardenCapacity()`, wired into `advanceZone`, `buyUpgrade`/`setUpgradeLevel` (slot upgrades only), `executeRebirth`, and `executeTranscendence`. The old dangling `idle_garden_slots` Sunlight upgrade now actually increases capacity. `tsc -p` clean, `expo lint` 0 errors.
+- **Root README.md rewritten** earlier in this session: replaced the stock `create-expo-app` boilerplate with a Bloomlings overview, tech stack, getting-started commands, project-structure tree, and a Documentation section documenting the compact-docs workflow (`npm run docs:compact` → `python3 docs/build_compact_docs.py`). Links to `docs/compact/README.md` for the full source → compact file map.
+- **Next up: Phase 4 Task 3 (Synergy System)** — `src/engine/synergies.ts`. Tag matching with tiered bonuses (2→1.15, 3→1.35, 4+→1.60), named pair synergies from content docs, first-discovery tracking.
+- Phase 4 Task 4 (Rebirth) should extract the existing inline reset logic from `prestigeSlice.ts` into `src/engine/rebirth.ts` following the same pattern as evolution/garden.
+- Phase 4 Task 5 (Nectar Shop UI) should add the real `nectar_garden_expansion` upgrade template so the Nectar upgrade path replaces the Phase 3 `idle_garden_slots` placeholder.

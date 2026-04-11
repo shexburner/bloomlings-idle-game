@@ -151,7 +151,7 @@ const initialUnlockedFeatures: MetaSlice["unlockedFeatures"] = {
 // -----------------------------------------------------------------------------
 
 export const useGameStore = create<GameStore>()((...args) => {
-  const [set] = args;
+  const [set, get] = args;
   return {
     // Spread all slice creators
     ...createResourceSlice(...args),
@@ -188,7 +188,7 @@ export const useGameStore = create<GameStore>()((...args) => {
         },
       })),
 
-    advanceZone: () =>
+    advanceZone: () => {
       set((state) => {
         const nextZone = state.zoneProgress.currentZone + 1;
         return {
@@ -221,7 +221,10 @@ export const useGameStore = create<GameStore>()((...args) => {
             totalZonesCleared: state.stats.totalZonesCleared + 1,
           },
         };
-      }),
+      });
+      // Crossing a zone threshold may unlock a new garden slot.
+      get().syncGardenCapacity();
+    },
 
     setActiveBoosts: (boosts: ActiveBoost[]) =>
       set({ activeBoosts: boosts }),

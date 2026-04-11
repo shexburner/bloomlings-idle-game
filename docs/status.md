@@ -6,6 +6,7 @@
 **Phase 1: Foundation** — COMPLETE
 **Phase 2: Core Engine** — COMPLETE
 **Phase 3: Content & UI** — COMPLETE
+**Phase 4: Progression Systems** — IN PROGRESS (2 / 5 engine tasks done)
 
 ## Completed Work
 
@@ -32,19 +33,22 @@
 3. Shop screen: ShopScreen (tab-based), UpgradeCard (affordability states), BuyMultiplierToggle (x1/x10/x25/x100/Max)
 4. Collection: CollectionGrid (3-column FlatList), BloomlingCard (rarity borders), BloomlingDetail (modal with lore/stats/evolution/synergy), ZoneInfo (expandable panel), BloomlingTemplates data file (8 Bloomlings)
 
-## What's Next: Phase 4 (Progression Systems)
+### Phase 4: Progression Systems (IN PROGRESS)
 
-### Engine Developer tasks:
-1. Evolution system — Level-to-100 triggers, stage transitions, stat multipliers
-2. Garden management — Add/remove Bloomlings, slot limits, validation
-3. Synergy system — Tag matching, bonus calculation, discovery tracking
-4. Rebirth (Prestige 1) — Nectar calculation, state reset, permanent upgrades
-5. Nectar shop UI — Prestige upgrade purchasing screen
+**Engine Developer:**
+1. **Evolution system** — DONE. `src/engine/evolution.ts` — `canEvolve`, `getEvolutionCost`, `evolveBloomling`, `getNextEvolutionStage`. Sprout→Bloom and Bloom→Elder cost tables (Sunlight + Nectar) sourced from `docs/economy/02-upgrade-costs.md`. `bloomlingSlice.evolveBloomling` wires the engine to the store, deducts costs, and applies the transformation.
+2. **Garden management** — DONE. `src/engine/garden.ts` — `getMaxGardenSlots`, `computeGardenSlotBreakdown`, `canAddToGarden`/`validateAddToGarden`, `placeBloomlingInSlot`, `removeBloomlingFromGarden`, `applyCapacityChange`, `getGardenBloomlings`. Slot sources: base 1 + zone unlocks at 5/15/30 + upgrade levels (`idle_garden_slots`, `nectar_garden_expansion`, `essence_eternal_garden`) + `dewdrop_bonus_slot` perk, hard-capped at 9. `bloomlingSlice` delegates all garden mutations to the engine and exposes `syncGardenCapacity()`, which is auto-called from `advanceZone`, `buyUpgrade`/`setUpgradeLevel` (for slot upgrades), `executeRebirth`, and `executeTranscendence` so capacity stays in sync with progression, purchases, and prestige resets.
 
-### Dependencies:
-- All engine work can reference existing economy docs for exact formulas
-- Bloomling templates data file exists for content integration
-- Synergy pairs defined in content docs
+## What's Next: Phase 4 remaining engine tasks
+
+3. **Synergy system** (`src/engine/synergies.ts`) — Tag matching, tiered bonus calculation (2/3/4+), named pair synergies, first-discovery tracking for Dewdrop rewards. Inputs: `docs/design/02-bloomling-mechanics.md`, `docs/content/01-biome1-bloomlings.md`, `docs/content/02-biome2-bloomlings.md`.
+4. **Rebirth system** (`src/engine/rebirth.ts`) — Pull existing reset logic out of `prestigeSlice.executeRebirth` into a pure engine module. Add `calculateNectarEarned`, `getRebirthPreview`, `canRebirth`. Respect Bloom/Elder Retention and Seasonal Memory Nectar upgrades once the Nectar shop ships. Input: `docs/economy/04-prestige-math.md`, `docs/design/04-prestige-systems.md`.
+5. **Nectar shop + Rebirth UI** (`src/components/prestige/`) — `RebirthScreen`, `NectarShop`, `NectarUpgradeCard`. Wire feature-gating at Zone 40. Adds the real `nectar_garden_expansion` upgrade template (engine already reads it).
+
+### Dependencies / Notes for next session
+- The `idle_garden_slots` Sunlight upgrade from Phase 3 is a placeholder that will likely be retired once the Nectar shop ships with `nectar_garden_expansion`. Until then, both contribute to capacity; either can be deprecated in Task 5 without changing engine code.
+- `src/state/slices/prestigeSlice.ts` still contains the rebirth/transcendence reset logic inline. Task 4 should extract it into `src/engine/rebirth.ts` as pure transformers and leave the slice as a thin wrapper — same pattern the evolution and garden tasks followed.
+- Synergy system should be wired into `selectors.totalSunlightPerSecond` once built so garden production picks up the bonus automatically.
 
 ## Blockers
 None.

@@ -10,9 +10,9 @@
 - Completed Work
   - Phase 1-2 (Foundation + Engine)
   - Phase 3: Content & UI (ALL DONE)
-- What's Next: Phase 4 (Progression Systems)
-  - Engine Developer tasks:
-  - Dependencies:
+  - Phase 4: Progression Systems (IN PROGRESS)
+- What's Next: Phase 4 remaining engine tasks
+  - Dependencies / Notes for next session
 - Blockers
 
 ## Key Points
@@ -34,19 +34,19 @@
 - `docs/content/03-upgrades-flavor.md` — 31 upgrades with flavor text (6 tap, 6 idle, 10 Nectar, 9 Essence)
 - `docs/content/04-achievements.md` — 36 achievements (8 Growth, 9 Power, 7 Journey, 6 Rebirth, 6 Hidden)
 
-### What's Next: Phase 4 (Progression Systems)
-- (No concise bullet/summary found; use grep in source file for details.)
+### Phase 4: Progression Systems (IN PROGRESS)
+- **Evolution system** — DONE. `src/engine/evolution.ts` — `canEvolve`, `getEvolutionCost`, `evolveBloomling`, `getNextEvolutionStage`. Sprout→Bloom and Bloom→Elder cost tables (Sunlight + Nectar) sourced from `docs/economy/02-upgrade-costs.md`. `bloomlingSlice.evolveBloomling` wires the engine to the store, deducts costs, and applies the transformation.
+- **Garden management** — DONE. `src/engine/garden.ts` — `getMaxGardenSlots`, `computeGardenSlotBreakdown`, `canAddToGarden`/`validateAddToGarden`, `placeBloomlingInSlot`, `removeBloomlingFromGarden`, `applyCapacityChange`, `getGardenBloomlings`. Slot sources: base 1 + zone unlocks at 5/15/30 + upgrade levels (`idle_garden_slots`, `nectar_garden_expansion`, `essence_eternal_garden`) + `dewdrop_bonus_slot` perk, hard-capped at 9. `bloomlingSlice` delegates all garden mutations to the engine and exposes `syncGardenCapacity()`, which is auto-called from `advanceZone`, `buyUpgrade`/`setUpgradeLevel` (for slot upgrades), `executeRebirth`, and `executeTranscendence` so capacity stays in sync with progression, purchases, and prestige resets.
 
-### Engine Developer tasks:
-- Evolution system — Level-to-100 triggers, stage transitions, stat multipliers
-- Garden management — Add/remove Bloomlings, slot limits, validation
-- Synergy system — Tag matching, bonus calculation, discovery tracking
-- Rebirth (Prestige 1) — Nectar calculation, state reset, permanent upgrades
+### What's Next: Phase 4 remaining engine tasks
+- **Synergy system** (`src/engine/synergies.ts`) — Tag matching, tiered bonus calculation (2/3/4+), named pair synergies, first-discovery tracking for Dewdrop rewards. Inputs: `docs/design/02-bloomling-mechanics.md`, `docs/content/01-biome1-bloomlings.md`, `docs/content/02-biome2-bloomlings.md`.
+- **Rebirth system** (`src/engine/rebirth.ts`) — Pull existing reset logic out of `prestigeSlice.executeRebirth` into a pure engine module. Add `calculateNectarEarned`, `getRebirthPreview`, `canRebirth`. Respect Bloom/Elder Retention and Seasonal Memory Nectar upgrades once the Nectar shop ships. Input: `docs/economy/04-prestige-math.md`, `docs/design/04-prestige-systems.md`.
+- **Nectar shop + Rebirth UI** (`src/components/prestige/`) — `RebirthScreen`, `NectarShop`, `NectarUpgradeCard`. Wire feature-gating at Zone 40. Adds the real `nectar_garden_expansion` upgrade template (engine already reads it).
 
-### Dependencies:
-- All engine work can reference existing economy docs for exact formulas
-- Bloomling templates data file exists for content integration
-- Synergy pairs defined in content docs
+### Dependencies / Notes for next session
+- The `idle_garden_slots` Sunlight upgrade from Phase 3 is a placeholder that will likely be retired once the Nectar shop ships with `nectar_garden_expansion`. Until then, both contribute to capacity; either can be deprecated in Task 5 without changing engine code.
+- `src/state/slices/prestigeSlice.ts` still contains the rebirth/transcendence reset logic inline. Task 4 should extract it into `src/engine/rebirth.ts` as pure transformers and leave the slice as a thin wrapper — same pattern the evolution and garden tasks followed.
+- Synergy system should be wired into `selectors.totalSunlightPerSecond` once built so garden production picks up the bonus automatically.
 
 ### Blockers
 - None.
