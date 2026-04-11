@@ -490,8 +490,14 @@ export interface GameStats {
   totalAdsWatched: number;
   /** Total Bloomlings discovered. */
   bloomlingsDiscovered: number;
-  /** Total synergies discovered. */
+  /** Total synergies discovered (length of `discoveredSynergyIds`). */
   synergiesDiscovered: number;
+  /**
+   * All synergy IDs the player has ever activated. Uses the engine's ID
+   * scheme: `tag:<Tag>` for tag synergies, `synergy_<name>` for named pair
+   * synergies. Feeds the Dewdrop "first discovery" reward in Phase 5.
+   */
+  discoveredSynergyIds: string[];
   /** Total achievements completed. */
   achievementsCompleted: number;
   /** Total zones cleared all-time (across all runs). */

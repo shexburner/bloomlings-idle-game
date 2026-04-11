@@ -6,7 +6,14 @@
 // =============================================================================
 
 import { EvolutionStage } from "~/types/game";
+import type { Bloomling, BloomlingTemplate } from "~/types/game";
 import type { GameStore } from "./store";
+import { getBloomlingTemplate } from "~/data/bloomlingTemplates";
+import {
+  calculateActiveSynergies,
+  getSynergyProductionMultiplier,
+  type ActiveSynergies,
+} from "~/engine/synergies";
 
 // -----------------------------------------------------------------------------
 // Constants (from economy docs)
@@ -64,48 +71,94 @@ export function calculateBloomlingProduction(
 // -----------------------------------------------------------------------------
 
 /**
- * Sum of all garden Bloomlings' production (before idle multiplier / synergy).
- * NOTE: This is a simplified version. A full implementation would need
- * BloomlingTemplate data to look up baseProduction. For now we use
- * Bloomling.totalProduced as a fallback hint, but the real implementation
- * requires a template registry. We store the base production on the
- * Bloomling template and look it up from a registry.
- *
- * For the engine to work without a template registry, we accept a
- * lookup function.
+ * Collect the Bloomlings currently placed in the Garden, in slot order,
+ * skipping empty slots and stale references.
  */
-export function totalSunlightPerSecond(
-  state: Pick<GameStore, "bloomlings" | "garden">,
-  getBaseProduction: (templateId: string) => number
-): number {
-  let total = 0;
+function collectGardenBloomlings(
+  state: Pick<GameStore, "bloomlings" | "garden">
+): Bloomling[] {
+  const result: Bloomling[] = [];
   for (const slot of state.garden.slots) {
     if (slot === null) continue;
     const bloomling = state.bloomlings[slot];
-    if (!bloomling) continue;
+    if (bloomling) result.push(bloomling);
+  }
+  return result;
+}
 
+/**
+ * Sum of all Garden Bloomlings' Sunlight/sec, applying synergy multipliers.
+ *
+ * Takes a `getBaseProduction` lookup so the function can be called without
+ * pulling in the template registry (useful for tests). Synergies are also
+ * computed internally using `getTemplate` if provided; when omitted,
+ * synergies are skipped and the result is raw base production only.
+ */
+export function totalSunlightPerSecond(
+  state: Pick<GameStore, "bloomlings" | "garden">,
+  getBaseProduction: (templateId: string) => number,
+  getTemplate?: (templateId: string) => BloomlingTemplate | undefined
+): number {
+  const gardenBloomlings = collectGardenBloomlings(state);
+  if (gardenBloomlings.length === 0) return 0;
+
+  const active: ActiveSynergies | null = getTemplate
+    ? calculateActiveSynergies(gardenBloomlings, getTemplate)
+    : null;
+
+  let total = 0;
+  for (const bloomling of gardenBloomlings) {
     const baseProduction = getBaseProduction(bloomling.templateId);
-    total += calculateBloomlingProduction(
+    const raw = calculateBloomlingProduction(
       baseProduction,
       bloomling.level,
       bloomling.evolutionStage
     );
+    const synergyMult = active
+      ? getSynergyProductionMultiplier(bloomling.instanceId, active)
+      : 1;
+    total += raw * synergyMult;
   }
   return total;
 }
 
 /**
- * Simplified totalSunlightPerSecond that uses a default base-production
- * lookup based on rarity. Useful when template registry is not yet loaded.
- * This approximation uses the Bloomling's templateId convention:
- * we fall back to 1 Sun/sec (Common) if unknown.
+ * Simplified totalSunlightPerSecond that uses a flat base production of 1
+ * for every Bloomling and skips synergies. Kept for legacy callers and
+ * tests; prefer `totalSunlightPerSecondFromRegistry` for anything that runs
+ * in the real game loop.
  */
 export function totalSunlightPerSecondSimple(
   state: Pick<GameStore, "bloomlings" | "garden">
 ): number {
-  // Without a template registry we cannot determine base production.
-  // Use a default of 1 (Common) -- the real game will wire up the registry.
   return totalSunlightPerSecond(state, () => 1);
+}
+
+/**
+ * Production per second using the real Bloomling template registry for
+ * base production and full synergy math. This is the function the game
+ * loop should use.
+ */
+export function totalSunlightPerSecondFromRegistry(
+  state: Pick<GameStore, "bloomlings" | "garden">
+): number {
+  return totalSunlightPerSecond(
+    state,
+    (templateId) => getBloomlingTemplate(templateId)?.baseProduction ?? 1,
+    getBloomlingTemplate
+  );
+}
+
+/**
+ * Compute the full ActiveSynergies result for the current Garden using
+ * the real template registry. Exposed for UI (synergy list panel) and
+ * for discovery tracking in the Bloomling slice.
+ */
+export function selectActiveSynergies(
+  state: Pick<GameStore, "bloomlings" | "garden">
+): ActiveSynergies {
+  const gardenBloomlings = collectGardenBloomlings(state);
+  return calculateActiveSynergies(gardenBloomlings, getBloomlingTemplate);
 }
 
 // -----------------------------------------------------------------------------

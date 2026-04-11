@@ -37,7 +37,7 @@
 - Track first-time synergy discoveries for Dewdrop rewards
 - Synergy data structure referencing content docs
 **Input**: docs/design/02-bloomling-mechanics.md, docs/content/01-biome1-bloomlings.md, docs/content/02-biome2-bloomlings.md
-**Status**: NOT STARTED
+**Status**: DONE — `src/engine/synergies.ts` provides `getTagSynergyMultiplier`, `findActiveTagSynergies`, `findActiveNamedSynergies`, `calculateActiveSynergies`, `getSynergyProductionMultiplier`, `getSynergyTapValueMultiplier`, and `reconcileSynergyDiscovery`. Tag tiers: 2→1.15, 3→1.35, 4+→1.60 (Elder-only per design doc via `TAG_SYNERGIES_REQUIRE_ELDER` flag). `NAMED_SYNERGIES` registry contains all 8 pairs from the content docs (3 Biome 1 + 3 Biome 2 + 2 cross-biome), including Cradle Guard's tap-value bonus. Multipliers stack multiplicatively across tag and named synergies. `totalSunlightPerSecondFromRegistry` (new selector) wires base production from `BLOOMLING_TEMPLATE_MAP` and applies synergy multipliers — the game loop now uses this instead of the placeholder `totalSunlightPerSecondSimple`. `bloomlingSlice.recomputeActiveSynergies()` writes `garden.activeSynergyIds` and folds newly activated synergies into `stats.discoveredSynergyIds` / `stats.synergiesDiscovered` for Phase 5 Dewdrop rewards, auto-called from `addToGarden`, `removeFromGarden`, `removeBloomling`, `evolveBloomling`, and `syncGardenCapacity`.
 
 ## Task 4: Rebirth System (`src/engine/rebirth.ts`)
 **Objective**: Implement Prestige Layer 1 — Rebirth for Nectar.

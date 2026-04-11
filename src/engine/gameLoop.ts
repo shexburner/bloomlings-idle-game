@@ -10,7 +10,7 @@ import { useEffect, useRef, useCallback } from "react";
 import { AppState, type AppStateStatus } from "react-native";
 import { useGameStore } from "~/state/store";
 import {
-  totalSunlightPerSecondSimple,
+  totalSunlightPerSecondFromRegistry,
   getActiveBoosts,
   getBoostMultiplier,
   hasReachedZoneThreshold,
@@ -73,7 +73,7 @@ export function gameTick(
   const deltaSeconds = deltaMs / 1000;
 
   // --- 1. Idle Sunlight production ---
-  const baseIdleRate = totalSunlightPerSecondSimple(state);
+  const baseIdleRate = totalSunlightPerSecondFromRegistry(state);
   const boostMultiplier = getBoostMultiplier(state, now);
   const sunlightEarned = baseIdleRate * deltaSeconds * boostMultiplier;
 
@@ -200,7 +200,7 @@ export function calculateOfflineProgress(
   }
 
   const durationSeconds = durationMs / 1000;
-  const baseIdleRate = totalSunlightPerSecondSimple(state);
+  const baseIdleRate = totalSunlightPerSecondFromRegistry(state);
 
   // Boosts may have expired during offline time — we don't apply them to
   // offline progress for simplicity (and because the exact expiry times

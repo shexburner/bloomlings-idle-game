@@ -116,6 +116,7 @@ const initialStats: GameStats = {
   totalAdsWatched: 0,
   bloomlingsDiscovered: 0,
   synergiesDiscovered: 0,
+  discoveredSynergyIds: [],
   achievementsCompleted: 0,
   totalZonesCleared: 0,
   totalGatesCleared: 0,

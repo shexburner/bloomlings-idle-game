@@ -14,6 +14,11 @@ import {
   placeBloomlingInSlot,
   removeBloomlingFromGarden,
 } from "~/engine/garden";
+import {
+  calculateActiveSynergies,
+  reconcileSynergyDiscovery,
+} from "~/engine/synergies";
+import { getBloomlingTemplate } from "~/data/bloomlingTemplates";
 
 export interface BloomlingSlice {
   bloomlings: Record<string, Bloomling>;
@@ -36,6 +41,14 @@ export interface BloomlingSlice {
    * zoneProgress, upgrades, or perks that could alter capacity.
    */
   syncGardenCapacity: () => void;
+  /**
+   * Recompute which synergies are active from the current Garden roster and
+   * write them to `garden.activeSynergyIds`. Also folds any newly activated
+   * synergies into `stats.discoveredSynergyIds` so Phase 5 can fire Dewdrop
+   * rewards on first discovery. Safe to call repeatedly — no-op if nothing
+   * changed.
+   */
+  recomputeActiveSynergies: () => void;
 }
 
 export const initialBloomlings: Record<string, Bloomling> = {};
@@ -52,7 +65,7 @@ export const createBloomlingSlice: StateCreator<
   [],
   [],
   BloomlingSlice
-> = (set) => ({
+> = (set, get) => ({
   bloomlings: initialBloomlings,
   garden: initialGarden,
 
@@ -64,7 +77,7 @@ export const createBloomlingSlice: StateCreator<
       },
     })),
 
-  removeBloomling: (instanceId: string) =>
+  removeBloomling: (instanceId: string) => {
     set((state) => {
       const { [instanceId]: _removed, ...remaining } = state.bloomlings;
       // Also remove from garden if placed
@@ -75,7 +88,9 @@ export const createBloomlingSlice: StateCreator<
         bloomlings: remaining,
         garden: { ...state.garden, slots: newSlots },
       };
-    }),
+    });
+    get().recomputeActiveSynergies();
+  },
 
   levelUpBloomling: (instanceId: string) =>
     set((state) => {
@@ -94,7 +109,7 @@ export const createBloomlingSlice: StateCreator<
       };
     }),
 
-  evolveBloomling: (instanceId: string) =>
+  evolveBloomling: (instanceId: string) => {
     set((state) => {
       const bloomling = state.bloomlings[instanceId];
       if (!bloomling) {
@@ -125,9 +140,12 @@ export const createBloomlingSlice: StateCreator<
           nectar: newNectar,
         },
       };
-    }),
+    });
+    // Reaching Elder stage can unlock new tag synergies.
+    get().recomputeActiveSynergies();
+  },
 
-  addToGarden: (instanceId: string, slotIndex: number) =>
+  addToGarden: (instanceId: string, slotIndex: number) => {
     set((state) => {
       const result = placeBloomlingInSlot(state, instanceId, slotIndex);
       if (result === null) return state;
@@ -135,9 +153,11 @@ export const createBloomlingSlice: StateCreator<
         bloomlings: result.bloomlings,
         garden: result.garden,
       };
-    }),
+    });
+    get().recomputeActiveSynergies();
+  },
 
-  removeFromGarden: (instanceId: string) =>
+  removeFromGarden: (instanceId: string) => {
     set((state) => {
       const result = removeBloomlingFromGarden(state, instanceId);
       if (result === null) return state;
@@ -145,9 +165,11 @@ export const createBloomlingSlice: StateCreator<
         bloomlings: result.bloomlings,
         garden: result.garden,
       };
-    }),
+    });
+    get().recomputeActiveSynergies();
+  },
 
-  syncGardenCapacity: () =>
+  syncGardenCapacity: () => {
     set((state) => {
       const result = applyCapacityChange(state);
       if (
@@ -164,6 +186,56 @@ export const createBloomlingSlice: StateCreator<
           maxSlots: result.maxSlots,
           slots: result.slots,
         },
+      };
+    });
+    // Capacity changes can evict Bloomlings, which changes synergies.
+    get().recomputeActiveSynergies();
+  },
+
+  recomputeActiveSynergies: () =>
+    set((state) => {
+      // Collect the Bloomlings currently in the Garden.
+      const gardenBloomlings: Bloomling[] = [];
+      for (const slotId of state.garden.slots) {
+        if (slotId === null) continue;
+        const b = state.bloomlings[slotId];
+        if (b) gardenBloomlings.push(b);
+      }
+
+      const active = calculateActiveSynergies(
+        gardenBloomlings,
+        getBloomlingTemplate
+      );
+
+      // Update active IDs if they changed.
+      const prevIds = state.garden.activeSynergyIds;
+      const nextIds = active.activeSynergyIds;
+      const idsChanged =
+        prevIds.length !== nextIds.length ||
+        prevIds.some((id, i) => id !== nextIds[i]);
+
+      // Fold any newly active synergies into the lifetime discovery list.
+      const discovery = reconcileSynergyDiscovery(
+        state.stats.discoveredSynergyIds,
+        nextIds
+      );
+      const discoveryChanged = discovery.newlyDiscovered.length > 0;
+
+      if (!idsChanged && !discoveryChanged) {
+        return state;
+      }
+
+      return {
+        garden: idsChanged
+          ? { ...state.garden, activeSynergyIds: [...nextIds] }
+          : state.garden,
+        stats: discoveryChanged
+          ? {
+              ...state.stats,
+              discoveredSynergyIds: [...discovery.discoveredSynergyIds],
+              synergiesDiscovered: discovery.discoveredSynergyIds.length,
+            }
+          : state.stats,
       };
     }),
 });
