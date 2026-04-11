@@ -1,50 +1,66 @@
-# Welcome to your Expo app 👋
+# Bloomlings
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A React Native / Expo idle game about growing creatures across biomes. Tap, collect, evolve, and rebirth your way through a garden of Bloomlings.
 
-## Get started
+## Tech stack
 
-1. Install dependencies
+- **Expo SDK 54** with Expo Router (file-based routing)
+- **React Native 0.81** / React 19
+- **Zustand** for state (sliced store + selectors)
+- **react-native-mmkv** for saves
+- **react-native-reanimated** for animations
+- **react-native-google-mobile-ads** for monetization
+- **TypeScript** (strict)
 
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Getting started
 
 ```bash
-npm run reset-project
+npm install
+npm start          # Expo dev server
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Platform-specific entry points:
 
-## Learn more
+```bash
+npm run android
+npm run ios
+npm run web
+npm run lint
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+## Project structure
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```
+app/            Expo Router screens (tabs, layouts)
+src/            Engine, state, services, types
+components/     Shared UI components
+constants/      Theme, colors, layout constants
+hooks/          Reusable React hooks
+assets/         Fonts, images
+docs/           Canonical design & engineering docs
+docs/compact/   Auto-generated low-token companions (see below)
+scripts/        Repo utility scripts
+```
 
-## Join the community
+## Documentation
 
-Join our community of developers creating universal apps.
+Design, economy, content, engine, and UI specs live under `docs/`, alongside `docs/roadmap.md` and `docs/status.md`. Every canonical doc has a token-light companion under `docs/compact/`, mirroring the source tree 1:1. The compact files are the default context for agents, PR reviews, and any other low-token workflow.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+### Compact docs workflow
+
+1. **Read `docs/compact/**` first.** Each compact file starts with a `<!-- Source: docs/... -->` header pointing to its canonical source.
+2. **Need more detail?** Jump to the source file named in that header and grep for the section you need.
+3. **Edit canonical docs only** — never hand-edit files in `docs/compact/`. They carry an `<!-- AUTO-GENERATED FILE: DO NOT EDIT DIRECTLY -->` banner for a reason.
+4. **Regenerate after editing** a canonical doc:
+
+   ```bash
+   npm run docs:compact
+   # equivalent to: python3 docs/build_compact_docs.py
+   ```
+
+The generator lives at `docs/build_compact_docs.py`. It walks `docs/content/`, `docs/design/`, `docs/economy/`, `docs/engine/`, `docs/ui/`, plus `docs/roadmap.md` and `docs/status.md`, and writes a compact version of each one into `docs/compact/`. See [`docs/compact/README.md`](docs/compact/README.md) for the full source → compact file map.
+
+## Status
+
+- Current progress: [`docs/status.md`](docs/status.md)
+- Phase breakdown: [`docs/roadmap.md`](docs/roadmap.md)
