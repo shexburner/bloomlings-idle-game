@@ -22,6 +22,7 @@ const MAPPING = {
   'cart.fill': 'shopping-cart',
   'square.grid.2x2.fill': 'grid-on',
   'gearshape.fill': 'settings',
+  'arrow.2.circlepath': 'autorenew',
 } as IconMapping;
 
 /**

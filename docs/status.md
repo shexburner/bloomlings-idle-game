@@ -6,7 +6,7 @@
 **Phase 1: Foundation** — COMPLETE
 **Phase 2: Core Engine** — COMPLETE
 **Phase 3: Content & UI** — COMPLETE
-**Phase 4: Progression Systems** — IN PROGRESS (4 / 5 engine tasks done)
+**Phase 4: Progression Systems** — COMPLETE (5 / 5 tasks done)
 
 ## Completed Work
 
@@ -42,13 +42,15 @@
 
 4. **Rebirth system** — DONE. `src/engine/rebirth.ts` — pure engine: `calculateNectarEarned` (tuned constants: threshold=32, exponent=3.1 from economy doc, with Nectar Roots bonus multiplier), `canRebirth` (zone 40+ and ≥1 Nectar), `getRebirthPreview` (Nectar earned, percentage increase, recommended flag, push-further projections), `getRetainedEvolutionStage` (Bloom/Elder Retention Nectar upgrades), `getStartingZone` (Seasonal Memory: Lv.1→Zone 5, Lv.2→10, Lv.3→15, Lv.4→20), `getStartingComboCount` (Combo Memory: start at 10), `resetBloomlingsForRebirth` (level→1, stage respects retention, clears garden placement), `filterUpgradesForRebirth` (keeps Nectar + Essence upgrades, discards Tap + Idle). `NECTAR_UPGRADE_IDS` (10 IDs) and `ESSENCE_UPGRADE_IDS` (9 IDs) exported as constants for category filtering. `prestigeSlice.executeRebirth` refactored to thin wrapper calling all engine functions. Fixed bugs: old code zeroed Essence on Rebirth and wiped all upgrades (including Nectar/Essence). `selectors.ts` Nectar formula updated to use tuned constants from engine (was using design-doc defaults: threshold=40, exponent=2.2). `stats.discoveredSynergyIds` confirmed NOT reset on Rebirth — lifetime meta-progression.
 
-## What's Next: Phase 4 remaining engine tasks
+5. **Nectar shop + Rebirth UI** — DONE. `src/components/prestige/RebirthScreen.tsx` — main prestige screen with two tabs: Rebirth (preview + action) and Nectar Shop. `RebirthPanel` shows season number, current run highest zone, Nectar preview (earned, percentage increase, recommended badge), push-further projections (+5/10/15/20 zones), two-step confirmation, and reset/keep info panel. `NectarShop` defines all 10 Nectar upgrade templates (`enriched_soil`, `stronger_roots`, `rapid_growth`, `seasonal_memory`, `nectar_roots`, `nectar_garden_expansion`, `combo_memory`, `deep_roots`, `bloom_retention`, `elder_retention`) with costs approximating the design doc sequences via `baseCost * costScaling^level`. `NectarUpgradeCard` adapts the Sunlight `UpgradeCard` pattern for Nectar currency (purple theme, ✧ icon, `spendNectar` instead of `spendSunlight`, bulk buy with `BuyMultiplierToggle`). Feature-gated: `allTimeHighestZone >= 40` unlocks the full screen; below that, a locked state shows progress toward Zone 40. New Rebirth tab added to `app/(tabs)/_layout.tsx` with `arrow.2.circlepath` / `autorenew` icon. Route: `app/(tabs)/rebirth.tsx`.
 
-5. **Nectar shop + Rebirth UI** (`src/components/prestige/`) — `RebirthScreen`, `NectarShop`, `NectarUpgradeCard`. Wire feature-gating at Zone 40. Adds the real `nectar_garden_expansion` upgrade template (engine already reads it).
+## What's Next: Phase 5 — Monetization
+
+See `docs/roadmap.md` Phase 5 for the full task list: AdMob integration, 7 ad touchpoints, Dewdrop shop, offline progress.
 
 ### Dependencies / Notes for next session
-- The `idle_garden_slots` Sunlight upgrade from Phase 3 is a placeholder that will likely be retired once the Nectar shop ships with `nectar_garden_expansion`. Until then, both contribute to capacity; either can be deprecated in Task 5 without changing engine code.
-- `executeTranscendence` in `prestigeSlice.ts` still has inline logic — same refactoring pattern should be applied when Transcendence engine work begins (not Task 5 scope).
+- The `idle_garden_slots` Sunlight upgrade from Phase 3 is a placeholder that may be retired now that the Nectar shop ships with `nectar_garden_expansion`. Both contribute to garden capacity via the engine; either can be deprecated without changing engine code.
+- `executeTranscendence` in `prestigeSlice.ts` still has inline logic — same refactoring pattern should be applied when Transcendence engine work begins (Phase 7).
 - Tag synergies are Elder-gated, so you won't see any tag synergies in the current UI until a Bloomling hits Elder stage (Bloom Lv.100 + Nectar cost). Named pair synergies activate at any stage — **Undergrowth Alliance** (Fernley + Mosswick) is the earliest, achievable once the player has both Bloomlings placed in the Garden. Consider unlocking a visible synergy panel in the Garden UI so players see the bonus firing even without Elders.
 - `TAG_SYNERGIES_REQUIRE_ELDER` flag in `synergies.ts` can be flipped to `false` for early playtests to make tag synergies work at any stage. Revert before shipping.
 - The `synergies: Record<string, Synergy>` field on `GameState` is still a stale placeholder (initialized to `{}` at store init and never written). The engine now uses `stats.discoveredSynergyIds` instead; that field can be removed when we do a cleanup pass, or repurposed for persisted per-synergy metadata if needed.

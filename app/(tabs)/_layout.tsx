@@ -1,5 +1,5 @@
 // =============================================================================
-// Tab Layout — 4-tab navigation with dark forest theme
+// Tab Layout — 5-tab navigation with dark forest theme
 // =============================================================================
 
 import { Tabs } from "expo-router";
@@ -53,6 +53,15 @@ export default function TabLayout() {
           title: "Collection",
           tabBarIcon: ({ color }) => (
             <IconSymbol size={26} name="square.grid.2x2.fill" color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="rebirth"
+        options={{
+          title: "Rebirth",
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={26} name="arrow.2.circlepath" color={color} />
           ),
         }}
       />
