@@ -4,11 +4,24 @@
 import type { StateCreator } from "zustand";
 import type { PrestigeState } from "~/types/game";
 import { EvolutionStage } from "~/types/game";
-import { calculateNectarOnRebirth, calculateEssenceOnTranscendence } from "../selectors";
+import { calculateEssenceOnTranscendence } from "../selectors";
 import { initialResources } from "./resourceSlice";
 import { initialCombo } from "./comboSlice";
 import { initialUpgrades } from "./upgradeSlice";
 import type { GameStore } from "../store";
+import {
+  calculateNectarEarned,
+  resetBloomlingsForRebirth,
+  filterUpgradesForRebirth,
+  getStartingZone,
+  getStartingComboCount,
+  getUpgradeLevel,
+  BLOOM_RETENTION_ID,
+  ELDER_RETENTION_ID,
+  SEASONAL_MEMORY_ID,
+  COMBO_MEMORY_ID,
+  NECTAR_ROOTS_ID,
+} from "~/engine/rebirth";
 
 export interface PrestigeSlice {
   prestige: PrestigeState;
@@ -41,28 +54,33 @@ export const createPrestigeSlice: StateCreator<
 
   executeRebirth: () => {
     const state = get();
-    const nectarEarned = calculateNectarOnRebirth(state);
+
+    // Read Nectar upgrade levels that affect the reset.
+    const nectarRootsLevel = getUpgradeLevel(state.upgrades, NECTAR_ROOTS_ID);
+    const bloomRetLevel = getUpgradeLevel(state.upgrades, BLOOM_RETENTION_ID);
+    const elderRetLevel = getUpgradeLevel(state.upgrades, ELDER_RETENTION_ID);
+    const seasonalLevel = getUpgradeLevel(state.upgrades, SEASONAL_MEMORY_ID);
+    const comboMemLevel = getUpgradeLevel(state.upgrades, COMBO_MEMORY_ID);
+
+    const highestZone = state.prestige.currentRunHighestZone;
+    const nectarEarned = calculateNectarEarned(highestZone, nectarRootsLevel);
+    const startingZone = getStartingZone(seasonalLevel);
+    const startingCombo = getStartingComboCount(comboMemLevel);
 
     set(() => ({
       resources: {
         ...initialResources,
         nectar: state.resources.nectar + nectarEarned,
         dewdrops: state.resources.dewdrops,
+        essence: state.resources.essence,
         // totalSunlightEarned persists (it's an all-time stat)
         totalSunlightEarned: state.resources.totalSunlightEarned,
       },
-      // Reset all bloomling levels to 1 and evolution to Sprout
-      bloomlings: Object.fromEntries(
-        Object.entries(state.bloomlings).map(([id, b]) => [
-          id,
-          {
-            ...b,
-            level: 1,
-            evolutionStage: EvolutionStage.Sprout,
-            inGarden: false,
-            gardenSlot: null,
-          },
-        ])
+      // Reset Bloomling levels/evolution, respecting retention upgrades.
+      bloomlings: resetBloomlingsForRebirth(
+        state.bloomlings,
+        bloomRetLevel,
+        elderRetLevel,
       ),
       garden: {
         ...state.garden,
@@ -70,11 +88,11 @@ export const createPrestigeSlice: StateCreator<
         activeSynergyIds: [],
         specialMeterProgress: 0,
       },
-      // Reset tap and idle upgrades, keep Nectar/Essence upgrades
-      upgrades: initialUpgrades,
-      // Reset zone progress
+      // Keep Nectar + Essence upgrades; discard Tap + Idle.
+      upgrades: filterUpgradesForRebirth(state.upgrades),
+      // Reset zone progress (Seasonal Memory may set a higher starting zone).
       zoneProgress: {
-        currentZone: 1,
+        currentZone: startingZone,
         currentZoneProgress: 0,
         gateActive: false,
         gateTimerRemainingMs: null,
@@ -85,8 +103,11 @@ export const createPrestigeSlice: StateCreator<
         bossTimerRemainingMs: null,
         bossFailCount: 0,
       },
-      // Reset combo
-      combo: initialCombo,
+      // Reset combo (Combo Memory may set a starting count).
+      combo: {
+        ...initialCombo,
+        count: startingCombo,
+      },
       // Clear active boosts
       activeBoosts: [],
       prestige: {
@@ -94,15 +115,15 @@ export const createPrestigeSlice: StateCreator<
         rebirthCount: state.prestige.rebirthCount + 1,
         currentSeason: state.prestige.currentSeason + 1,
         totalNectarEarned: state.prestige.totalNectarEarned + nectarEarned,
-        currentRunHighestZone: 1,
+        currentRunHighestZone: startingZone,
         allTimeHighestZone: Math.max(
           state.prestige.allTimeHighestZone,
-          state.prestige.currentRunHighestZone
+          state.prestige.currentRunHighestZone,
         ),
       },
       lastTickAt: Date.now(),
     }));
-    // Zone reset to 1 removes zone-based slot unlocks; Nectar upgrades persist.
+    // Zone/upgrade changes affect garden capacity; Nectar upgrades persist.
     get().syncGardenCapacity();
   },
 

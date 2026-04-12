@@ -50,7 +50,7 @@
 - Seasonal Memory upgrade affects starting zone post-Rebirth
 - Increment rebirth count, update highest zone record
 **Input**: docs/economy/04-prestige-math.md, docs/design/04-prestige-systems.md
-**Status**: NOT STARTED
+**Status**: DONE — `src/engine/rebirth.ts` provides `calculateNectarEarned` (tuned constants: threshold=32, exponent=3.1, with Nectar Roots bonus), `canRebirth`, `getRebirthPreview` (projections for push-further hints), `getRetainedEvolutionStage` (Bloom/Elder Retention), `getStartingZone` (Seasonal Memory), `getStartingComboCount` (Combo Memory), `resetBloomlingsForRebirth` (respects retention), `filterUpgradesForRebirth` (keeps Nectar + Essence upgrades). `NECTAR_UPGRADE_IDS` (10) and `ESSENCE_UPGRADE_IDS` (9) exported as constants. `prestigeSlice.executeRebirth` refactored to thin wrapper. Fixed bugs: Essence was zeroed on Rebirth, all upgrades were wiped instead of keeping Nectar/Essence. `selectors.ts` updated to import tuned Nectar constants from engine.
 
 ## Task 5: Nectar Shop + Rebirth UI (`src/components/prestige/`)
 **Objective**: Build the prestige screen and Nectar upgrade shop.

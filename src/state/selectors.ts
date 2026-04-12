@@ -14,6 +14,12 @@ import {
   getSynergyProductionMultiplier,
   type ActiveSynergies,
 } from "~/engine/synergies";
+import {
+  NECTAR_BASE,
+  NECTAR_THRESHOLD,
+  NECTAR_EXPONENT,
+  REBIRTH_UNLOCK_ZONE,
+} from "~/engine/rebirth";
 
 // -----------------------------------------------------------------------------
 // Constants (from economy docs)
@@ -22,11 +28,6 @@ import {
 /** Zone threshold formula: 50 * 1.12^zoneNumber */
 const ZONE_THRESHOLD_BASE = 50;
 const ZONE_THRESHOLD_SCALING = 1.12;
-
-/** Nectar formula constants (from 04-prestige-systems.md) */
-const NECTAR_BASE = 1;
-const NECTAR_THRESHOLD = 40;
-const NECTAR_EXPONENT = 2.2;
 
 /** Essence formula constants (from 04-prestige-systems.md) */
 const ESSENCE_BASE = 1;
@@ -271,7 +272,7 @@ export function calculateNectarOnRebirth(
   state: Pick<GameStore, "prestige">
 ): number {
   const highestZone = state.prestige.currentRunHighestZone;
-  if (highestZone < NECTAR_THRESHOLD) return 0;
+  if (highestZone < REBIRTH_UNLOCK_ZONE) return 0;
 
   return Math.floor(
     NECTAR_BASE * Math.pow(highestZone / NECTAR_THRESHOLD, NECTAR_EXPONENT)
