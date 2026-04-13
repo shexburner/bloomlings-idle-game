@@ -698,3 +698,19 @@ export interface TranscendencePreview {
   /** Reason(s) the player is not eligible, if any. */
   ineligibleReasons: string[];
 }
+
+/**
+ * Transient summary of the most recent offline session.
+ * Written by the game loop on foreground, read by the Welcome Back modal,
+ * and cleared on dismiss. Not persisted to disk.
+ */
+export interface OfflineSessionSummary {
+  /** Sunlight credited to the player for this offline window. */
+  sunlightEarned: number;
+  /** Duration (ms) actually used in the calc, after the 24h cap. */
+  durationMs: number;
+  /** Whether the raw away time exceeded the 24h cap. */
+  wasCapped: boolean;
+  /** Effective efficiency fraction applied (0.5 base, up to 1.0 with Cosmic Roots). */
+  efficiency: number;
+}

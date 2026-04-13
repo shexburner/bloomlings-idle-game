@@ -16,6 +16,7 @@ import {
   hasReachedZoneThreshold,
 } from "~/state/selectors";
 import type { GameStore } from "~/state/store";
+import { calculateOfflineProgress } from "./offlineProgress";
 
 // -----------------------------------------------------------------------------
 // Constants
@@ -27,11 +28,11 @@ const TICK_INTERVAL_MS = 100;
 /** Combo decay window: reset combo if no tap for 1.5 seconds. */
 const COMBO_DECAY_MS = 1500;
 
-/** Maximum offline time to award progress for (24 hours). */
-const MAX_OFFLINE_MS = 24 * 60 * 60 * 1000;
-
-/** Offline production efficiency (50% of real-time by default). */
-const OFFLINE_EFFICIENCY = 0.5;
+/**
+ * Don't surface the Welcome Back modal for tiny away windows — prevents it
+ * from popping up during brief tab/app switches.
+ */
+const OFFLINE_MODAL_MIN_MS = 30 * 1000;
 
 // -----------------------------------------------------------------------------
 // Pure Tick Function
@@ -169,48 +170,6 @@ export function applyTick(
 }
 
 // -----------------------------------------------------------------------------
-// Offline Progress
-// -----------------------------------------------------------------------------
-
-/** Result of offline progress calculation. */
-export interface OfflineProgressResult {
-  /** Total sunlight earned while offline. */
-  sunlightEarned: number;
-  /** Duration in milliseconds used for the calculation. */
-  durationMs: number;
-  /** Whether the duration was capped. */
-  wasCapped: boolean;
-}
-
-/**
- * Calculate offline progress.
- * Uses the same idle production rate but at reduced efficiency.
- */
-export function calculateOfflineProgress(
-  state: Pick<GameStore, "bloomlings" | "garden" | "activeBoosts">,
-  lastTickAt: number,
-  now: number
-): OfflineProgressResult {
-  const rawDuration = now - lastTickAt;
-  const wasCapped = rawDuration > MAX_OFFLINE_MS;
-  const durationMs = Math.min(rawDuration, MAX_OFFLINE_MS);
-
-  if (durationMs <= 0) {
-    return { sunlightEarned: 0, durationMs: 0, wasCapped: false };
-  }
-
-  const durationSeconds = durationMs / 1000;
-  const baseIdleRate = totalSunlightPerSecondFromRegistry(state);
-
-  // Boosts may have expired during offline time — we don't apply them to
-  // offline progress for simplicity (and because the exact expiry times
-  // make this complex). Only base idle rate applies.
-  const sunlightEarned = baseIdleRate * durationSeconds * OFFLINE_EFFICIENCY;
-
-  return { sunlightEarned, durationMs, wasCapped };
-}
-
-// -----------------------------------------------------------------------------
 // useGameLoop Hook
 // -----------------------------------------------------------------------------
 
@@ -271,6 +230,20 @@ export function useGameLoop(): void {
         if (offlineResult.sunlightEarned > 0) {
           state.addSunlight(offlineResult.sunlightEarned);
           state.addZoneProgress(offlineResult.sunlightEarned);
+        }
+
+        // Surface a welcome-back summary for the UI. Skip for very short
+        // away windows (tab switches, etc.) to keep the modal non-annoying.
+        if (
+          offlineResult.sunlightEarned > 0 &&
+          offlineResult.durationMs >= OFFLINE_MODAL_MIN_MS
+        ) {
+          state.setLastOfflineSession({
+            sunlightEarned: offlineResult.sunlightEarned,
+            durationMs: offlineResult.durationMs,
+            wasCapped: offlineResult.wasCapped,
+            efficiency: offlineResult.efficiency,
+          });
         }
 
         state.setLastActiveAt(now);

@@ -28,6 +28,7 @@ import type {
   Achievement,
   DailyState,
   GameStats,
+  OfflineSessionSummary,
   Perk,
   Synergy,
   ZoneProgressState,
@@ -59,6 +60,11 @@ export interface MetaSlice {
   lastTickAt: number;
   lastActiveAt: number;
   engineRunning: boolean;
+  /**
+   * Transient summary of the last offline session, written by the game loop
+   * on foreground and cleared by the Welcome Back modal. NOT persisted.
+   */
+  lastOfflineSession: OfflineSessionSummary | null;
   unlockedFeatures: {
     tapUpgradeShop: boolean;
     idleUpgradeShop: boolean;
@@ -75,6 +81,8 @@ export interface MetaSlice {
   setLastTickAt: (timestamp: number) => void;
   setEngineRunning: (running: boolean) => void;
   setLastActiveAt: (timestamp: number) => void;
+  setLastOfflineSession: (summary: OfflineSessionSummary | null) => void;
+  clearLastOfflineSession: () => void;
   addZoneProgress: (amount: number) => void;
   advanceZone: () => void;
   setActiveBoosts: (boosts: ActiveBoost[]) => void;
@@ -174,12 +182,15 @@ export const useGameStore = create<GameStore>()((...args) => {
     lastTickAt: Date.now(),
     lastActiveAt: Date.now(),
     engineRunning: false,
+    lastOfflineSession: null,
     unlockedFeatures: initialUnlockedFeatures,
 
     // --- Meta actions ---
     setLastTickAt: (timestamp: number) => set({ lastTickAt: timestamp }),
     setEngineRunning: (running: boolean) => set({ engineRunning: running }),
     setLastActiveAt: (timestamp: number) => set({ lastActiveAt: timestamp }),
+    setLastOfflineSession: (summary) => set({ lastOfflineSession: summary }),
+    clearLastOfflineSession: () => set({ lastOfflineSession: null }),
 
     addZoneProgress: (amount: number) =>
       set((state) => ({
