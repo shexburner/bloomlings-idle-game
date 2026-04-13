@@ -125,6 +125,9 @@ export const createPrestigeSlice: StateCreator<
     }));
     // Zone/upgrade changes affect garden capacity; Nectar upgrades persist.
     get().syncGardenCapacity();
+    // Seasonal Memory can start a rebirth at zone > 1, which may have
+    // unlocked additional species the player's save doesn't yet reflect.
+    get().discoverBloomlingsForZone(startingZone);
   },
 
   executeTranscendence: () => {
@@ -192,5 +195,8 @@ export const createPrestigeSlice: StateCreator<
     }));
     // Full upgrade wipe removes slot-granting upgrades too; recompute capacity.
     get().syncGardenCapacity();
+    // Transcendence resets to zone 1. Re-run discovery so the player is
+    // guaranteed a Fernley auto-placed in the garden for the new run.
+    get().discoverBloomlingsForZone(1);
   },
 });

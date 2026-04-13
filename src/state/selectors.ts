@@ -50,6 +50,37 @@ export function calculateUpgradeCost(
   return baseCost * Math.pow(scalingFactor, level);
 }
 
+/** Bloomling level-up cost scaling factor (matches Tap Power scaling). */
+export const BLOOMLING_LEVEL_UP_SCALING = 1.15;
+
+/** Rapid Growth upgrade grants a 10% cost discount per level. */
+export const RAPID_GROWTH_DISCOUNT_PER_LEVEL = 0.10;
+
+/** Floor for Rapid Growth cost multiplier (Rapid Growth maxLevel 15 would otherwise invert). */
+export const RAPID_GROWTH_DISCOUNT_FLOOR = 0.25;
+
+/**
+ * Sunlight cost to level a Bloomling from `currentLevel` to `currentLevel + 1`.
+ * Uses the standard geometric formula with scaling 1.15, then applies the
+ * Rapid Growth Nectar upgrade discount (capped at 25% of raw cost).
+ */
+export function calculateLevelUpCost(
+  baseLevelCost: number,
+  currentLevel: number,
+  rapidGrowthLevel: number
+): number {
+  const raw = calculateUpgradeCost(
+    baseLevelCost,
+    BLOOMLING_LEVEL_UP_SCALING,
+    currentLevel
+  );
+  const discount = Math.max(
+    RAPID_GROWTH_DISCOUNT_FLOOR,
+    1 - rapidGrowthLevel * RAPID_GROWTH_DISCOUNT_PER_LEVEL
+  );
+  return Math.ceil(raw * discount);
+}
+
 // -----------------------------------------------------------------------------
 // Bloomling Production
 // -----------------------------------------------------------------------------

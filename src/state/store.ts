@@ -225,6 +225,10 @@ export const useGameStore = create<GameStore>()((...args) => {
       });
       // Crossing a zone threshold may unlock a new garden slot.
       get().syncGardenCapacity();
+      // ...and may unlock a new Bloomling species. Run discovery after the
+      // slot array is sized so auto-placement (for the first-ever species)
+      // lands in a valid slot.
+      get().discoverBloomlingsForZone(get().zoneProgress.currentZone);
     },
 
     setActiveBoosts: (boosts: ActiveBoost[]) =>

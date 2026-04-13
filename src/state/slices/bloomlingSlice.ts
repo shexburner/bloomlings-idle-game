@@ -18,6 +18,12 @@ import {
   calculateActiveSynergies,
   reconcileSynergyDiscovery,
 } from "~/engine/synergies";
+import {
+  createBloomlingInstance,
+  getZoneUnlockTemplates,
+} from "~/engine/discovery";
+import { getUpgradeLevel } from "~/engine/rebirth";
+import { calculateLevelUpCost } from "../selectors";
 import { getBloomlingTemplate } from "~/data/bloomlingTemplates";
 
 export interface BloomlingSlice {
@@ -35,6 +41,20 @@ export interface BloomlingSlice {
   evolveBloomling: (instanceId: string) => void;
   addToGarden: (instanceId: string, slotIndex: number) => void;
   removeFromGarden: (instanceId: string) => void;
+  /**
+   * Grant any zone-milestone Bloomlings whose threshold has been met and
+   * that are not already owned. The very first Bloomling ever discovered is
+   * auto-placed into garden slot 0 so idle production starts immediately.
+   * Safe to call repeatedly — idempotent when nothing new qualifies.
+   */
+  discoverBloomlingsForZone: (zone: number) => void;
+  /**
+   * Run `discoverBloomlingsForZone` for the current zone. Call once after
+   * the save is loaded so fresh installs receive Fernley (zone 1) and
+   * returning players retroactively receive everything their save earned
+   * before this feature existed.
+   */
+  ensureInitialDiscoveries: () => void;
   /**
    * Recompute the garden's max slots from progression, upgrades, and perks,
    * and resize the slot array accordingly. Call this after any change to
@@ -98,6 +118,21 @@ export const createBloomlingSlice: StateCreator<
       if (!bloomling || bloomling.level >= 100) {
         return state;
       }
+      const template = getBloomlingTemplate(bloomling.templateId);
+      if (!template) {
+        return state;
+      }
+
+      const rapidGrowthLevel = getUpgradeLevel(state.upgrades, "rapid_growth");
+      const cost = calculateLevelUpCost(
+        template.baseLevelCost,
+        bloomling.level,
+        rapidGrowthLevel
+      );
+      if (state.resources.sunlight < cost) {
+        return state;
+      }
+
       return {
         bloomlings: {
           ...state.bloomlings,
@@ -105,6 +140,10 @@ export const createBloomlingSlice: StateCreator<
             ...bloomling,
             level: bloomling.level + 1,
           },
+        },
+        resources: {
+          ...state.resources,
+          sunlight: state.resources.sunlight - cost,
         },
       };
     }),
@@ -167,6 +206,65 @@ export const createBloomlingSlice: StateCreator<
       };
     });
     get().recomputeActiveSynergies();
+  },
+
+  discoverBloomlingsForZone: (zone: number) => {
+    set((state) => {
+      const newTemplates = getZoneUnlockTemplates(zone, state.bloomlings);
+      if (newTemplates.length === 0) {
+        return state;
+      }
+
+      const wasEmpty = Object.keys(state.bloomlings).length === 0;
+
+      // Merge new instances into the bloomlings record.
+      const newInstances = newTemplates.map(createBloomlingInstance);
+      const mergedBloomlings: Record<string, Bloomling> = {
+        ...state.bloomlings,
+      };
+      for (const instance of newInstances) {
+        mergedBloomlings[instance.instanceId] = instance;
+      }
+
+      // Auto-place the very first Bloomling into slot 0 so idle production
+      // starts immediately on fresh installs. Later discoveries go to the
+      // collection and require manual placement by the player.
+      let nextGarden = state.garden;
+      let finalBloomlings = mergedBloomlings;
+      const firstInstance = wasEmpty ? newInstances[0] : undefined;
+      if (firstInstance) {
+        const result = placeBloomlingInSlot(
+          {
+            bloomlings: mergedBloomlings,
+            garden: state.garden,
+            zoneProgress: state.zoneProgress,
+            upgrades: state.upgrades,
+            perks: state.perks,
+          },
+          firstInstance.instanceId,
+          0
+        );
+        if (result !== null) {
+          finalBloomlings = result.bloomlings;
+          nextGarden = result.garden;
+        }
+      }
+
+      return {
+        bloomlings: finalBloomlings,
+        garden: nextGarden,
+        stats: {
+          ...state.stats,
+          bloomlingsDiscovered: Object.keys(finalBloomlings).length,
+        },
+      };
+    });
+    // Newly-placed Bloomlings may activate synergies.
+    get().recomputeActiveSynergies();
+  },
+
+  ensureInitialDiscoveries: () => {
+    get().discoverBloomlingsForZone(get().zoneProgress.currentZone);
   },
 
   syncGardenCapacity: () => {

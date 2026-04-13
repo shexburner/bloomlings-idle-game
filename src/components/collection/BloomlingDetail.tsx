@@ -10,7 +10,15 @@ import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-nati
 import type { BloomlingTemplate, Bloomling } from "~/types/game";
 import { EvolutionStage, Rarity } from "~/types/game";
 import { useGameStore } from "~/state/store";
-import { calculateBloomlingProduction } from "~/state/selectors";
+import {
+  calculateBloomlingProduction,
+  calculateLevelUpCost,
+} from "~/state/selectors";
+import {
+  canEvolve,
+  getEvolutionCost,
+  getNextEvolutionStage,
+} from "~/engine/evolution";
 import { formatNumber } from "~/utils/formatNumber";
 
 // ---------------------------------------------------------------------------
@@ -28,6 +36,8 @@ const COLORS = {
   accentDark: "#2e7d32",
   danger: "#f44336",
   sunlight: "#ffd700",
+  nectar: "#e91e63",
+  elderPurple: "#9c27b0",
   levelText: "#4fc3f7",
   tagBg: "rgba(45,74,62,0.5)",
 };
@@ -95,6 +105,13 @@ export function BloomlingDetail({
 }: BloomlingDetailProps) {
   const addToGarden = useGameStore((s) => s.addToGarden);
   const removeFromGarden = useGameStore((s) => s.removeFromGarden);
+  const levelUpBloomling = useGameStore((s) => s.levelUpBloomling);
+  const evolveBloomlingAction = useGameStore((s) => s.evolveBloomling);
+  const sunlight = useGameStore((s) => s.resources.sunlight);
+  const nectar = useGameStore((s) => s.resources.nectar);
+  const rapidGrowthLevel = useGameStore(
+    (s) => s.upgrades["rapid_growth"]?.level ?? 0
+  );
   const gardenSlots = useGameStore((s) => s.garden.slots);
   const gardenMaxSlots = useGameStore((s) => s.garden.maxSlots);
 
@@ -108,6 +125,24 @@ export function BloomlingDetail({
     instance.level,
     instance.evolutionStage
   );
+  const nextLevelProduction = calculateBloomlingProduction(
+    template.baseProduction,
+    instance.level + 1,
+    instance.evolutionStage
+  );
+  const productionDelta = nextLevelProduction - production;
+  const levelUpCost = calculateLevelUpCost(
+    template.baseLevelCost,
+    instance.level,
+    rapidGrowthLevel
+  );
+  const isMaxLevel = instance.level >= 100;
+  const canAffordLevelUp = !isMaxLevel && sunlight >= levelUpCost;
+
+  const evolutionCost = getEvolutionCost(instance);
+  const nextStage = getNextEvolutionStage(instance.evolutionStage);
+  const canEvolveNow = canEvolve(instance, { sunlight, nectar });
+  const isAtMaxLevelForEvolution = instance.level >= 100;
 
   const handleGardenToggle = () => {
     if (instance.inGarden) {
@@ -187,6 +222,54 @@ export function BloomlingDetail({
               </View>
             </View>
 
+            {/* Level Up section */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Level Up</Text>
+              <View style={styles.statsGrid}>
+                <StatRow
+                  label="Current"
+                  value={`${formatNumber(production)}/s`}
+                  valueColor={COLORS.sunlight}
+                />
+                <StatRow
+                  label="Next Level"
+                  value={
+                    isMaxLevel
+                      ? "—"
+                      : `${formatNumber(nextLevelProduction)}/s (+${formatNumber(productionDelta)}/s)`
+                  }
+                  valueColor={isMaxLevel ? COLORS.textMuted : COLORS.accent}
+                />
+              </View>
+              {isMaxLevel ? (
+                <View style={styles.levelUpMaxIndicator}>
+                  <Text style={styles.levelUpMaxText}>
+                    MAX LEVEL — Ready to Evolve
+                  </Text>
+                </View>
+              ) : (
+                <Pressable
+                  style={[
+                    styles.actionButton,
+                    canAffordLevelUp
+                      ? styles.actionButtonAffordable
+                      : styles.actionButtonDisabled,
+                  ]}
+                  onPress={() => levelUpBloomling(instance.instanceId)}
+                  disabled={!canAffordLevelUp}
+                >
+                  <Text
+                    style={[
+                      styles.actionButtonText,
+                      !canAffordLevelUp && styles.actionButtonTextDisabled,
+                    ]}
+                  >
+                    {`Level Up  \u2600 ${formatNumber(levelUpCost)}`}
+                  </Text>
+                </Pressable>
+              )}
+            </View>
+
             {/* Ability section */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Ability</Text>
@@ -243,6 +326,96 @@ export function BloomlingDetail({
                   );
                 })}
               </View>
+              {/* Evolve button */}
+              {nextStage === null ? (
+                <Text style={styles.evolveCompleteText}>Fully evolved.</Text>
+              ) : !isAtMaxLevelForEvolution ? (
+                <View>
+                  <Pressable
+                    style={[styles.actionButton, styles.actionButtonDisabled]}
+                    disabled
+                  >
+                    <Text
+                      style={[
+                        styles.actionButtonText,
+                        styles.actionButtonTextDisabled,
+                      ]}
+                    >
+                      {`Level 100 Required (${instance.level}/100)`}
+                    </Text>
+                  </Pressable>
+                  <View style={styles.evolveProgressTrack}>
+                    <View
+                      style={[
+                        styles.evolveProgressFill,
+                        {
+                          width: `${Math.min(100, instance.level)}%`,
+                          backgroundColor: rarityColor,
+                        },
+                      ]}
+                    />
+                  </View>
+                </View>
+              ) : canEvolveNow ? (
+                <Pressable
+                  style={[
+                    styles.actionButton,
+                    {
+                      backgroundColor:
+                        nextStage === EvolutionStage.Elder
+                          ? COLORS.elderPurple
+                          : COLORS.accent,
+                    },
+                  ]}
+                  onPress={() => evolveBloomlingAction(instance.instanceId)}
+                >
+                  <Text style={styles.actionButtonText}>
+                    {`Evolve to ${STAGE_LABELS[nextStage]}  \u2600 ${formatNumber(evolutionCost.sunlight)}`}
+                    {evolutionCost.nectar > 0
+                      ? `  +  ${evolutionCost.nectar} \u2728`
+                      : ""}
+                  </Text>
+                </Pressable>
+              ) : (
+                <Pressable
+                  style={[styles.actionButton, styles.actionButtonDisabled]}
+                  disabled
+                >
+                  <Text
+                    style={[
+                      styles.actionButtonText,
+                      styles.actionButtonTextDisabled,
+                    ]}
+                  >
+                    {`Evolve  \u2600 `}
+                    <Text
+                      style={{
+                        color:
+                          sunlight < evolutionCost.sunlight
+                            ? COLORS.danger
+                            : COLORS.textMuted,
+                      }}
+                    >
+                      {formatNumber(evolutionCost.sunlight)}
+                    </Text>
+                    {evolutionCost.nectar > 0 ? (
+                      <>
+                        <Text style={{ color: COLORS.textMuted }}>{"  +  "}</Text>
+                        <Text
+                          style={{
+                            color:
+                              nectar < evolutionCost.nectar
+                                ? COLORS.danger
+                                : COLORS.nectar,
+                          }}
+                        >
+                          {`${evolutionCost.nectar} \u2728`}
+                        </Text>
+                      </>
+                    ) : null}
+                  </Text>
+                </Pressable>
+              )}
             </View>
 
             {/* Synergy tags */}
@@ -541,5 +714,58 @@ const styles = StyleSheet.create({
   },
   gardenButtonTextDisabled: {
     color: "#6b7b6e",
+  },
+  actionButton: {
+    marginTop: 10,
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  actionButtonAffordable: {
+    backgroundColor: "#4caf50",
+  },
+  actionButtonDisabled: {
+    backgroundColor: "#3a3a4a",
+  },
+  actionButtonText: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#0d1117",
+  },
+  actionButtonTextDisabled: {
+    color: "#6b7b6e",
+  },
+  levelUpMaxIndicator: {
+    marginTop: 10,
+    paddingVertical: 10,
+    borderRadius: 10,
+    alignItems: "center",
+    borderWidth: 1,
+    borderStyle: "dashed",
+    borderColor: "#8a9b8e",
+  },
+  levelUpMaxText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#8a9b8e",
+    textTransform: "uppercase",
+    letterSpacing: 1,
+  },
+  evolveCompleteText: {
+    marginTop: 10,
+    fontSize: 12,
+    color: "#8a9b8e",
+    fontStyle: "italic",
+    textAlign: "center",
+  },
+  evolveProgressTrack: {
+    marginTop: 8,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: "#2d4a3e",
+    overflow: "hidden",
+  },
+  evolveProgressFill: {
+    height: "100%",
   },
 });

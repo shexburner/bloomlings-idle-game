@@ -10,6 +10,7 @@ import "react-native-reanimated";
 
 import { useGameLoop } from "~/engine/gameLoop";
 import { useAutoSave, initializeFromDisk } from "~/services/saveManager";
+import { useGameStore } from "~/state/store";
 
 /** Custom dark theme for Bloomlings with forest-inspired colors. */
 const bloomlingsDarkTheme = {
@@ -30,9 +31,14 @@ export const unstable_settings = {
 };
 
 export default function RootLayout() {
-  // Load saved state on mount
+  // Load saved state on mount, then retroactively grant any Bloomling
+  // species the player's zone progress has earned. Fresh installs get
+  // Fernley auto-placed in garden slot 0 so idle production starts
+  // immediately; returning players pick up species their pre-fix save
+  // never recorded.
   useEffect(() => {
     initializeFromDisk();
+    useGameStore.getState().ensureInitialDiscoveries();
   }, []);
 
   // Start the game loop (ticks ~10/sec, handles offline progress)
