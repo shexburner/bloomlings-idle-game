@@ -7,6 +7,7 @@
 **Phase 2: Core Engine** — COMPLETE
 **Phase 3: Content & UI** — COMPLETE
 **Phase 4: Progression Systems** — COMPLETE (5 / 5 tasks done)
+**Phase 5: Monetization** — IN PROGRESS (1 / 4 tasks done)
 
 ## Completed Work
 
@@ -44,9 +45,15 @@
 
 5. **Nectar shop + Rebirth UI** — DONE. `src/components/prestige/RebirthScreen.tsx` — main prestige screen with two tabs: Rebirth (preview + action) and Nectar Shop. `RebirthPanel` shows season number, current run highest zone, Nectar preview (earned, percentage increase, recommended badge), push-further projections (+5/10/15/20 zones), two-step confirmation, and reset/keep info panel. `NectarShop` defines all 10 Nectar upgrade templates (`enriched_soil`, `stronger_roots`, `rapid_growth`, `seasonal_memory`, `nectar_roots`, `nectar_garden_expansion`, `combo_memory`, `deep_roots`, `bloom_retention`, `elder_retention`) with costs approximating the design doc sequences via `baseCost * costScaling^level`. `NectarUpgradeCard` adapts the Sunlight `UpgradeCard` pattern for Nectar currency (purple theme, ✧ icon, `spendNectar` instead of `spendSunlight`, bulk buy with `BuyMultiplierToggle`). Feature-gated: `allTimeHighestZone >= 40` unlocks the full screen; below that, a locked state shows progress toward Zone 40. New Rebirth tab added to `app/(tabs)/_layout.tsx` with `arrow.2.circlepath` / `autorenew` icon. Route: `app/(tabs)/rebirth.tsx`.
 
-## What's Next: Phase 5 — Monetization
+### Phase 5: Monetization (IN PROGRESS)
 
-See `docs/roadmap.md` Phase 5 for the full task list: AdMob integration, 7 ad touchpoints, Dewdrop shop, offline progress.
+**Engine Developer:**
+
+1. **Offline progress** — DONE. `src/engine/offlineProgress.ts` — pure engine: `MAX_OFFLINE_MS` (24h cap), `BASE_OFFLINE_EFFICIENCY` (50%), `getOfflineEfficiency` (Cosmic Roots Essence upgrade lifts efficiency toward 100% at `level/3` rate, max level 3), `getDeepRootsMultiplier` (Deep Roots Nectar upgrade adds +10% yield per level, max level 10), `calculateOfflineProgress(state, lastTickAt, now, { adBoost? })` returns `{ sunlightEarned, durationMs, wasCapped, efficiency }`. The `adBoost` option doubles final earnings as a hook for the future Double-Offline ad touchpoint — currently unwired. `gameLoop.ts` now imports `calculateOfflineProgress` from the new module (previously inline). The inline `MAX_OFFLINE_MS` / `OFFLINE_EFFICIENCY` constants were removed from `gameLoop.ts`. On foreground, the game loop writes `meta.lastOfflineSession` (transient, not persisted) with the session summary for any away window ≥ 30s. New UI: `src/components/offline/WelcomeBackModal.tsx` renders when `lastOfflineSession !== null`, shows duration / earned Sunlight / efficiency %, a "capped at 24h" note when applicable, and a placeholder "Watch ad for 2×" button (disabled, marked `TODO(admob)`). Modal is mounted once in `app/_layout.tsx` and clears the session on "Collect". New type: `OfflineSessionSummary` in `src/types/game.ts`. New store field + actions: `lastOfflineSession`, `setLastOfflineSession`, `clearLastOfflineSession` in `MetaSlice` (`src/state/store.ts`).
+
+## What's Next: Phase 5 — Monetization (3 tasks remaining)
+
+See `docs/roadmap.md` Phase 5: AdMob integration (`src/services/adManager.ts`), 7 ad touchpoints (including wiring the already-placed "Watch ad for 2×" button in `WelcomeBackModal`), Dewdrop shop (`app/(tabs)/dewdrop-shop.tsx`).
 
 ### Dependencies / Notes for next session
 - The `idle_garden_slots` Sunlight upgrade from Phase 3 is a placeholder that may be retired now that the Nectar shop ships with `nectar_garden_expansion`. Both contribute to garden capacity via the engine; either can be deprecated without changing engine code.

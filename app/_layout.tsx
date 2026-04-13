@@ -11,6 +11,7 @@ import "react-native-reanimated";
 import { useGameLoop } from "~/engine/gameLoop";
 import { useAutoSave, initializeFromDisk } from "~/services/saveManager";
 import { useGameStore } from "~/state/store";
+import { WelcomeBackModal } from "~/components/offline/WelcomeBackModal";
 
 /** Custom dark theme for Bloomlings with forest-inspired colors. */
 const bloomlingsDarkTheme = {
@@ -56,6 +57,7 @@ export default function RootLayout() {
           options={{ presentation: "modal", title: "Modal" }}
         />
       </Stack>
+      <WelcomeBackModal />
       <StatusBar style="light" />
     </ThemeProvider>
   );

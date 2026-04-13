@@ -44,7 +44,7 @@
 | AdMob integration | Engine Developer | `src/services/adManager.ts` | NOT STARTED |
 | 7 ad touchpoints | UI/UX + Engine | various | NOT STARTED |
 | Dewdrop shop | UI/UX Developer | `app/(tabs)/dewdrop-shop.tsx` | NOT STARTED |
-| Offline progress | Engine Developer | `src/engine/offlineProgress.ts` | NOT STARTED |
+| Offline progress | Engine Developer | `src/engine/offlineProgress.ts` | DONE |
 
 ## Phase 6: Polish & Retention
 | Task | Persona | Output File | Status |
