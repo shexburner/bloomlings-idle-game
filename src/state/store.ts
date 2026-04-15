@@ -83,6 +83,13 @@ export interface MetaSlice {
   setLastActiveAt: (timestamp: number) => void;
   setLastOfflineSession: (summary: OfflineSessionSummary | null) => void;
   clearLastOfflineSession: () => void;
+  /**
+   * Retroactively grant the "2× offline earnings" ad reward. Adds another
+   * copy of `lastOfflineSession.sunlightEarned` to the player's balance and
+   * bumps `stats.totalAdsWatched`. Called by `WelcomeBackModal` after a
+   * successful rewarded ad. No-op if no session is pending.
+   */
+  applyAdDoubleOffline: () => void;
   addZoneProgress: (amount: number) => void;
   advanceZone: () => void;
   setActiveBoosts: (boosts: ActiveBoost[]) => void;
@@ -191,6 +198,24 @@ export const useGameStore = create<GameStore>()((...args) => {
     setLastActiveAt: (timestamp: number) => set({ lastActiveAt: timestamp }),
     setLastOfflineSession: (summary) => set({ lastOfflineSession: summary }),
     clearLastOfflineSession: () => set({ lastOfflineSession: null }),
+
+    applyAdDoubleOffline: () => {
+      const session = get().lastOfflineSession;
+      if (session === null || session.sunlightEarned <= 0) return;
+      const bonus = session.sunlightEarned;
+      // Grant exactly what the modal showed — re-running offline progress
+      // with adBoost:true could drift if baseline rates have changed while
+      // the ad was playing. The engine's `adBoost` option remains for
+      // future callers / tests.
+      get().addSunlight(bonus);
+      get().addZoneProgress(bonus);
+      set((state) => ({
+        stats: {
+          ...state.stats,
+          totalAdsWatched: state.stats.totalAdsWatched + 1,
+        },
+      }));
+    },
 
     addZoneProgress: (amount: number) =>
       set((state) => ({
