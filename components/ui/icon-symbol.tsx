@@ -23,6 +23,7 @@ const MAPPING = {
   'square.grid.2x2.fill': 'grid-on',
   'gearshape.fill': 'settings',
   'arrow.2.circlepath': 'autorenew',
+  'drop.fill': 'water-drop',
 } as IconMapping;
 
 /**
