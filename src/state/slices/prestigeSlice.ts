@@ -74,11 +74,15 @@ export const createPrestigeSlice: StateCreator<
       ? REBIRTH_BOOST_MULTIPLIER
       : 1;
 
+    // Lucky Sprout "NextRebirthBoost" reward (Phase 5 ad touchpoint) stacks
+    // multiplicatively on top of the Dewdrop boost perk. Consumed here.
+    const luckySproutNectarBonus = state.pendingNectarBonus ?? 1;
+
     const highestZone = state.prestige.currentRunHighestZone;
     const nectarEarned = calculateNectarEarned(
       highestZone,
       nectarRootsLevel,
-      rebirthBoostMultiplier,
+      rebirthBoostMultiplier * luckySproutNectarBonus,
     );
     const startingZone = getStartingZone(seasonalLevel);
     const startingCombo = getStartingComboCount(comboMemLevel);
@@ -138,6 +142,10 @@ export const createPrestigeSlice: StateCreator<
       },
       // Clear active boosts
       activeBoosts: [],
+      // Consume the Lucky Sprout next-rebirth bonus (applied above).
+      pendingNectarBonus: null,
+      // The tap-boost from Lucky Sprout is tied to the previous run; clear.
+      luckySproutTapBoostExpiresAt: null,
       prestige: {
         ...state.prestige,
         rebirthCount: state.prestige.rebirthCount + 1,
@@ -204,6 +212,8 @@ export const createPrestigeSlice: StateCreator<
       },
       combo: initialCombo,
       activeBoosts: [],
+      pendingNectarBonus: null,
+      luckySproutTapBoostExpiresAt: null,
       prestige: {
         ...state.prestige,
         rebirthCount: 0,

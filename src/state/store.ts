@@ -24,7 +24,6 @@ import { createSettingsSlice, initialSettings } from "./slices/settingsSlice";
 import type {
   ActiveBoost,
   AdRewardConfig,
-  AdTouchpoint,
   Achievement,
   DailyState,
   GameStats,
@@ -33,8 +32,31 @@ import type {
   Synergy,
   ZoneProgressState,
 } from "~/types/game";
+import { AdTouchpoint } from "~/types/game";
 import { PERK_ID, PERK_TEMPLATE_MAP } from "~/data/perkTemplates";
 import { DEWDROP_SLOT_PERK_ID } from "~/engine/garden";
+import { getBloomlingTemplate } from "~/data/bloomlingTemplates";
+import { totalSunlightPerSecondFromRegistry } from "./selectors";
+import {
+  LuckySproutReward,
+  LUCKY_SPROUT_BONUS_SUNLIGHT_SECONDS,
+  LUCKY_SPROUT_DEWDROP_AMOUNT,
+  LUCKY_SPROUT_NECTAR_BONUS_MULTIPLIER,
+  LUCKY_SPROUT_TAP_BOOST_DURATION_MS,
+} from "~/engine/luckySprout";
+
+// -----------------------------------------------------------------------------
+// Touchpoint Constants (docs/design/05-ad-economy.md)
+// -----------------------------------------------------------------------------
+
+/** Sunbeam Boost: 2× production for 10 minutes. */
+const SUNBEAM_BOOST_DURATION_MS = 10 * 60 * 1000;
+const SUNBEAM_BOOST_MULTIPLIER = 2;
+
+/** Combo Keeper: freeze combo decay for 5 minutes. */
+const COMBO_KEEPER_FREEZE_DURATION_MS = 5 * 60 * 1000;
+/** Combo Keeper: 30-minute cooldown between ads. */
+const COMBO_KEEPER_COOLDOWN_MS = 30 * 60 * 1000;
 
 // -----------------------------------------------------------------------------
 // Combined Store Type
@@ -67,6 +89,37 @@ export interface MetaSlice {
    * on foreground and cleared by the Welcome Back modal. NOT persisted.
    */
   lastOfflineSession: OfflineSessionSummary | null;
+  /**
+   * True when a Lucky Sprout pop-up is waiting for the player. Cleared when
+   * the reward is granted or the modal is dismissed. NOT persisted — the
+   * game loop re-triggers on its own cadence.
+   */
+  luckySproutPending: boolean;
+  /**
+   * ms timestamp of the most recent Lucky Sprout trigger (pending or
+   * resolved). Used to schedule the next 10–15 min appearance. Persisted so
+   * closing the app doesn't let the player force an immediate pop-up by
+   * relaunching.
+   */
+  lastLuckySproutAt: number | null;
+  /**
+   * ms timestamp when the Lucky Sprout tap-boost reward expires, or null if
+   * no boost is active. Unlike `activeBoosts` (idle-only), this multiplier is
+   * applied inside the tap path. Persisted so the boost survives app restart.
+   */
+  luckySproutTapBoostExpiresAt: number | null;
+  /**
+   * ms timestamp of the last Combo Keeper ad watch, used to enforce the
+   * 30-minute cooldown (docs/design/05-ad-economy.md §Combo Keeper).
+   * Persisted so the cooldown survives app restart.
+   */
+  lastComboKeeperAt: number | null;
+  /**
+   * Multiplier queued for the next Rebirth's Nectar payout, or null if none
+   * pending. Granted by the Lucky Sprout NextRebirthBoost reward. Consumed
+   * and cleared inside `executeRebirth`. Persisted.
+   */
+  pendingNectarBonus: number | null;
   unlockedFeatures: {
     tapUpgradeShop: boolean;
     idleUpgradeShop: boolean;
@@ -122,6 +175,41 @@ export interface MetaSlice {
    * zone. Returns true on success, false if the perk is unavailable.
    */
   useZoneSkip: () => boolean;
+
+  // --- Ad touchpoint rewards ---
+  /**
+   * Apply the Sunbeam Boost ad reward: 2× Sunlight production for 10 minutes.
+   * Appends an `ActiveBoost` to `activeBoosts`; multiple consecutive watches
+   * stack duration (each adds its own entry) but don't stack multiplier
+   * because the idle selector multiplies all active boosts together — kept
+   * simple: latest replaces existing.
+   */
+  applySunbeamBoost: () => void;
+  /**
+   * Apply the Combo Keeper ad reward: freeze combo decay for 5 minutes and
+   * stamp the 30-minute cooldown. Returns true on success, false if the
+   * cooldown is still active.
+   */
+  applyComboKeeper: () => boolean;
+  /**
+   * Mark a Lucky Sprout appearance as pending. Safe to call even if already
+   * pending (idempotent). Records `lastLuckySproutAt` so the next interval
+   * is scheduled from this moment.
+   */
+  triggerLuckySprout: () => void;
+  /**
+   * Dismiss a pending Lucky Sprout without granting a reward (modal close or
+   * ad unavailability). Keeps `lastLuckySproutAt` — the next spawn is still
+   * ~10–15 min out, not immediate.
+   */
+  clearLuckySprout: () => void;
+  /**
+   * Grant a rolled Lucky Sprout reward. Clears the pending flag as part of
+   * the transaction. Returns a description context the modal can render.
+   */
+  applyLuckySproutReward: (
+    reward: LuckySproutReward
+  ) => { bonusSunlight: number; freeLevelUpBloomlingName: string | null };
 }
 
 /**
@@ -220,6 +308,11 @@ export const useGameStore = create<GameStore>()((...args) => {
     lastActiveAt: Date.now(),
     engineRunning: false,
     lastOfflineSession: null,
+    luckySproutPending: false,
+    lastLuckySproutAt: null,
+    luckySproutTapBoostExpiresAt: null,
+    lastComboKeeperAt: null,
+    pendingNectarBonus: null,
     unlockedFeatures: initialUnlockedFeatures,
 
     // --- Meta actions ---
@@ -417,6 +510,137 @@ export const useGameStore = create<GameStore>()((...args) => {
       }));
       get().advanceZone();
       return true;
+    },
+
+    // --- Ad touchpoint rewards ---
+
+    applySunbeamBoost: () => {
+      const now = Date.now();
+      const boost: ActiveBoost = {
+        source: AdTouchpoint.SunbeamBoost,
+        multiplier: SUNBEAM_BOOST_MULTIPLIER,
+        expiresAt: now + SUNBEAM_BOOST_DURATION_MS,
+      };
+      set((state) => {
+        // Keep non-Sunbeam boosts untouched, replace any pre-existing Sunbeam
+        // boost so duration refreshes cleanly rather than stacking multiplier.
+        const others = state.activeBoosts.filter(
+          (b) => b.source !== AdTouchpoint.SunbeamBoost
+        );
+        return {
+          activeBoosts: [...others, boost],
+          stats: {
+            ...state.stats,
+            totalAdsWatched: state.stats.totalAdsWatched + 1,
+          },
+        };
+      });
+    },
+
+    applyComboKeeper: () => {
+      const now = Date.now();
+      const { lastComboKeeperAt } = get();
+      if (
+        lastComboKeeperAt !== null &&
+        now - lastComboKeeperAt < COMBO_KEEPER_COOLDOWN_MS
+      ) {
+        return false;
+      }
+      get().setComboFrozen(true, now + COMBO_KEEPER_FREEZE_DURATION_MS);
+      set((state) => ({
+        lastComboKeeperAt: now,
+        stats: {
+          ...state.stats,
+          totalAdsWatched: state.stats.totalAdsWatched + 1,
+        },
+      }));
+      return true;
+    },
+
+    triggerLuckySprout: () => {
+      set({ luckySproutPending: true, lastLuckySproutAt: Date.now() });
+    },
+
+    clearLuckySprout: () => {
+      set({ luckySproutPending: false });
+    },
+
+    applyLuckySproutReward: (reward: LuckySproutReward) => {
+      const now = Date.now();
+      let bonusSunlight = 0;
+      let freeLevelUpBloomlingName: string | null = null;
+
+      switch (reward) {
+        case LuckySproutReward.BonusSunlight: {
+          const state = get();
+          const idleRate = totalSunlightPerSecondFromRegistry({
+            bloomlings: state.bloomlings,
+            garden: state.garden,
+          });
+          // Guarantee a small payout if the player has no Garden production yet.
+          bonusSunlight = Math.max(
+            idleRate * LUCKY_SPROUT_BONUS_SUNLIGHT_SECONDS,
+            10
+          );
+          state.addSunlight(bonusSunlight);
+          break;
+        }
+        case LuckySproutReward.TapBoost: {
+          set({
+            luckySproutTapBoostExpiresAt:
+              now + LUCKY_SPROUT_TAP_BOOST_DURATION_MS,
+          });
+          break;
+        }
+        case LuckySproutReward.Dewdrop: {
+          get().addDewdrops(LUCKY_SPROUT_DEWDROP_AMOUNT);
+          break;
+        }
+        case LuckySproutReward.FreeLevelUp: {
+          const state = get();
+          // Pick any unlocked Bloomling under level 100. Falls back to zero
+          // state (no-op) if the player has no eligible Bloomling.
+          const candidates = Object.values(state.bloomlings).filter(
+            (b) => b.unlocked && b.level < 100
+          );
+          if (candidates.length > 0) {
+            const picked =
+              candidates[Math.floor(Math.random() * candidates.length)]!;
+            set((s) => ({
+              bloomlings: {
+                ...s.bloomlings,
+                [picked.instanceId]: {
+                  ...picked,
+                  level: picked.level + 1,
+                },
+              },
+            }));
+            freeLevelUpBloomlingName =
+              getBloomlingTemplate(picked.templateId)?.name ??
+              picked.templateId;
+          }
+          break;
+        }
+        case LuckySproutReward.NextRebirthBoost: {
+          // Stack multiplicatively with any pre-existing queued bonus.
+          set((s) => ({
+            pendingNectarBonus:
+              (s.pendingNectarBonus ?? 1) *
+              LUCKY_SPROUT_NECTAR_BONUS_MULTIPLIER,
+          }));
+          break;
+        }
+      }
+
+      set((state) => ({
+        luckySproutPending: false,
+        stats: {
+          ...state.stats,
+          totalAdsWatched: state.stats.totalAdsWatched + 1,
+        },
+      }));
+
+      return { bonusSunlight, freeLevelUpBloomlingName };
     },
   };
 });
