@@ -444,6 +444,11 @@ export interface DailyState {
   adStreakDays: number;
   /** Whether the streak shield has been used this week. */
   streakShieldUsedThisWeek: boolean;
+  /**
+   * ms timestamp of the last Dewdrop Garden ad reward. Drives the 3-minute
+   * cooldown between Dewdrop earn ads. `null` if no ad has been watched yet.
+   */
+  lastDewdropAdAt: number | null;
 }
 
 // -----------------------------------------------------------------------------

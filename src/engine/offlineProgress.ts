@@ -7,9 +7,15 @@
 //     at 1/3 of the remaining gap per level (max level 3).
 //   - Deep Roots (Nectar) adds a +10%-per-level multiplier on final offline
 //     yield (max level 10 → +100%).
+//   - Offline Boost (Dewdrop perk) raises the efficiency *floor* from 50%
+//     to 75% — effectively halving the gap Cosmic Roots still needs to close.
 // The `adBoost` flag doubles final earnings and exists so the future AdMob
 // "Double Offline" touchpoint can wire in without touching engine shape.
 // =============================================================================
+import {
+  OFFLINE_BOOST_EFFICIENCY,
+  PERK_ID,
+} from "~/data/perkTemplates";
 import { totalSunlightPerSecondFromRegistry } from "~/state/selectors";
 import type { GameStore } from "~/state/store";
 
@@ -62,18 +68,23 @@ export interface OfflineProgressOptions {
 // -----------------------------------------------------------------------------
 
 /**
- * Offline efficiency fraction, moved by Cosmic Roots toward 100%.
+ * Offline efficiency fraction. The floor is lifted by the Offline Boost
+ * Dewdrop perk (50% → 75%), then Cosmic Roots closes the remaining gap
+ * toward 100% across its three levels.
  * Returns a value in `[BASE_OFFLINE_EFFICIENCY, 1.0]`.
  */
 export function getOfflineEfficiency(
-  state: Pick<GameStore, "upgrades">
+  state: Pick<GameStore, "upgrades" | "perks">
 ): number {
   const cosmicLevel = Math.min(
     state.upgrades["cosmic_roots"]?.level ?? 0,
     COSMIC_ROOTS_MAX_LEVEL
   );
-  const gap = 1 - BASE_OFFLINE_EFFICIENCY;
-  return BASE_OFFLINE_EFFICIENCY + gap * (cosmicLevel / COSMIC_ROOTS_MAX_LEVEL);
+  const hasOfflineBoost =
+    state.perks?.[PERK_ID.OfflineBoost]?.purchased === true;
+  const floor = hasOfflineBoost ? OFFLINE_BOOST_EFFICIENCY : BASE_OFFLINE_EFFICIENCY;
+  const gap = 1 - floor;
+  return floor + gap * (cosmicLevel / COSMIC_ROOTS_MAX_LEVEL);
 }
 
 /**
@@ -102,7 +113,7 @@ export function getDeepRootsMultiplier(
  * exact expiry within the offline window would make the math brittle.
  */
 export function calculateOfflineProgress(
-  state: Pick<GameStore, "bloomlings" | "garden" | "upgrades">,
+  state: Pick<GameStore, "bloomlings" | "garden" | "upgrades" | "perks">,
   lastTickAt: number,
   now: number,
   options: OfflineProgressOptions = {}

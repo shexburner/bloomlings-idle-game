@@ -98,21 +98,25 @@ const COMBO_MEMORY_START = 10;
  *
  * ```
  * nectarEarned = floor(NECTAR_BASE * (highestZone / NECTAR_THRESHOLD)^NECTAR_EXPONENT
- *                      * (1 + nectarRootsLevel * 0.10))
+ *                      * (1 + nectarRootsLevel * 0.10)
+ *                      * rebirthBoostMultiplier)
  * ```
  *
- * Returns 0 if `highestZone` is below `REBIRTH_UNLOCK_ZONE`.
+ * `rebirthBoostMultiplier` is the Dewdrop Instant Rebirth Boost consumable
+ * (1.5×). Defaults to 1.0 (no boost). Returns 0 if `highestZone` is below
+ * `REBIRTH_UNLOCK_ZONE`.
  */
 export function calculateNectarEarned(
   highestZone: number,
   nectarRootsLevel: number = 0,
+  rebirthBoostMultiplier: number = 1,
 ): number {
   if (highestZone < REBIRTH_UNLOCK_ZONE) return 0;
 
   const raw =
     NECTAR_BASE * Math.pow(highestZone / NECTAR_THRESHOLD, NECTAR_EXPONENT);
   const nectarMultiplier = 1 + nectarRootsLevel * 0.1;
-  return Math.floor(raw * nectarMultiplier);
+  return Math.floor(raw * nectarMultiplier * rebirthBoostMultiplier);
 }
 
 // -----------------------------------------------------------------------------
@@ -153,8 +157,13 @@ export function getRebirthPreview(
   highestZone: number,
   currentNectar: number,
   nectarRootsLevel: number = 0,
+  rebirthBoostMultiplier: number = 1,
 ): RebirthPreview {
-  const nectarEarned = calculateNectarEarned(highestZone, nectarRootsLevel);
+  const nectarEarned = calculateNectarEarned(
+    highestZone,
+    nectarRootsLevel,
+    rebirthBoostMultiplier,
+  );
 
   const percentageIncrease =
     currentNectar > 0
@@ -175,6 +184,7 @@ export function getRebirthPreview(
     nectarEarned: calculateNectarEarned(
       highestZone + additionalZones,
       nectarRootsLevel,
+      rebirthBoostMultiplier,
     ),
   }));
 

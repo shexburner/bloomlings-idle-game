@@ -64,9 +64,13 @@ export interface EvolutionCost {
  * - Bloom -> Elder: Sunlight + Nectar.
  * - Elder: cannot evolve, returns { sunlight: 0, nectar: 0 }.
  *
- * Rarity is looked up from the Bloomling template registry.
+ * Rarity is looked up from the Bloomling template registry. Pass a
+ * `discountFactor` < 1.0 to apply the Evolution Shard consumable (0.5).
  */
-export function getEvolutionCost(bloomling: Bloomling): EvolutionCost {
+export function getEvolutionCost(
+  bloomling: Bloomling,
+  discountFactor: number = 1,
+): EvolutionCost {
   const template = BLOOMLING_TEMPLATE_MAP[bloomling.templateId];
   if (!template) {
     return { sunlight: 0, nectar: 0 };
@@ -74,16 +78,18 @@ export function getEvolutionCost(bloomling: Bloomling): EvolutionCost {
 
   const rarity = template.rarity;
 
+  const apply = (base: number): number => Math.ceil(base * discountFactor);
+
   switch (bloomling.evolutionStage) {
     case EvolutionStage.Sprout:
       return {
-        sunlight: SPROUT_TO_BLOOM_SUNLIGHT[rarity],
+        sunlight: apply(SPROUT_TO_BLOOM_SUNLIGHT[rarity]),
         nectar: 0,
       };
     case EvolutionStage.Bloom:
       return {
-        sunlight: BLOOM_TO_ELDER_SUNLIGHT[rarity],
-        nectar: BLOOM_TO_ELDER_NECTAR[rarity],
+        sunlight: apply(BLOOM_TO_ELDER_SUNLIGHT[rarity]),
+        nectar: apply(BLOOM_TO_ELDER_NECTAR[rarity]),
       };
     case EvolutionStage.Elder:
       return { sunlight: 0, nectar: 0 };
@@ -104,7 +110,8 @@ export function getEvolutionCost(bloomling: Bloomling): EvolutionCost {
  */
 export function canEvolve(
   bloomling: Bloomling,
-  resources: { sunlight: number; nectar: number }
+  resources: { sunlight: number; nectar: number },
+  discountFactor: number = 1,
 ): boolean {
   // Cannot evolve past Elder
   if (bloomling.evolutionStage === EvolutionStage.Elder) {
@@ -123,7 +130,7 @@ export function canEvolve(
   }
 
   // Must afford the cost
-  const cost = getEvolutionCost(bloomling);
+  const cost = getEvolutionCost(bloomling, discountFactor);
   if (resources.sunlight < cost.sunlight) {
     return false;
   }

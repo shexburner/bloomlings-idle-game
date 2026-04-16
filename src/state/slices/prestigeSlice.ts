@@ -22,6 +22,10 @@ import {
   COMBO_MEMORY_ID,
   NECTAR_ROOTS_ID,
 } from "~/engine/rebirth";
+import {
+  PERK_ID,
+  REBIRTH_BOOST_MULTIPLIER,
+} from "~/data/perkTemplates";
 
 export interface PrestigeSlice {
   prestige: PrestigeState;
@@ -62,10 +66,33 @@ export const createPrestigeSlice: StateCreator<
     const seasonalLevel = getUpgradeLevel(state.upgrades, SEASONAL_MEMORY_ID);
     const comboMemLevel = getUpgradeLevel(state.upgrades, COMBO_MEMORY_ID);
 
+    // Instant Rebirth Boost (Dewdrop consumable): +50% Nectar once, consumed here.
+    const boostPerk = state.perks[PERK_ID.RebirthBoost];
+    const boostAvailable =
+      boostPerk !== undefined && boostPerk.quantity > 0;
+    const rebirthBoostMultiplier = boostAvailable
+      ? REBIRTH_BOOST_MULTIPLIER
+      : 1;
+
     const highestZone = state.prestige.currentRunHighestZone;
-    const nectarEarned = calculateNectarEarned(highestZone, nectarRootsLevel);
+    const nectarEarned = calculateNectarEarned(
+      highestZone,
+      nectarRootsLevel,
+      rebirthBoostMultiplier,
+    );
     const startingZone = getStartingZone(seasonalLevel);
     const startingCombo = getStartingComboCount(comboMemLevel);
+
+    // Build the updated perks object — only changes if we consumed the boost.
+    const newPerks = boostAvailable
+      ? {
+          ...state.perks,
+          [PERK_ID.RebirthBoost]: {
+            ...boostPerk,
+            quantity: boostPerk.quantity - 1,
+          },
+        }
+      : state.perks;
 
     set(() => ({
       resources: {
@@ -76,6 +103,7 @@ export const createPrestigeSlice: StateCreator<
         // totalSunlightEarned persists (it's an all-time stat)
         totalSunlightEarned: state.resources.totalSunlightEarned,
       },
+      perks: newPerks,
       // Reset Bloomling levels/evolution, respecting retention upgrades.
       bloomlings: resetBloomlingsForRebirth(
         state.bloomlings,
