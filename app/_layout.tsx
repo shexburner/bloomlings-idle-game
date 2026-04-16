@@ -9,6 +9,7 @@ import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 
 import { useGameLoop } from "~/engine/gameLoop";
+import { initializeAds } from "~/services/adManager";
 import { useAutoSave, initializeFromDisk } from "~/services/saveManager";
 import { useGameStore } from "~/state/store";
 import { WelcomeBackModal } from "~/components/offline/WelcomeBackModal";
@@ -40,6 +41,9 @@ export default function RootLayout() {
   useEffect(() => {
     initializeFromDisk();
     useGameStore.getState().ensureInitialDiscoveries();
+    // Fire-and-forget: AdMob SDK init is non-blocking and safe on web
+    // (no-ops via the adManager platform guard).
+    void initializeAds();
   }, []);
 
   // Start the game loop (ticks ~10/sec, handles offline progress)

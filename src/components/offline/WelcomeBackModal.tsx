@@ -1,14 +1,16 @@
 // =============================================================================
 // WelcomeBackModal — Surfaces the most recent offline earnings on foreground
 // =============================================================================
-// Reads `meta.lastOfflineSession`; clears it on "Collect". Mounts once at
-// the root layout so it appears regardless of active tab.
-// The "Watch ad for 2x" button is a visual placeholder — AdMob wiring ships
-// with Phase 5 task 1.
+// Reads `meta.lastOfflineSession`; clears it on "Collect" or after a rewarded
+// ad doubles the earnings. Mounts once at the root layout so it appears
+// regardless of active tab. The "Watch ad for 2×" button is wired to the
+// Double-Offline rewarded-ad touchpoint via `useRewardedAd`.
 // =============================================================================
 
+import { useEffect, useRef, useState } from "react";
 import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 
+import { useRewardedAd, type AdUnavailableReason } from "~/services/adManager";
 import { useGameStore } from "~/state/store";
 import { formatNumber } from "~/utils/formatNumber";
 
@@ -27,6 +29,8 @@ const COLORS = {
   sunlight: "#ffd700",
   warn: "#ffb74d",
   disabled: "#3a3a3a",
+  adAccent: "#ffb300",
+  adAccentDark: "#b37700",
 };
 
 // ---------------------------------------------------------------------------
@@ -49,17 +53,94 @@ function formatDuration(ms: number): string {
   return `${seconds}s`;
 }
 
+/** User-facing explanation for why an ad didn't play. */
+function unavailableMessage(reason: AdUnavailableReason): string {
+  switch (reason) {
+    case "closed_without_reward":
+      return "Ad closed early — 1× earnings kept.";
+    case "web_unsupported":
+      return "Ads aren't available on web — tap Collect to take the 1×.";
+    case "no_fill":
+    case "load_error":
+    default:
+      return "No boost available right now — tap Collect to take the 1×.";
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
+
+type Status = "idle" | "watching" | "rewarded" | "unavailable";
+
+/** How long to flash the "Earnings doubled!" confirmation before dismissing. */
+const REWARD_FLASH_MS = 1200;
 
 export function WelcomeBackModal() {
   const session = useGameStore((s) => s.lastOfflineSession);
   const clearLastOfflineSession = useGameStore(
     (s) => s.clearLastOfflineSession
   );
+  const applyAdDoubleOffline = useGameStore((s) => s.applyAdDoubleOffline);
+
+  const { isLoaded, show } = useRewardedAd("doubleOffline");
+
+  const [status, setStatus] = useState<Status>("idle");
+  const [unavailableReason, setUnavailableReason] =
+    useState<AdUnavailableReason | null>(null);
+  const rewardTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const visible = session !== null;
+
+  // Reset local UI state whenever a new session appears / disappears.
+  useEffect(() => {
+    if (!visible) {
+      setStatus("idle");
+      setUnavailableReason(null);
+      if (rewardTimerRef.current !== null) {
+        clearTimeout(rewardTimerRef.current);
+        rewardTimerRef.current = null;
+      }
+    }
+  }, [visible]);
+
+  // Cleanup any pending flash timer on unmount.
+  useEffect(() => {
+    return () => {
+      if (rewardTimerRef.current !== null) {
+        clearTimeout(rewardTimerRef.current);
+      }
+    };
+  }, []);
+
+  const handleWatchAd = () => {
+    if (status === "watching" || status === "rewarded") return;
+    setUnavailableReason(null);
+    setStatus("watching");
+    show({
+      onReward: () => {
+        applyAdDoubleOffline();
+        setStatus("rewarded");
+        rewardTimerRef.current = setTimeout(() => {
+          rewardTimerRef.current = null;
+          clearLastOfflineSession();
+        }, REWARD_FLASH_MS);
+      },
+      onUnavailable: (reason) => {
+        setUnavailableReason(reason);
+        setStatus("unavailable");
+      },
+    });
+  };
+
+  const adButtonLabel = (() => {
+    if (status === "watching") return "Loading ad…";
+    if (status === "rewarded") return "Earnings doubled!";
+    if (!isLoaded) return "Loading ad…";
+    return "Watch ad for 2×";
+  })();
+
+  const adButtonDisabled = status === "watching" || status === "rewarded";
 
   return (
     <Modal
@@ -94,22 +175,38 @@ export function WelcomeBackModal() {
                 </Text>
               )}
 
+              {status === "rewarded" && (
+                <Text style={styles.rewardedNote}>
+                  +☀ {formatNumber(session.sunlightEarned)} bonus from ad
+                </Text>
+              )}
+
+              {status === "unavailable" && unavailableReason !== null && (
+                <Text style={styles.unavailableNote}>
+                  {unavailableMessage(unavailableReason)}
+                </Text>
+              )}
+
               <View style={styles.buttonRow}>
                 <Pressable
                   style={[styles.button, styles.collectButton]}
                   onPress={clearLastOfflineSession}
+                  disabled={status === "rewarded"}
                 >
                   <Text style={styles.collectButtonText}>Collect</Text>
                 </Pressable>
 
-                {/* TODO(admob): wire this to the Double-Offline ad touchpoint
-                    once src/services/adManager.ts lands (Phase 5 task 1). */}
                 <Pressable
-                  style={[styles.button, styles.adButton]}
-                  disabled
+                  style={[
+                    styles.button,
+                    styles.adButton,
+                    adButtonDisabled && styles.adButtonDisabled,
+                  ]}
+                  onPress={handleWatchAd}
+                  disabled={adButtonDisabled}
                 >
-                  <Text style={styles.adButtonText}>Watch ad for 2×</Text>
-                  <Text style={styles.adButtonSubtext}>(coming soon)</Text>
+                  <Text style={styles.adButtonText}>{adButtonLabel}</Text>
+                  <Text style={styles.adButtonSubtext}>Ad</Text>
                 </Pressable>
               </View>
             </>
@@ -185,6 +282,20 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     fontStyle: "italic",
   },
+  rewardedNote: {
+    color: COLORS.sunlight,
+    fontSize: 14,
+    fontWeight: "700",
+    textAlign: "center",
+    marginBottom: 12,
+  },
+  unavailableNote: {
+    color: COLORS.textMuted,
+    fontSize: 12,
+    textAlign: "center",
+    marginBottom: 12,
+    fontStyle: "italic",
+  },
   buttonRow: {
     flexDirection: "row",
     gap: 12,
@@ -206,17 +317,22 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   adButton: {
-    backgroundColor: COLORS.disabled,
+    backgroundColor: COLORS.adAccent,
+    borderWidth: 1,
+    borderColor: COLORS.adAccentDark,
+  },
+  adButtonDisabled: {
     opacity: 0.6,
   },
   adButtonText: {
-    color: COLORS.text,
+    color: "#2b1a00",
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: "700",
   },
   adButtonSubtext: {
-    color: COLORS.textMuted,
+    color: "#5a3a00",
     fontSize: 10,
     marginTop: 2,
+    fontWeight: "600",
   },
 });
