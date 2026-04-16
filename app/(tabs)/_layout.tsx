@@ -57,6 +57,15 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="dewdrop-shop"
+        options={{
+          title: "Dewdrops",
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={26} name="drop.fill" color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="rebirth"
         options={{
           title: "Rebirth",

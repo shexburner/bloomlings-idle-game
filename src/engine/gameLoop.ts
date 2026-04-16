@@ -218,6 +218,10 @@ export function useGameLoop(): void {
   useEffect(() => {
     const handleAppStateChange = (nextAppState: AppStateStatus) => {
       if (nextAppState === "active") {
+        // App coming to foreground — roll the daily counters first so
+        // streaks / caps reflect the current calendar day before any
+        // Dewdrop-shop interactions happen later in this session.
+        useGameStore.getState().rolloverDailyState();
         // App coming to foreground — calculate offline progress
         const state = useGameStore.getState();
         const now = Date.now();

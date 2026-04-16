@@ -19,12 +19,18 @@ import {
   reconcileSynergyDiscovery,
 } from "~/engine/synergies";
 import {
+  EVOLUTION_SHARD_DISCOUNT,
+  PERK_ID,
+} from "~/data/perkTemplates";
+import {
   createBloomlingInstance,
   getZoneUnlockTemplates,
 } from "~/engine/discovery";
 import { getUpgradeLevel } from "~/engine/rebirth";
 import { calculateLevelUpCost } from "../selectors";
 import { getBloomlingTemplate } from "~/data/bloomlingTemplates";
+
+const EVOLUTION_SHARD_PERK_ID = PERK_ID.EvolutionShard;
 
 export interface BloomlingSlice {
   bloomlings: Record<string, Bloomling>;
@@ -155,18 +161,35 @@ export const createBloomlingSlice: StateCreator<
         return state;
       }
 
+      // Evolution Shard (Dewdrop perk): consumes one charge to halve cost.
+      const shardPerk = state.perks[EVOLUTION_SHARD_PERK_ID];
+      const shardAvailable =
+        shardPerk !== undefined && shardPerk.quantity > 0;
+      const discountFactor = shardAvailable ? EVOLUTION_SHARD_DISCOUNT : 1;
+
       // Check eligibility using the evolution engine
-      if (!canEvolve(bloomling, state.resources)) {
+      if (!canEvolve(bloomling, state.resources, discountFactor)) {
         return state;
       }
 
       // Calculate and deduct costs
-      const cost = getEvolutionCost(bloomling);
+      const cost = getEvolutionCost(bloomling, discountFactor);
       const newSunlight = state.resources.sunlight - cost.sunlight;
       const newNectar = state.resources.nectar - cost.nectar;
 
       // Apply evolution transformation
       const evolved = evolveBloomlingPure(bloomling);
+
+      // Consume the shard (if any) so it applies to at most one evolution.
+      const newPerks = shardAvailable
+        ? {
+            ...state.perks,
+            [EVOLUTION_SHARD_PERK_ID]: {
+              ...shardPerk,
+              quantity: shardPerk.quantity - 1,
+            },
+          }
+        : state.perks;
 
       return {
         bloomlings: {
@@ -178,6 +201,7 @@ export const createBloomlingSlice: StateCreator<
           sunlight: newSunlight,
           nectar: newNectar,
         },
+        perks: newPerks,
       };
     });
     // Reaching Elder stage can unlock new tag synergies.
