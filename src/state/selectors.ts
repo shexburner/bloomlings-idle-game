@@ -170,15 +170,19 @@ export function totalSunlightPerSecondSimple(
  * Production per second using the real Bloomling template registry for
  * base production and full synergy math. This is the function the game
  * loop should use.
+ *
+ * Applies the `idle_production` upgrade multiplier (+10% per level).
  */
 export function totalSunlightPerSecondFromRegistry(
-  state: Pick<GameStore, "bloomlings" | "garden">
+  state: Pick<GameStore, "bloomlings" | "garden" | "upgrades">
 ): number {
+  const idleLevel = state.upgrades["idle_production"]?.level ?? 0;
+  const idleMult = 1 + idleLevel * 0.10;
   return totalSunlightPerSecond(
     state,
     (templateId) => getBloomlingTemplate(templateId)?.baseProduction ?? 1,
     getBloomlingTemplate
-  );
+  ) * idleMult;
 }
 
 /**
@@ -215,13 +219,11 @@ export function effectiveTapValue(
 }
 
 /**
- * Derive baseTapValue from the store (1 + sum of all tap upgrade effects).
- * This is a placeholder -- the real implementation would use the upgrade
- * template registry to determine each upgrade's contribution.
+ * Derive baseTapValue from the store (1 + tap_power levels * 0.25 per level).
  */
-export function getBaseTapValue(_state: Pick<GameStore, "upgrades">): number {
-  // Starting base tap value
-  return 1;
+export function getBaseTapValue(state: Pick<GameStore, "upgrades">): number {
+  const tapPowerLevel = state.upgrades["tap_power"]?.level ?? 0;
+  return 1 + tapPowerLevel * 0.25;
 }
 
 /**

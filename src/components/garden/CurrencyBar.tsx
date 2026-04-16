@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { Animated, StyleSheet, Text, View } from "react-native";
 
 import { useGameStore } from "~/state/store";
-import { totalSunlightPerSecondSimple } from "~/state/selectors";
+import { totalSunlightPerSecondFromRegistry } from "~/state/selectors";
 import { formatNumber, formatRate } from "~/utils/formatNumber";
 
 /** Color palette for the currency bar. */
@@ -26,7 +26,11 @@ export function CurrencyBar() {
   const dewdrops = useGameStore((s) => s.resources.dewdrops);
 
   const idleRate = useGameStore((s) =>
-    totalSunlightPerSecondSimple({ bloomlings: s.bloomlings, garden: s.garden })
+    totalSunlightPerSecondFromRegistry({
+      bloomlings: s.bloomlings,
+      garden: s.garden,
+      upgrades: s.upgrades,
+    })
   );
 
   // Animated sunlight counter for smooth counting effect

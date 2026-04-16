@@ -67,6 +67,7 @@ export function gameTick(
     | "combo"
     | "activeBoosts"
     | "zoneProgress"
+    | "upgrades"
   >,
   now: number,
   deltaMs: number

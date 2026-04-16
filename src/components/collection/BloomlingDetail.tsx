@@ -115,40 +115,30 @@ export function BloomlingDetail({
   const gardenSlots = useGameStore((s) => s.garden.slots);
   const gardenMaxSlots = useGameStore((s) => s.garden.maxSlots);
 
-  if (!template || !instance) {
-    return null;
-  }
-
-  const rarityColor = RARITY_COLORS[template.rarity];
-  const production = calculateBloomlingProduction(
-    template.baseProduction,
-    instance.level,
-    instance.evolutionStage
-  );
-  const nextLevelProduction = calculateBloomlingProduction(
-    template.baseProduction,
-    instance.level + 1,
-    instance.evolutionStage
-  );
+  const rarityColor = template ? RARITY_COLORS[template.rarity] : "#2d4a3e";
+  const production = template && instance ? calculateBloomlingProduction(
+    template.baseProduction, instance.level, instance.evolutionStage
+  ) : 0;
+  const nextLevelProduction = template && instance ? calculateBloomlingProduction(
+    template.baseProduction, instance.level + 1, instance.evolutionStage
+  ) : 0;
   const productionDelta = nextLevelProduction - production;
-  const levelUpCost = calculateLevelUpCost(
-    template.baseLevelCost,
-    instance.level,
-    rapidGrowthLevel
-  );
-  const isMaxLevel = instance.level >= 100;
+  const levelUpCost = template && instance ? calculateLevelUpCost(
+    template.baseLevelCost, instance.level, rapidGrowthLevel
+  ) : 0;
+  const isMaxLevel = (instance?.level ?? 0) >= 100;
   const canAffordLevelUp = !isMaxLevel && sunlight >= levelUpCost;
 
-  const evolutionCost = getEvolutionCost(instance);
-  const nextStage = getNextEvolutionStage(instance.evolutionStage);
-  const canEvolveNow = canEvolve(instance, { sunlight, nectar });
-  const isAtMaxLevelForEvolution = instance.level >= 100;
+  const evolutionCost = instance ? getEvolutionCost(instance) : { sunlight: 0, nectar: 0 };
+  const nextStage = instance ? getNextEvolutionStage(instance.evolutionStage) : null;
+  const canEvolveNow = instance ? canEvolve(instance, { sunlight, nectar }) : false;
+  const isAtMaxLevelForEvolution = (instance?.level ?? 0) >= 100;
 
   const handleGardenToggle = () => {
+    if (!instance) return;
     if (instance.inGarden) {
       removeFromGarden(instance.instanceId);
     } else {
-      // Find first empty slot
       const emptySlotIndex = gardenSlots.indexOf(null);
       if (emptySlotIndex !== -1) {
         addToGarden(instance.instanceId, emptySlotIndex);
@@ -157,7 +147,7 @@ export function BloomlingDetail({
   };
 
   const hasEmptySlot = gardenSlots.indexOf(null) !== -1;
-  const canAddToGarden = !instance.inGarden && hasEmptySlot;
+  const canAddToGarden = !instance?.inGarden && hasEmptySlot;
 
   return (
     <Modal
@@ -171,6 +161,7 @@ export function BloomlingDetail({
           testID="bloomling-detail"
           style={[styles.container, { borderColor: rarityColor }]}
         >
+        {(!template || !instance) ? null : (<>
           {/* Close button */}
           <Pressable
             testID="bloomling-detail-close"
@@ -474,6 +465,7 @@ export function BloomlingDetail({
               </Pressable>
             </View>
           </ScrollView>
+        </>)}
         </View>
       </View>
     </Modal>

@@ -202,14 +202,19 @@ export function useTapHandler(): TapHandler {
     // --- Calculate tap reward ---
     const baseTapValue = selectEffectiveTapValue(state);
 
+    const critChanceLevel = state.upgrades["tap_crit_chance"]?.level ?? 0;
+    const critDamageLevel = state.upgrades["tap_crit_damage"]?.level ?? 0;
+    const effectiveCritChance = BASE_CRIT_CHANCE + critChanceLevel * 0.02;
+    const effectiveCritMultiplier = BASE_CRIT_MULTIPLIER + critDamageLevel * 0.50;
+
     // tapMultiplier is already folded into baseTapValue via selectEffectiveTapValue,
     // so we pass 1.0 as the tapMultiplier to avoid double-multiplying.
     const result = calculateTapReward(
       baseTapValue,
       1.0,
       newComboCount,
-      BASE_CRIT_CHANCE,
-      BASE_CRIT_MULTIPLIER
+      effectiveCritChance,
+      effectiveCritMultiplier
     );
 
     // --- Apply state updates ---
