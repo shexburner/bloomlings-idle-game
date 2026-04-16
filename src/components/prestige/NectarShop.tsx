@@ -166,7 +166,7 @@ export function NectarShop() {
   const buyCount = buyMultiplier as number;
 
   return (
-    <View style={styles.container}>
+    <View testID="nectar-shop" style={styles.container}>
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>
           {"\u2727"} Nectar Upgrades

@@ -100,6 +100,7 @@ export function ComboMeter() {
 
   return (
     <Animated.View
+      testID="combo-meter"
       style={[
         styles.container,
         {
@@ -113,10 +114,14 @@ export function ComboMeter() {
           style={[styles.glowOverlay, { opacity: glowOpacity }]}
         />
       )}
-      <Text style={[styles.comboText, isHighCombo && styles.highComboText]}>
+      <Text
+        testID="combo-count"
+        style={[styles.comboText, isHighCombo && styles.highComboText]}
+      >
         x{comboCount} Combo
       </Text>
       <Text
+        testID="combo-multiplier"
         style={[
           styles.multiplierText,
           isHighCombo && styles.highMultiplierText,

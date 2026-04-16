@@ -42,7 +42,7 @@ export function RebirthScreen() {
   // Locked state: player hasn't reached Zone 40 in any run
   if (!hasReachedUnlock) {
     return (
-      <View style={[styles.container, { paddingTop: insets.top }]}>
+      <View testID="rebirth-screen-locked" style={[styles.container, { paddingTop: insets.top }]}>
         <Text style={styles.header}>Rebirth</Text>
         <View style={styles.lockedContainer}>
           <Text style={styles.lockedIcon}>{"\u2727"}</Text>
@@ -74,11 +74,11 @@ export function RebirthScreen() {
   }
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View testID="rebirth-screen" style={[styles.container, { paddingTop: insets.top }]}>
       {/* Header with Nectar balance */}
       <View style={styles.headerRow}>
         <Text style={styles.header}>Rebirth</Text>
-        <Text style={styles.nectarBalance}>
+        <Text testID="rebirth-nectar-balance" style={styles.nectarBalance}>
           {"\u2727"} {formatNumber(nectar)}
         </Text>
       </View>
@@ -86,6 +86,7 @@ export function RebirthScreen() {
       {/* Tabs */}
       <View style={styles.tabBar}>
         <Pressable
+          testID="rebirth-tab-rebirth"
           style={[styles.tab, activeTab === "rebirth" && styles.tabActive]}
           onPress={() => setActiveTab("rebirth")}
         >
@@ -99,6 +100,7 @@ export function RebirthScreen() {
           </Text>
         </Pressable>
         <Pressable
+          testID="rebirth-tab-shop"
           style={[styles.tab, activeTab === "shop" && styles.tabActive]}
           onPress={() => setActiveTab("shop")}
         >

@@ -139,7 +139,7 @@ export function NectarUpgradeCard({
     : `+${formatNumber(template.effectPerLevel * 100, 0)}% per level`;
 
   return (
-    <Animated.View style={[styles.card, { backgroundColor: flashBg }]}>
+    <Animated.View testID={`nectar-shop-item-${template.id}`} style={[styles.card, { backgroundColor: flashBg }]}>
       <View style={styles.cardInner}>
         <View style={styles.info}>
           <View style={styles.nameRow}>
@@ -154,6 +154,7 @@ export function NectarUpgradeCard({
         </View>
 
         <Pressable
+          testID={`nectar-shop-buy-${template.id}`}
           style={[
             styles.buyButton,
             canAfford ? styles.buyAffordable : styles.buyUnaffordable,

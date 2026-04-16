@@ -32,12 +32,14 @@ export function BuyMultiplierToggle({
   onSelect,
 }: BuyMultiplierToggleProps) {
   return (
-    <View style={styles.container}>
+    <View testID="buy-multiplier-toggle" style={styles.container}>
       {MULTIPLIER_OPTIONS.map((option) => {
         const isActive = selected === option.value;
+        const idLabel = option.label.toLowerCase();
         return (
           <Pressable
             key={option.label}
+            testID={`multiplier-${idLabel}`}
             style={[styles.button, isActive && styles.buttonActive]}
             onPress={() => onSelect(option.value)}
           >

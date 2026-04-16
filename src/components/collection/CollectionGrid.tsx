@@ -97,10 +97,13 @@ export function CollectionGrid() {
   );
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View
+      testID="collection-grid"
+      style={[styles.container, { paddingTop: insets.top }]}
+    >
       {/* Header */}
       <Text style={styles.header}>Bloomling Collection</Text>
-      <Text style={styles.subtitle}>
+      <Text testID="collection-discovered-count" style={styles.subtitle}>
         {discoveredCount} / {BLOOMLING_TEMPLATES.length} Discovered
       </Text>
 

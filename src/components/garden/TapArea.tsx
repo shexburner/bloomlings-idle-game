@@ -25,7 +25,11 @@ export function TapArea({ onTapResult, children }: TapAreaProps) {
   };
 
   return (
-    <Pressable style={styles.container} onPress={handlePress}>
+    <Pressable
+      testID="tap-area"
+      style={styles.container}
+      onPress={handlePress}
+    >
       {children}
     </Pressable>
   );

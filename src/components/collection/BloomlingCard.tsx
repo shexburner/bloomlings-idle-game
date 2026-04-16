@@ -79,6 +79,7 @@ export function BloomlingCard({
   if (!discovered) {
     return (
       <View
+        testID={`bloomling-card-${template.id}-locked`}
         style={[
           styles.card,
           styles.cardUndiscovered,
@@ -102,6 +103,7 @@ export function BloomlingCard({
 
   return (
     <Pressable
+      testID={`bloomling-card-${template.id}`}
       style={[styles.card, { borderColor: rarityColor }]}
       onPress={handlePress}
     >

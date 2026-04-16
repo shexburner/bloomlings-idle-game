@@ -143,19 +143,27 @@ export function UpgradeCard({ template, buyCount }: UpgradeCardProps) {
 
   const effectDescription = `+${formatNumber(template.effectPerLevel * 100, 0)}% per level`;
 
+  const cardId = template.id.replace(/_/g, "-");
+
   return (
-    <Animated.View style={[styles.card, { backgroundColor: flashBg }]}>
+    <Animated.View
+      testID={`upgrade-card-${cardId}`}
+      style={[styles.card, { backgroundColor: flashBg }]}
+    >
       <View style={styles.cardInner}>
         <View style={styles.info}>
           <View style={styles.nameRow}>
             <Text style={styles.name}>{template.name}</Text>
-            <Text style={styles.level}>Lv. {currentLevel}</Text>
+            <Text testID={`upgrade-level-${cardId}`} style={styles.level}>
+              Lv. {currentLevel}
+            </Text>
           </View>
           <Text style={styles.description}>{template.description}</Text>
           <Text style={styles.effect}>{effectDescription}</Text>
         </View>
 
         <Pressable
+          testID={`upgrade-buy-${cardId}`}
           style={[styles.buyButton, canAfford ? styles.buyAffordable : styles.buyUnaffordable]}
           onPress={handleBuy}
           disabled={!canAfford}

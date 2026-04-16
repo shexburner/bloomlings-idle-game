@@ -56,25 +56,31 @@ export function CurrencyBar() {
   }, [sunlight, animatedSunlight]);
 
   return (
-    <View style={styles.container}>
+    <View testID="currency-bar" style={styles.container}>
       {/* Sunlight - primary currency, takes full width on top */}
       <View style={styles.primaryRow}>
         <Text style={styles.sunlightIcon}>{"\u2600"}</Text>
-        <Text style={styles.sunlightValue}>
+        <Text testID="currency-sunlight" style={styles.sunlightValue}>
           {formatNumber(displaySunlight)}
         </Text>
-        <Text style={styles.rateText}>{formatRate(idleRate)}</Text>
+        <Text testID="currency-sunlight-rate" style={styles.rateText}>
+          {formatRate(idleRate)}
+        </Text>
       </View>
 
       {/* Secondary currencies */}
       <View style={styles.secondaryRow}>
         <View style={styles.currencyChip}>
           <Text style={styles.nectarIcon}>{"\u2727"}</Text>
-          <Text style={styles.nectarValue}>{formatNumber(nectar)}</Text>
+          <Text testID="currency-nectar" style={styles.nectarValue}>
+            {formatNumber(nectar)}
+          </Text>
         </View>
         <View style={styles.currencyChip}>
           <Text style={styles.dewdropIcon}>{"\u25C6"}</Text>
-          <Text style={styles.dewdropValue}>{formatNumber(dewdrops)}</Text>
+          <Text testID="currency-dewdrops" style={styles.dewdropValue}>
+            {formatNumber(dewdrops)}
+          </Text>
         </View>
       </View>
     </View>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites errors="0"
+            failures="0"
+            tests="1">
+
+  <testsuite name="smoke · cold launch" id="smoke.01-launch.test"
+    errors="0" failures="0" hostname="" package="smoke" skipped="0"
+    tests="1" time="130.0" timestamp="">
+  
+    <testcase name="renders Garden tab with tap area, sunlight, and zone progress" classname="smoke · cold launch" time="130.0" assertions="4">
+
+    
+
+    
+
+    
+
+    
+    </testcase>
+  
+
+  
+    <system-err>
+       NoSuchElementError
+   An error occurred while running .click() command on &lt;//*[@resource-id=&#34;tap-area&#34;]&gt;: Timed out while waiting for element &#34;//*[@resource-id=&#34;tap-area&#34;]&#34; with &#34;xpath&#34; to be present for 60000 milliseconds.
+
+    Try fixing by :
+    1. Please inspect the html before the step
+    2. Verify if an element with the mentioned selector is present in the DOM tree
+
+    Error location:
+    C:\Users\sheha\Documents\bloomlings-idle-game\e2e\tests\smoke\02-tap-earns.test.js:18
+    ––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+     16 | 
+     17 |     for (let i = 0; i &lt; 10; i += 1) {
+     18 |       browser.click(byTestId(&#39;tap-area&#39;)); 
+     19 |     }
+     20 | 
+    ––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+
+ NoSuchElementError
+   An error occurred while running .click() command on &lt;//*[@resource-id=&#34;tap-area&#34;]&gt;: Timed out while waiting for element &#34;//*[@resource-id=&#34;tap-area&#34;]&#34; with &#34;xpath&#34; to be present for 60000 milliseconds.
+
+    Try fixing by :
+    1. Please inspect the html before the step
+    2. Verify if an element with the mentioned selector is present in the DOM tree
+
+    Error location:
+    C:\Users\sheha\Documents\bloomlings-idle-game\e2e\tests\smoke\02-tap-earns.test.js:18
+    ––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+     16 | 
+     17 |     for (let i = 0; i &lt; 10; i += 1) {
+     18 |       browser.click(byTestId(&#39;tap-area&#39;)); 
+     19 |     }
+     20 | 
+    ––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+
+ NoSuchElementError
+   An error occurred while running .getText() command on &lt;//*[@resource-id=&#34;currency-sunlight&#34;]&gt;: Timed out while waiting for element &#34;//*[@resource-id=&#34;currency-sunlight&#34;]&#34; with &#34;xpath&#34; to be present for 60000 milliseconds.
+
+    Try fixing by :
+    1. Please inspect the html before the step
+    2. Verify if an element with the mentioned selector is present in the DOM tree
+
+    Error location:
+    C:\Users\sheha\Documents\bloomlings-idle-game\e2e\tests\smoke\02-tap-earns.test.js:21
+    ––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+     19 |     }
+     20 | 
+     21 |     browser.getText(byTestId(&#39;currency-sunlight&#39;), function (after) { 
+     22 |       browser.assert.notEqual(after.value.trim(), &#39;0&#39;, &#39;sunlight incremented past 0&#39;);
+     23 |     });
+    ––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+
+    </system-err>
+  
+
+    
+
+  
+  </testsuite>
+</testsuites>

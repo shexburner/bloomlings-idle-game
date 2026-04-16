@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites errors="1"
+            failures="0"
+            tests="0">
+
+  <testsuite name="smoke · tap earns sunlight" id="smoke.02-tap-earns.test"
+    errors="1" failures="0" hostname="" package="smoke" skipped="1"
+    tests="0" time="0.000" timestamp="">
+  
+
+  
+    <system-err>
+       An error occurred while creating a new Appium Server session: [WebDriverError] Neither ANDROID_HOME nor ANDROID_SDK_ROOT environment variable was exported. Read https://developer.android.com/studio/command-line/variables for more details
+ An error occurred while creating a new Appium Server session: [WebDriverError] Neither ANDROID_HOME nor ANDROID_SDK_ROOT environment variable was exported. Read https://developer.android.com/studio/command-line/variables for more details
+ An error occurred while creating a new Appium Server session: [WebDriverError] Neither ANDROID_HOME nor ANDROID_SDK_ROOT environment variable was exported. Read https://developer.android.com/studio/command-line/variables for more details
+    </system-err>
+  
+
+    
+    <error message="An error occurred while creating a new Appium Server session: [WebDriverError] Neither ANDROID_HOME nor ANDROID_SDK_ROOT environment variable was exported. Read https://developer.android.com/studio/command-line/variables for more details"><![CDATA[
+      WebDriverError: An error occurred while creating a new Appium Server session: [WebDriverError] Neither ANDROID_HOME nor ANDROID_SDK_ROOT environment variable was exported. Read https://developer.android.com/studio/command-line/variables for more details
+    at Object.throwDecodedError (C:\Users\sheha\Documents\bloomlings-idle-game\node_modules\selenium-webdriver\lib\error.js:521:15)
+    at parseHttpResponse (C:\Users\sheha\Documents\bloomlings-idle-game\node_modules\selenium-webdriver\lib\http.js:514:13)
+    at Executor.execute (C:\Users\sheha\Documents\bloomlings-idle-game\node_modules\selenium-webdriver\lib\http.js:446:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      ]]></error>  
+
+  
+    
+    <testcase
+      name="increases currency-sunlight after 10 taps" classname="smoke · tap earns sunlight">
+      <skipped />
+    </testcase>
+    
+  
+  </testsuite>
+</testsuites>

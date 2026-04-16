@@ -178,13 +178,17 @@ export function ShopScreen() {
   const buyCount = buyMultiplier as number;
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View
+      testID="shop-screen"
+      style={[styles.container, { paddingTop: insets.top }]}
+    >
       {/* Header */}
       <Text style={styles.header}>Upgrade Shop</Text>
 
       {/* Tabs */}
       <View style={styles.tabBar}>
         <Pressable
+          testID="shop-tab-tap"
           style={[styles.tab, activeTab === "tap" && styles.tabActive]}
           onPress={() => setActiveTab("tap")}
         >
@@ -198,6 +202,7 @@ export function ShopScreen() {
           </Text>
         </Pressable>
         <Pressable
+          testID="shop-tab-idle"
           style={[styles.tab, activeTab === "idle" && styles.tabActive]}
           onPress={() => setActiveTab("idle")}
         >

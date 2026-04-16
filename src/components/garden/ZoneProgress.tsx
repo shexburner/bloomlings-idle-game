@@ -45,13 +45,18 @@ export function ZoneProgress() {
     progressPercent > 0.75 ? COLORS.barFillGold : COLORS.barFill;
 
   return (
-    <View style={styles.container}>
+    <View testID="zone-progress" style={styles.container}>
       <View style={styles.headerRow}>
-        <Text style={styles.zoneLabel}>Zone {currentZone}</Text>
-        <Text style={styles.biomeName}>{biomeName}</Text>
+        <Text testID="zone-label" style={styles.zoneLabel}>
+          Zone {currentZone}
+        </Text>
+        <Text testID="zone-biome" style={styles.biomeName}>
+          {biomeName}
+        </Text>
       </View>
       <View style={styles.barTrack}>
         <View
+          testID="zone-progress-fill"
           style={[
             styles.barFill,
             {
@@ -61,7 +66,7 @@ export function ZoneProgress() {
           ]}
         />
       </View>
-      <Text style={styles.progressText}>
+      <Text testID="zone-progress-percent" style={styles.progressText}>
         {Math.round(progressPercent * 100)}%
       </Text>
     </View>

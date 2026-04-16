@@ -167,9 +167,16 @@ export function BloomlingDetail({
       onRequestClose={onClose}
     >
       <View style={styles.overlay}>
-        <View style={[styles.container, { borderColor: rarityColor }]}>
+        <View
+          testID="bloomling-detail"
+          style={[styles.container, { borderColor: rarityColor }]}
+        >
           {/* Close button */}
-          <Pressable style={styles.closeButton} onPress={onClose}>
+          <Pressable
+            testID="bloomling-detail-close"
+            style={styles.closeButton}
+            onPress={onClose}
+          >
             <Text style={styles.closeText}>{"\u2715"}</Text>
           </Pressable>
 
@@ -249,6 +256,7 @@ export function BloomlingDetail({
                 </View>
               ) : (
                 <Pressable
+                  testID="bloomling-detail-level-up"
                   style={[
                     styles.actionButton,
                     canAffordLevelUp
@@ -358,6 +366,7 @@ export function BloomlingDetail({
                 </View>
               ) : canEvolveNow ? (
                 <Pressable
+                  testID="bloomling-detail-evolve"
                   style={[
                     styles.actionButton,
                     {
@@ -438,6 +447,7 @@ export function BloomlingDetail({
             {/* Garden action */}
             <View style={styles.actionSection}>
               <Pressable
+                testID="bloomling-detail-garden-toggle"
                 style={[
                   styles.gardenButton,
                   instance.inGarden

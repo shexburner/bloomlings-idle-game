@@ -166,12 +166,13 @@ export function RebirthPanel() {
       {confirming ? (
         <View style={styles.confirmRow}>
           <Pressable
+            testID="rebirth-cancel"
             style={styles.cancelButton}
             onPress={() => setConfirming(false)}
           >
             <Text style={styles.cancelButtonText}>Cancel</Text>
           </Pressable>
-          <Pressable style={styles.confirmButton} onPress={handleRebirth}>
+          <Pressable testID="rebirth-confirm" style={styles.confirmButton} onPress={handleRebirth}>
             <Text style={styles.confirmButtonText}>
               Confirm Rebirth
             </Text>
@@ -179,6 +180,7 @@ export function RebirthPanel() {
         </View>
       ) : (
         <Pressable
+          testID="rebirth-button"
           style={[
             styles.rebirthButton,
             !eligible && styles.rebirthDisabled,

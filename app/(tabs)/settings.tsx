@@ -94,6 +94,7 @@ export default function SettingsScreen() {
 
   return (
     <ScrollView
+      testID="settings-screen"
       style={styles.container}
       contentContainerStyle={[
         styles.content,
@@ -127,15 +128,16 @@ export default function SettingsScreen() {
       {/* --- Save & Data Section --- */}
       <Text style={styles.sectionHeader}>Save & Data</Text>
       <View style={styles.card}>
-        <Pressable style={styles.button} onPress={handleSave}>
+        <Pressable testID="settings-save" style={styles.button} onPress={handleSave}>
           <Text style={styles.buttonText}>Save Game</Text>
         </Pressable>
         <View style={styles.separator} />
-        <Pressable style={styles.button} onPress={handleExport}>
+        <Pressable testID="settings-export" style={styles.button} onPress={handleExport}>
           <Text style={styles.buttonText}>Export Save</Text>
         </Pressable>
         {exportText.length > 0 && (
           <TextInput
+            testID="settings-export-text"
             style={styles.codeField}
             value={exportText}
             multiline
@@ -146,6 +148,7 @@ export default function SettingsScreen() {
         <View style={styles.separator} />
         <Text style={styles.importLabel}>Import Save</Text>
         <TextInput
+          testID="settings-import-input"
           style={styles.codeField}
           value={importText}
           onChangeText={setImportText}
@@ -154,6 +157,7 @@ export default function SettingsScreen() {
           multiline
         />
         <Pressable
+          testID="settings-import"
           style={[styles.button, styles.importButton]}
           onPress={handleImport}
         >

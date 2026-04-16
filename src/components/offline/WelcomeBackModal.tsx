@@ -68,7 +68,7 @@ export function WelcomeBackModal() {
       animationType="fade"
       onRequestClose={clearLastOfflineSession}
     >
-      <View style={styles.overlay}>
+      <View testID="welcome-back-modal" style={styles.overlay}>
         <View style={styles.card}>
           <Text style={styles.title}>Welcome back</Text>
 
@@ -96,6 +96,7 @@ export function WelcomeBackModal() {
 
               <View style={styles.buttonRow}>
                 <Pressable
+                  testID="welcome-back-collect"
                   style={[styles.button, styles.collectButton]}
                   onPress={clearLastOfflineSession}
                 >

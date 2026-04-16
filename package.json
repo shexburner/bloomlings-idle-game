@@ -9,7 +9,10 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "docs:compact": "python3 docs/build_compact_docs.py"
+    "docs:compact": "python3 docs/build_compact_docs.py",
+    "appium": "appium",
+    "test:e2e": "nightwatch --env android.device",
+    "test:e2e:smoke": "nightwatch --env smoke e2e/tests/smoke"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
@@ -43,9 +46,13 @@
     "zustand": "^5.0.12"
   },
   "devDependencies": {
+    "@nightwatch/mobile-helper": "^2.0.0",
     "@types/react": "~19.1.0",
+    "appium": "^3.3.0",
+    "appium-uiautomator2-driver": "^7.1.2",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
+    "nightwatch": "^3.15.0",
     "typescript": "~5.9.2"
   },
   "private": true

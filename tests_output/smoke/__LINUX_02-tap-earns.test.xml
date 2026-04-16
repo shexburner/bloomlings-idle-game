@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites errors="3"
+            failures="1"
+            tests="1">
+
+  <testsuite name="smoke · tap earns sunlight" id="smoke.02-tap-earns.test"
+    errors="3" failures="1" hostname="" package="smoke" skipped="0"
+    tests="1" time="618.5" timestamp="">
+  
+    <testcase name="increases currency-sunlight after 10 taps" classname="smoke · tap earns sunlight" time="618.5" assertions="3">
+
+    
+
+      <failure message="Error while running &#34;getText&#34; command: [TypeError] after.value.trim is not a function">TypeError: Error while running &#34;getText&#34; command: [TypeError] after.value.trim is not a function
+    at NightwatchAPI.&lt;anonymous&gt; (C:\Users\sheha\Documents\bloomlings-idle-game\e2e\tests\smoke\02-tap-earns.test.js:22:43)</failure>
+
+    
+    <error message="Error while running &#34;getText&#34; command: [TypeError] after.value.trim is not a function" type="error"><![CDATA[
+    TypeError: Error while running &#34;getText&#34; command: [TypeError] after.value.trim is not a function
+    at NightwatchAPI.&lt;anonymous&gt; (C:\Users\sheha\Documents\bloomlings-idle-game\e2e\tests\smoke\02-tap-earns.test.js:22:43)
+    at Object.apply (C:\Users\sheha\Documents\bloomlings-idle-game\node_modules\nightwatch\lib\api\_loaders\_base-loader.js:411:29)
+    at GetText.complete (C:\Users\sheha\Documents\bloomlings-idle-game\node_modules\nightwatch\lib\element\command.js:240:27)
+    at GetText.handleElementError (C:\Users\sheha\Documents\bloomlings-idle-game\node_modules\nightwatch\lib\api\element-commands\_baseElementCommand.js:181:17)
+    at GetText.elementNotFound (C:\Users\sheha\Documents\bloomlings-idle-game\node_modules\nightwatch\lib\api\element-commands\_baseElementCommand.js:109:17)
+    at GetText.elementLocateError (C:\Users\sheha\Documents\bloomlings-idle-game\node_modules\nightwatch\lib\element\command.js:195:19)
+    at Object.errorHandler (C:\Users\sheha\Documents\bloomlings-idle-game\node_modules\nightwatch\lib\api\element-commands\_baseElementCommand.js:94:23)
+    at PeriodicPromise.runAction (C:\Users\sheha\Documents\bloomlings-idle-game\node_modules\nightwatch\lib\utils\periodic-promise.js:64:29)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    ]]></error>
+    
+    </testcase>
+  
+
+  
+    <system-err>
+       NoSuchElementError
+   An error occurred while running .click() command on &lt;//*[@resource-id=&#34;tap-area&#34;]&gt;: Timed out while waiting for element &#34;//*[@resource-id=&#34;tap-area&#34;]&#34; with &#34;xpath&#34; to be present for 60000 milliseconds.
+
+    Try fixing by :
+    1. Please inspect the html before the step
+    2. Verify if an element with the mentioned selector is present in the DOM tree
+
+    Error location:
+    C:\Users\sheha\Documents\bloomlings-idle-game\e2e\tests\smoke\02-tap-earns.test.js:18
+    ––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+     16 | 
+     17 |     for (let i = 0; i &lt; 10; i += 1) {
+     18 |       browser.click(byTestId(&#39;tap-area&#39;)); 
+     19 |     }
+     20 | 
+    ––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+
+ NoSuchElementError
+   An error occurred while running .click() command on &lt;//*[@resource-id=&#34;tap-area&#34;]&gt;: Timed out while waiting for element &#34;//*[@resource-id=&#34;tap-area&#34;]&#34; with &#34;xpath&#34; to be present for 60000 milliseconds.
+
+    Try fixing by :
+    1. Please inspect the html before the step
+    2. Verify if an element with the mentioned selector is present in the DOM tree
+
+    Error location:
+    C:\Users\sheha\Documents\bloomlings-idle-game\e2e\tests\smoke\02-tap-earns.test.js:18
+    ––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+     16 | 
+     17 |     for (let i = 0; i &lt; 10; i += 1) {
+     18 |       browser.click(byTestId(&#39;tap-area&#39;)); 
+     19 |     }
+     20 | 
+    ––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+
+ NoSuchElementError
+   An error occurred while running .getText() command on &lt;//*[@resource-id=&#34;currency-sunlight&#34;]&gt;: Timed out while waiting for element &#34;//*[@resource-id=&#34;currency-sunlight&#34;]&#34; with &#34;xpath&#34; to be present for 60000 milliseconds.
+
+    Try fixing by :
+    1. Please inspect the html before the step
+    2. Verify if an element with the mentioned selector is present in the DOM tree
+
+    Error location:
+    C:\Users\sheha\Documents\bloomlings-idle-game\e2e\tests\smoke\02-tap-earns.test.js:21
+    ––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+     19 |     }
+     20 | 
+     21 |     browser.getText(byTestId(&#39;currency-sunlight&#39;), function (after) { 
+     22 |       browser.assert.notEqual(after.value.trim(), &#39;0&#39;, &#39;sunlight incremented past 0&#39;);
+     23 |     });
+    ––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+
+    </system-err>
+  
+
+    
+
+  
+  </testsuite>
+</testsuites>
