@@ -64,9 +64,15 @@ Copy this block when filing a new bug. Give each bug a unique incrementing ID.
 
 ## Open bugs
 
+*(none)*
+
+---
+
+## Fixed bugs (awaiting verification)
+
 ### BUG-008 — Completionist achievement sunlight reward not granted
 
-- **Status:** open
+- **Status:** fixed
 - **Severity:** low
 - **Reported by:** Code Reviewer
 - **Reported on:** 2026-04-17
@@ -91,16 +97,17 @@ Both sunlight and dewdrop rewards are granted on completionist unlock, matching 
 Sunlight reward is skipped; only dewdrops are granted.
 
 **Fix**
-*(pending)*
+eafb24c — Added `if (completionist.sunlightReward > 0) get().addSunlight(completionist.sunlightReward)` before the dewdrop check in the completionist second-pass block of `checkAndGrantAchievements`.
 
 **History**
 - 2026-04-17 — opened by Code Reviewer
+- 2026-04-17 — fixed in eafb24c
 
 ---
 
 ### BUG-009 — COMBO_KEEPER_COOLDOWN_MS duplicated across store and component
 
-- **Status:** open
+- **Status:** fixed
 - **Severity:** low
 - **Reported by:** Code Reviewer
 - **Reported on:** 2026-04-17
@@ -118,21 +125,22 @@ Single source of truth: constant exported from `store.ts` (or a shared constants
 Two independent copies; drift will cause the button to appear or stay hidden at the wrong time.
 
 **Fix**
-*(pending)*
+eafb24c — `COMBO_KEEPER_COOLDOWN_MS` changed to `export const` in `src/state/store.ts`. Local duplicate and "Must match" comment removed from `src/components/garden/ComboKeeperButton.tsx`; constant now imported from `~/state/store`.
 
 **History**
 - 2026-04-17 — opened by Code Reviewer
+- 2026-04-17 — fixed in eafb24c
 
 ---
 
 ### BUG-010 — speed_demon, stubborn_sprout, hat_trick achievements are permanently unattainable
 
-- **Status:** open
+- **Status:** fixed
 - **Severity:** medium
 - **Reported by:** Code Reviewer
 - **Reported on:** 2026-04-17
 - **Branch / commit:** claude/review-readme-next-task-iznKG@b702117
-- **File(s):** src/engine/achievements.ts:46-50, src/engine/gameLoop.ts, src/engine/tapSystem.ts
+- **File(s):** src/engine/achievements.ts:46-50, src/state/store.ts (advanceZone), src/engine/tapSystem.ts
 - **Last updated:** 2026-04-17
 
 **Repro / evidence**
@@ -149,18 +157,11 @@ All three achievements are attainable by players who meet the described conditio
 Achievements display in the UI but can never be granted.
 
 **Fix**
-*(pending)*
+eafb24c — Module-level `zoneEnteredAt` timestamp added to `src/state/store.ts`. `advanceZone` reads `gateFailCount` before the reset, calls `triggerHiddenAchievement("speed_demon")` if the zone was cleared in under 30 s, and `triggerHiddenAchievement("stubborn_sprout")` if `gateFailCount > 0`, then resets `zoneEnteredAt`. A `consecutiveCritRef` added to `useTapHandler` in `src/engine/tapSystem.ts` calls `triggerHiddenAchievement("hat_trick")` when 5 consecutive crits are landed.
 
 **History**
 - 2026-04-17 — opened by Code Reviewer
-
----
-
----
-
-## Fixed bugs (awaiting verification)
-
-*(none)*
+- 2026-04-17 — fixed in eafb24c
 
 ---
 

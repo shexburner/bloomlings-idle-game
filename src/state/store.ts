@@ -58,7 +58,7 @@ const SUNBEAM_BOOST_MULTIPLIER = 2;
 /** Combo Keeper: freeze combo decay for 5 minutes. */
 const COMBO_KEEPER_FREEZE_DURATION_MS = 5 * 60 * 1000;
 /** Combo Keeper: 30-minute cooldown between ads. */
-const COMBO_KEEPER_COOLDOWN_MS = 30 * 60 * 1000;
+export const COMBO_KEEPER_COOLDOWN_MS = 30 * 60 * 1000;
 
 // -----------------------------------------------------------------------------
 // Combined Store Type
@@ -298,6 +298,9 @@ const initialUnlockedFeatures: MetaSlice["unlockedFeatures"] = {
   transcendence: false,
 };
 
+// Module-level timestamp for speed_demon achievement (not persisted).
+let zoneEnteredAt = Date.now();
+
 // -----------------------------------------------------------------------------
 // Store Creation
 // -----------------------------------------------------------------------------
@@ -367,6 +370,9 @@ export const useGameStore = create<GameStore>()((...args) => {
       })),
 
     advanceZone: () => {
+      const now = Date.now();
+      const { gateFailCount } = get().zoneProgress;
+
       set((state) => {
         const nextZone = state.zoneProgress.currentZone + 1;
         return {
@@ -400,6 +406,16 @@ export const useGameStore = create<GameStore>()((...args) => {
           },
         };
       });
+      // BUG-010: speed_demon — zone cleared in under 30 s
+      if (now - zoneEnteredAt < 30_000) {
+        get().triggerHiddenAchievement("speed_demon");
+      }
+      // BUG-010: stubborn_sprout — cleared a gate after at least one failure
+      if (gateFailCount > 0) {
+        get().triggerHiddenAchievement("stubborn_sprout");
+      }
+      zoneEnteredAt = now;
+
       // Crossing a zone threshold may unlock a new garden slot.
       get().syncGardenCapacity();
       // ...and may unlock a new Bloomling species. Run discovery after the
@@ -727,6 +743,9 @@ export const useGameStore = create<GameStore>()((...args) => {
               achievementsCompleted: s.stats.achievementsCompleted + 1,
             },
           }));
+          if (completionist.sunlightReward > 0) {
+            get().addSunlight(completionist.sunlightReward);
+          }
           if (completionist.dewdropReward > 0) {
             get().addDewdrops(completionist.dewdropReward);
           }
