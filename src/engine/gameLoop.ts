@@ -191,6 +191,9 @@ export function useGameLoop(): void {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const lastTickRef = useRef<number>(Date.now());
   const luckySproutLastCheckRef = useRef<number>(Date.now());
+  // Pre-rolled target interval; re-rolled only after each spawn resolves so the
+  // distribution stays uniform rather than biased toward the minimum.
+  const luckySproutNextIntervalRef = useRef<number>(nextLuckySproutIntervalMs());
 
   const tick = useCallback(() => {
     const now = Date.now();
@@ -203,13 +206,19 @@ export function useGameLoop(): void {
     // Lucky Sprout scheduler: check every 30s of foreground play.
     if (now - luckySproutLastCheckRef.current >= LUCKY_SPROUT_CHECK_INTERVAL_MS) {
       luckySproutLastCheckRef.current = now;
-      if (
+      if (state.lastLuckySproutAt === null) {
+        // First launch: seed the timestamp so the 10–15 min interval starts
+        // from now rather than triggering immediately on the first check.
+        useGameStore.setState({ lastLuckySproutAt: now });
+        luckySproutNextIntervalRef.current = nextLuckySproutIntervalMs();
+      } else if (
         !state.luckySproutPending &&
         state.lastOfflineSession === null &&
-        (state.lastLuckySproutAt === null ||
-          now - state.lastLuckySproutAt > nextLuckySproutIntervalMs())
+        now - state.lastLuckySproutAt > luckySproutNextIntervalRef.current
       ) {
         state.triggerLuckySprout();
+        // Re-roll the interval for the next spawn cycle.
+        luckySproutNextIntervalRef.current = nextLuckySproutIntervalMs();
       }
     }
 

@@ -45,19 +45,23 @@ export function SunbeamBoostButton() {
   // Tick state so the countdown re-renders each second.
   const [, setTick] = useState(0);
 
+  // Compute isActive before the effect so the interval is gated on it.
+  const sunbeamBoost = activeBoosts.find(
+    (b) => b.source === AdTouchpoint.SunbeamBoost
+  );
+  const isActive = sunbeamBoost !== undefined && sunbeamBoost.expiresAt > Date.now();
+
+  // Only run the 1 Hz tick while the boost is actively counting down.
   useEffect(() => {
+    if (!isActive) return;
     const id = setInterval(() => setTick((n) => n + 1), 1000);
     return () => clearInterval(id);
-  }, []);
+  }, [isActive]);
 
   if (allTimeHighestZone < 15) return null;
 
   const now = Date.now();
-  const sunbeamBoost = activeBoosts.find(
-    (b) => b.source === AdTouchpoint.SunbeamBoost
-  );
-  const isActive = sunbeamBoost !== undefined && sunbeamBoost.expiresAt > now;
-  const remainingMs = isActive ? sunbeamBoost.expiresAt - now : 0;
+  const remainingMs = isActive ? sunbeamBoost!.expiresAt - now : 0;
 
   const handlePress = () => {
     if (isWatching || isActive) return;

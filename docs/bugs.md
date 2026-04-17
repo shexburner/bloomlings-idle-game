@@ -64,9 +64,15 @@ Copy this block when filing a new bug. Give each bug a unique incrementing ID.
 
 ## Open bugs
 
+*(none)*
+
+---
+
+## Fixed bugs (awaiting verification)
+
 ### BUG-001 — saveManager references fields missing from GameState type
 
-- **Status:** open
+- **Status:** fixed
 - **Severity:** blocking
 - **Reported by:** Code Reviewer
 - **Reported on:** 2026-04-17
@@ -91,16 +97,17 @@ Branch typechecks cleanly. All persisted fields are declared on `GameState`.
 Four new fields live only on `MetaSlice` (`src/state/store.ts:97-122`). `SaveData.state` is typed `Omit<GameState, "combo" | "engineRunning">`, so both the write path (object literal excess property) and the read path (property access) fail to compile.
 
 **Fix**
-<pending>
+40fd3a9 — Four fields added to `GameState` in `src/types/game.ts:633-640`; already included in `extractSaveState` and `applySaveToStore`.
 
 **History**
 - 2026-04-17 — opened by Code Reviewer
+- 2026-04-17 — fixed; fields confirmed present in 40fd3a9
 
 ---
 
 ### BUG-002 — Lucky Sprout BonusSunlight crashes at runtime (missing upgrades arg)
 
-- **Status:** open
+- **Status:** fixed
 - **Severity:** blocking
 - **Reported by:** Code Reviewer
 - **Reported on:** 2026-04-17
@@ -125,16 +132,17 @@ Signature requires `Pick<GameStore, "bloomlings" | "garden" | "upgrades">`. Insi
 App crashes for ~35% of Lucky Sprout watches.
 
 **Fix**
-<pending — pass `upgrades: state.upgrades` (or pass `state` directly)>
+40fd3a9 — `upgrades: state.upgrades` added to the `totalSunlightPerSecondFromRegistry` call at `src/state/store.ts:579`.
 
 **History**
 - 2026-04-17 — opened by Code Reviewer
+- 2026-04-17 — fixed; `upgrades` arg confirmed present in 40fd3a9
 
 ---
 
 ### BUG-003 — First Lucky Sprout fires ~30 s after launch instead of 10–15 min
 
-- **Status:** open
+- **Status:** fixed
 - **Severity:** high
 - **Reported by:** Code Reviewer
 - **Reported on:** 2026-04-17
@@ -157,16 +165,17 @@ First Lucky Sprout appears 10–15 min after launch, per `docs/design/05-ad-econ
 Modal can appear within 30 s of opening a fresh save.
 
 **Fix**
-<pending — seed `lastLuckySproutAt = now` on first foreground, or treat `null` as "not yet eligible" and stamp it on the first check>
+40fd3a9 — When `lastLuckySproutAt === null`, scheduler now stamps `now` without triggering (seeds the interval clock). See `src/engine/gameLoop.ts:209-213`.
 
 **History**
 - 2026-04-17 — opened by Code Reviewer
+- 2026-04-17 — fixed; null-seeding confirmed in 40fd3a9
 
 ---
 
 ### BUG-004 — Lucky Sprout interval re-rolled every 30 s biases spawns early
 
-- **Status:** open
+- **Status:** fixed
 - **Severity:** medium
 - **Reported by:** Code Reviewer
 - **Reported on:** 2026-04-17
@@ -184,16 +193,17 @@ Spawn time uniformly distributed in [10 min, 15 min].
 Distribution skewed toward 10 min.
 
 **Fix**
-<pending — lock the next interval into a ref or store field at trigger/clear time; re-roll only after a spawn is resolved>
+40fd3a9 — `luckySproutNextIntervalRef` pre-rolls the interval; it is re-rolled only after a spawn resolves, not on every check. See `src/engine/gameLoop.ts:196,221`.
 
 **History**
 - 2026-04-17 — opened by Code Reviewer
+- 2026-04-17 — fixed; locked-ref approach confirmed in 40fd3a9
 
 ---
 
 ### BUG-005 — SunbeamBoostButton runs a 1 Hz timer even when hidden/inactive
 
-- **Status:** open
+- **Status:** fixed
 - **Severity:** low
 - **Reported by:** Code Reviewer
 - **Reported on:** 2026-04-17
@@ -211,16 +221,17 @@ Timer runs only while a Sunbeam Boost is active (i.e. only while the countdown i
 Timer ticks every second on every Garden render, wasting cycles pre-Zone 15 and between boosts.
 
 **Fix**
-<pending — gate the interval behind `isActive`, or move the re-render to a derived value>
+40fd3a9 — `isActive` computed before hooks; `useEffect` guarded by `if (!isActive) return`. Timer starts/stops with the boost. See `src/components/garden/SunbeamBoostButton.tsx:49-59`.
 
 **History**
 - 2026-04-17 — opened by Code Reviewer
+- 2026-04-17 — fixed; `isActive` gating confirmed in 40fd3a9
 
 ---
 
 ### BUG-006 — Rolling TapBoost twice truncates remaining duration
 
-- **Status:** open
+- **Status:** fixed
 - **Severity:** low
 - **Reported by:** Code Reviewer
 - **Reported on:** 2026-04-17
@@ -238,16 +249,17 @@ Duration extends (or the player gets the max of existing vs new), matching playe
 New boost replaces existing; can shorten remaining time.
 
 **Fix**
-<pending — use `Math.max(existing ?? 0, now) + LUCKY_SPROUT_TAP_BOOST_DURATION_MS`>
+40fd3a9 — Uses `Math.max(s.luckySproutTapBoostExpiresAt ?? 0, now) + DURATION` so existing time is never lost. See `src/state/store.ts:590-594`.
 
 **History**
 - 2026-04-17 — opened by Code Reviewer
+- 2026-04-17 — fixed; Math.max extension confirmed in 40fd3a9
 
 ---
 
 ### BUG-007 — No automated coverage for the three new ad touchpoints
 
-- **Status:** open
+- **Status:** fixed
 - **Severity:** medium
 - **Reported by:** QA Tester
 - **Reported on:** 2026-04-17
@@ -265,16 +277,15 @@ At minimum one smoke spec per touchpoint (modal appears → dismiss path, FAB vi
 Zero coverage. Regressions will only surface in manual QA.
 
 **Fix**
-<pending>
+Pending commit — three specs added under `e2e/tests/ads/` (TC-AD-001 through TC-AD-006); section 11 added to `docs/testing/test-cases.md`.
 
 **History**
 - 2026-04-17 — opened by QA Tester
+- 2026-04-17 — fixed; e2e specs and catalog entries added
 
 ---
 
 ## Fixed bugs (awaiting verification)
-
-*(none)*
 
 ---
 
