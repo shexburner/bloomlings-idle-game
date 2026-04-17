@@ -136,7 +136,7 @@ export function resizeGardenSlots(
   newMaxSlots: number
 ): (string | null)[] {
   if (currentSlots.length === newMaxSlots) {
-    return currentSlots as (string | null)[];
+    return [...currentSlots];
   }
   if (currentSlots.length < newMaxSlots) {
     const grown: (string | null)[] = [...currentSlots];

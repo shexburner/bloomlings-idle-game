@@ -171,6 +171,7 @@ export interface TapHandler {
  */
 export function useTapHandler(): TapHandler {
   const tapHistoryRef = useRef<number[]>([]);
+  const consecutiveCritRef = useRef<number>(0);
 
   const comboCount = useGameStore((state) => state.combo.count);
   const comboMultiplier = getComboMultiplier(comboCount);
@@ -225,6 +226,16 @@ export function useTapHandler(): TapHandler {
     const result: TapResult = tapBoostActive
       ? { ...rawResult, sunlight: rawResult.sunlight * LUCKY_SPROUT_TAP_BOOST_MULTIPLIER }
       : rawResult;
+
+    // BUG-010: hat_trick — track consecutive crits
+    if (result.isCritical) {
+      consecutiveCritRef.current += 1;
+      if (consecutiveCritRef.current >= 5) {
+        useGameStore.getState().triggerHiddenAchievement("hat_trick");
+      }
+    } else {
+      consecutiveCritRef.current = 0;
+    }
 
     // --- Apply state updates ---
     // Update combo (this also updates lastTapAt and sessionMaxCombo)

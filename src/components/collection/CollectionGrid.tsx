@@ -8,7 +8,6 @@
 
 import { useCallback, useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import type { BloomlingTemplate, Bloomling } from "~/types/game";
 import { useGameStore } from "~/state/store";
@@ -35,7 +34,6 @@ const COLORS = {
 // ---------------------------------------------------------------------------
 
 export function CollectionGrid() {
-  const insets = useSafeAreaInsets();
   const bloomlings = useGameStore((s) => s.bloomlings);
 
   // Detail modal state
@@ -99,7 +97,7 @@ export function CollectionGrid() {
   return (
     <View
       testID="collection-grid"
-      style={[styles.container, { paddingTop: insets.top }]}
+      style={styles.container}
     >
       {/* Header */}
       <Text style={styles.header}>Bloomling Collection</Text>

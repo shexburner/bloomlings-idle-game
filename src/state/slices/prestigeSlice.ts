@@ -164,6 +164,8 @@ export const createPrestigeSlice: StateCreator<
     // Seasonal Memory can start a rebirth at zone > 1, which may have
     // unlocked additional species the player's save doesn't yet reflect.
     get().discoverBloomlingsForZone(startingZone);
+    // Check rebirth-count achievements.
+    get().checkAndGrantAchievements();
   },
 
   executeTranscendence: () => {
@@ -236,5 +238,7 @@ export const createPrestigeSlice: StateCreator<
     // Transcendence resets to zone 1. Re-run discovery so the player is
     // guaranteed a Fernley auto-placed in the garden for the new run.
     get().discoverBloomlingsForZone(1);
+    // Check transcendence achievements.
+    get().checkAndGrantAchievements();
   },
 });

@@ -511,6 +511,11 @@ export interface GameStats {
   totalGatesCleared: number;
   /** Total bosses defeated all-time. */
   totalBossesDefeated: number;
+  /**
+   * How many times the player has returned to collect offline earnings between
+   * midnight and 5 AM (local time). Used for the "Night Owl" hidden achievement.
+   */
+  nightOwlOfflineCollections: number;
 }
 
 // -----------------------------------------------------------------------------

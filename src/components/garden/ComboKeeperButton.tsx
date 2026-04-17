@@ -10,10 +10,7 @@ import { useState } from "react";
 import { Pressable, StyleSheet, Text } from "react-native";
 
 import { useRewardedAd } from "~/services/adManager";
-import { useGameStore } from "~/state/store";
-
-/** Must match COMBO_KEEPER_COOLDOWN_MS in store.ts. */
-const COMBO_KEEPER_COOLDOWN_MS = 30 * 60 * 1000;
+import { useGameStore, COMBO_KEEPER_COOLDOWN_MS } from "~/state/store";
 
 const COMBO_THRESHOLD = 50;
 

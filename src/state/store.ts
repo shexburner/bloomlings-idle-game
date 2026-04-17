@@ -34,9 +34,11 @@ import type {
 } from "~/types/game";
 import { AdTouchpoint } from "~/types/game";
 import { PERK_ID, PERK_TEMPLATE_MAP } from "~/data/perkTemplates";
+import { buildInitialAchievements } from "~/data/achievementTemplates";
 import { DEWDROP_SLOT_PERK_ID } from "~/engine/garden";
 import { getBloomlingTemplate } from "~/data/bloomlingTemplates";
 import { totalSunlightPerSecondFromRegistry } from "./selectors";
+import { checkAchievements } from "~/engine/achievements";
 import {
   LuckySproutReward,
   LUCKY_SPROUT_BONUS_SUNLIGHT_SECONDS,
@@ -56,7 +58,7 @@ const SUNBEAM_BOOST_MULTIPLIER = 2;
 /** Combo Keeper: freeze combo decay for 5 minutes. */
 const COMBO_KEEPER_FREEZE_DURATION_MS = 5 * 60 * 1000;
 /** Combo Keeper: 30-minute cooldown between ads. */
-const COMBO_KEEPER_COOLDOWN_MS = 30 * 60 * 1000;
+export const COMBO_KEEPER_COOLDOWN_MS = 30 * 60 * 1000;
 
 // -----------------------------------------------------------------------------
 // Combined Store Type
@@ -210,6 +212,21 @@ export interface MetaSlice {
   applyLuckySproutReward: (
     reward: LuckySproutReward
   ) => { bonusSunlight: number; freeLevelUpBloomlingName: string | null };
+
+  // --- Achievements ---
+  /**
+   * Check all passively-computable achievements against current state. Marks
+   * newly-completed ones, grants their rewards, and bumps
+   * `stats.achievementsCompleted`. Safe to call frequently — no-op when
+   * nothing is newly complete.
+   */
+  checkAndGrantAchievements: () => void;
+  /**
+   * Directly complete a hidden/event-driven achievement by ID. No-op if
+   * already completed or the ID is unknown. Used for achievements that cannot
+   * be evaluated from static store state (e.g. "patient_gardener").
+   */
+  triggerHiddenAchievement: (id: string) => void;
 }
 
 /**
@@ -253,6 +270,7 @@ const initialStats: GameStats = {
   totalZonesCleared: 0,
   totalGatesCleared: 0,
   totalBossesDefeated: 0,
+  nightOwlOfflineCollections: 0,
 };
 
 const initialDaily: DailyState = {
@@ -280,6 +298,9 @@ const initialUnlockedFeatures: MetaSlice["unlockedFeatures"] = {
   transcendence: false,
 };
 
+// Module-level timestamp for speed_demon achievement (not persisted).
+let zoneEnteredAt = Date.now();
+
 // -----------------------------------------------------------------------------
 // Store Creation
 // -----------------------------------------------------------------------------
@@ -301,7 +322,7 @@ export const useGameStore = create<GameStore>()((...args) => {
     activeBoosts: [],
     adStates: {} as Record<AdTouchpoint, AdRewardConfig>,
     daily: initialDaily,
-    achievements: {},
+    achievements: buildInitialAchievements(),
     synergies: {},
     stats: initialStats,
     lastTickAt: Date.now(),
@@ -349,6 +370,9 @@ export const useGameStore = create<GameStore>()((...args) => {
       })),
 
     advanceZone: () => {
+      const now = Date.now();
+      const { gateFailCount } = get().zoneProgress;
+
       set((state) => {
         const nextZone = state.zoneProgress.currentZone + 1;
         return {
@@ -382,12 +406,24 @@ export const useGameStore = create<GameStore>()((...args) => {
           },
         };
       });
+      // BUG-010: speed_demon — zone cleared in under 30 s
+      if (now - zoneEnteredAt < 30_000) {
+        get().triggerHiddenAchievement("speed_demon");
+      }
+      // BUG-010: stubborn_sprout — cleared a gate after at least one failure
+      if (gateFailCount > 0) {
+        get().triggerHiddenAchievement("stubborn_sprout");
+      }
+      zoneEnteredAt = now;
+
       // Crossing a zone threshold may unlock a new garden slot.
       get().syncGardenCapacity();
       // ...and may unlock a new Bloomling species. Run discovery after the
       // slot array is sized so auto-placement (for the first-ever species)
       // lands in a valid slot.
       get().discoverBloomlingsForZone(get().zoneProgress.currentZone);
+      // Check zone/growth achievements after each zone advance.
+      get().checkAndGrantAchievements();
     },
 
     setActiveBoosts: (boosts: ActiveBoost[]) =>
@@ -643,6 +679,102 @@ export const useGameStore = create<GameStore>()((...args) => {
       }));
 
       return { bonusSunlight, freeLevelUpBloomlingName };
+    },
+
+    // --- Achievements ---
+
+    checkAndGrantAchievements: () => {
+      const state = get();
+      const newlyCompleted = checkAchievements(state);
+      if (newlyCompleted.length === 0) return;
+
+      const now = Date.now();
+      let totalSunlight = 0;
+      let totalDewdrops = 0;
+
+      set((s) => {
+        const updated = { ...s.achievements };
+        for (const id of newlyCompleted) {
+          const achievement = updated[id];
+          if (achievement === undefined || achievement.completed) continue;
+          updated[id] = {
+            ...achievement,
+            completed: true,
+            completedAt: now,
+            progress: achievement.target,
+          };
+          totalSunlight += achievement.sunlightReward;
+          totalDewdrops += achievement.dewdropReward;
+        }
+        return {
+          achievements: updated,
+          stats: {
+            ...s.stats,
+            achievementsCompleted:
+              s.stats.achievementsCompleted + newlyCompleted.length,
+          },
+        };
+      });
+
+      if (totalSunlight > 0) get().addSunlight(totalSunlight);
+      if (totalDewdrops > 0) get().addDewdrops(totalDewdrops);
+
+      // Check completionist separately: it depends on other achievements.
+      const afterState = get();
+      const completionist = afterState.achievements["completionist"];
+      if (completionist !== undefined && !completionist.completed) {
+        const doneCount = Object.values(afterState.achievements).filter(
+          (a) => a.id !== "completionist" && a.completed
+        ).length;
+        if (doneCount >= completionist.target) {
+          const now2 = Date.now();
+          set((s) => ({
+            achievements: {
+              ...s.achievements,
+              completionist: {
+                ...completionist,
+                completed: true,
+                completedAt: now2,
+                progress: completionist.target,
+              },
+            },
+            stats: {
+              ...s.stats,
+              achievementsCompleted: s.stats.achievementsCompleted + 1,
+            },
+          }));
+          if (completionist.sunlightReward > 0) {
+            get().addSunlight(completionist.sunlightReward);
+          }
+          if (completionist.dewdropReward > 0) {
+            get().addDewdrops(completionist.dewdropReward);
+          }
+        }
+      }
+    },
+
+    triggerHiddenAchievement: (id: string) => {
+      const state = get();
+      const achievement = state.achievements[id];
+      if (achievement === undefined || achievement.completed) return;
+      const now = Date.now();
+      set((s) => ({
+        achievements: {
+          ...s.achievements,
+          [id]: {
+            ...achievement,
+            completed: true,
+            completedAt: now,
+            progress: achievement.target,
+          },
+        },
+        stats: {
+          ...s.stats,
+          achievementsCompleted: s.stats.achievementsCompleted + 1,
+        },
+      }));
+      if (achievement.sunlightReward > 0) get().addSunlight(achievement.sunlightReward);
+      if (achievement.dewdropReward > 0) get().addDewdrops(achievement.dewdropReward);
     },
   };
 });
