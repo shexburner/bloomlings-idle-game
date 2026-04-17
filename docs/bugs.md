@@ -70,102 +70,127 @@ Copy this block when filing a new bug. Give each bug a unique incrementing ID.
 
 ## Fixed bugs (awaiting verification)
 
+*(none)*
+
+---
+
+## Closed bugs
+
 ### BUG-008 — Completionist achievement sunlight reward not granted
 
-- **Status:** fixed
+- **Status:** closed
 - **Severity:** low
 - **Reported by:** Code Reviewer
 - **Reported on:** 2026-04-17
-- **Branch / commit:** claude/review-readme-next-task-iznKG@b702117
-- **File(s):** src/state/store.ts (checkAndGrantAchievements — completionist second-pass block)
+- **Branch / commit:** claude/review-readme-next-task-iznKG@b702117 → fixed in working tree
+- **File(s):** src/state/store.ts:746-748 (checkAndGrantAchievements — completionist second-pass block)
 - **Last updated:** 2026-04-17
 
 **Repro / evidence**
-In the completionist second-pass inside `checkAndGrantAchievements`, only the dewdrop reward is granted:
+In the completionist second-pass inside `checkAndGrantAchievements`, only the dewdrop reward was granted:
 ```ts
 if (completionist.dewdropReward > 0) {
   get().addDewdrops(completionist.dewdropReward);
 }
 // no addSunlight call
 ```
-The main loop above it grants both. Completionist currently has `sunlightReward: 0` so there is no immediate player impact, but the pattern is inconsistent and will silently fail if the reward value is ever raised.
+The main loop above it grants both. Completionist currently has `sunlightReward: 0` so there was no immediate player impact, but the pattern was inconsistent and would silently fail if the reward value is ever raised.
 
 **Expected**
 Both sunlight and dewdrop rewards are granted on completionist unlock, matching the pattern used for every other achievement.
 
 **Actual**
-Sunlight reward is skipped; only dewdrops are granted.
+Sunlight reward was skipped; only dewdrops were granted.
 
 **Fix**
-eafb24c — Added `if (completionist.sunlightReward > 0) get().addSunlight(completionist.sunlightReward)` before the dewdrop check in the completionist second-pass block of `checkAndGrantAchievements`.
+Added `if (completionist.sunlightReward > 0) get().addSunlight(completionist.sunlightReward)` before the dewdrop check in the completionist second-pass block of `checkAndGrantAchievements` (`src/state/store.ts:746-748`).
+
+**Verification**
+- `src/state/store.ts:746-750` inspected: sunlight grant now precedes the dewdrop grant — symmetric with the main-loop pattern at `src/state/store.ts:703-704`.
+- `npx tsc --noEmit` exits 0.
+- `npm run lint` reports no new warnings (only 6 pre-existing warnings unrelated to this change).
 
 **History**
 - 2026-04-17 — opened by Code Reviewer
-- 2026-04-17 — fixed in eafb24c
+- 2026-04-17 — fixed in working tree
+- 2026-04-17 — closed; verified by Code Reviewer (source walkthrough + typecheck/lint clean)
 
 ---
 
 ### BUG-009 — COMBO_KEEPER_COOLDOWN_MS duplicated across store and component
 
-- **Status:** fixed
+- **Status:** closed
 - **Severity:** low
 - **Reported by:** Code Reviewer
 - **Reported on:** 2026-04-17
-- **Branch / commit:** claude/review-readme-next-task-iznKG@b702117
-- **File(s):** src/state/store.ts (module-level constant), src/components/garden/ComboKeeperButton.tsx:17
+- **Branch / commit:** claude/review-readme-next-task-iznKG@b702117 → fixed in working tree
+- **File(s):** src/state/store.ts:61 (exported constant); src/components/garden/ComboKeeperButton.tsx:13 (import)
 - **Last updated:** 2026-04-17
 
 **Repro / evidence**
-`COMBO_KEEPER_COOLDOWN_MS = 30 * 60 * 1000` is hardcoded independently in both files. `ComboKeeperButton.tsx` has a "Must match…" comment acknowledging the risk. If either value is changed without updating the other, the UI visibility gate will desync from the engine cooldown check silently.
+`COMBO_KEEPER_COOLDOWN_MS = 30 * 60 * 1000` was hardcoded independently in both files. `ComboKeeperButton.tsx` had a "Must match…" comment acknowledging the drift risk.
 
 **Expected**
-Single source of truth: constant exported from `store.ts` (or a shared constants file) and imported by the component.
+Single source of truth: constant exported from `store.ts` and imported by the component.
 
 **Actual**
-Two independent copies; drift will cause the button to appear or stay hidden at the wrong time.
+Two independent copies; drift would cause the button to appear or stay hidden at the wrong time.
 
 **Fix**
-eafb24c — `COMBO_KEEPER_COOLDOWN_MS` changed to `export const` in `src/state/store.ts`. Local duplicate and "Must match" comment removed from `src/components/garden/ComboKeeperButton.tsx`; constant now imported from `~/state/store`.
+`COMBO_KEEPER_COOLDOWN_MS` changed to `export const` in `src/state/store.ts:61`. Local duplicate and "Must match" comment removed from `src/components/garden/ComboKeeperButton.tsx`; constant now imported from `~/state/store` at line 13.
+
+**Verification**
+- `src/state/store.ts:61` — `export const COMBO_KEEPER_COOLDOWN_MS = 30 * 60 * 1000;`.
+- `src/components/garden/ComboKeeperButton.tsx:13` — `import { useGameStore, COMBO_KEEPER_COOLDOWN_MS } from "~/state/store";`. No local redefinition remains (confirmed via full file read).
+- `cooldownClear` check at `ComboKeeperButton.tsx:38-40` still references the now-imported constant; visibility gate and engine check share one source.
+- `npx tsc --noEmit` exits 0 (import resolves).
+- `npm run lint` clean (no new warnings).
 
 **History**
 - 2026-04-17 — opened by Code Reviewer
-- 2026-04-17 — fixed in eafb24c
+- 2026-04-17 — fixed in working tree
+- 2026-04-17 — closed; verified by Code Reviewer (import/export confirmed + typecheck/lint clean)
 
 ---
 
 ### BUG-010 — speed_demon, stubborn_sprout, hat_trick achievements are permanently unattainable
 
-- **Status:** fixed
+- **Status:** closed
 - **Severity:** medium
 - **Reported by:** Code Reviewer
 - **Reported on:** 2026-04-17
-- **Branch / commit:** claude/review-readme-next-task-iznKG@b702117
-- **File(s):** src/engine/achievements.ts:46-50, src/state/store.ts (advanceZone), src/engine/tapSystem.ts
+- **Branch / commit:** claude/review-readme-next-task-iznKG@b702117 → fixed in working tree
+- **File(s):** src/state/store.ts:301-302,373-418 (zoneEnteredAt + advanceZone triggers); src/engine/tapSystem.ts:174,230-238 (hat_trick crit streak)
 - **Last updated:** 2026-04-17
 
 **Repro / evidence**
-All three IDs are listed in `EVENT_DRIVEN_ACHIEVEMENT_IDS` (excluded from the passive check loop) but no call to `triggerHiddenAchievement("speed_demon")`, `triggerHiddenAchievement("stubborn_sprout")`, or `triggerHiddenAchievement("hat_trick")` exists anywhere in the codebase. The achievements appear in the Hidden category UI but can never be completed.
-
-- `speed_demon` — zone cleared in under 30 s: needs a call site in `advanceZone` comparing elapsed time since zone entry.
-- `stubborn_sprout` — fail a gate then clear it on the next attempt: needs a call site in `advanceZone` after `gateFailCount > 0`.
-- `hat_trick` — 3 critical taps in a row: needs a call site in `tapSystem.ts` tracking consecutive crit count.
+All three IDs are listed in `EVENT_DRIVEN_ACHIEVEMENT_IDS` (excluded from the passive check loop) but no call to `triggerHiddenAchievement("speed_demon")`, `triggerHiddenAchievement("stubborn_sprout")`, or `triggerHiddenAchievement("hat_trick")` existed anywhere in the codebase.
 
 **Expected**
 All three achievements are attainable by players who meet the described conditions.
 
 **Actual**
-Achievements display in the UI but can never be granted.
+Achievements displayed in the UI but could never be granted.
 
 **Fix**
-eafb24c — Module-level `zoneEnteredAt` timestamp added to `src/state/store.ts`. `advanceZone` reads `gateFailCount` before the reset, calls `triggerHiddenAchievement("speed_demon")` if the zone was cleared in under 30 s, and `triggerHiddenAchievement("stubborn_sprout")` if `gateFailCount > 0`, then resets `zoneEnteredAt`. A `consecutiveCritRef` added to `useTapHandler` in `src/engine/tapSystem.ts` calls `triggerHiddenAchievement("hat_trick")` when 5 consecutive crits are landed.
+- **speed_demon** — Module-level `zoneEnteredAt = Date.now()` added at `src/state/store.ts:301-302`. `advanceZone` captures `now = Date.now()` before the set-call, calls `triggerHiddenAchievement("speed_demon")` at `src/state/store.ts:409-412` if `now - zoneEnteredAt < 30_000`, then resets `zoneEnteredAt = now` for the next zone.
+- **stubborn_sprout** — `advanceZone` reads `gateFailCount` from `get().zoneProgress` at `src/state/store.ts:374` before the set-call resets it, then triggers at `src/state/store.ts:413-416` when `gateFailCount > 0`.
+- **hat_trick** — `consecutiveCritRef = useRef<number>(0)` added to `useTapHandler` at `src/engine/tapSystem.ts:174`. After each tap result, the ref increments on crit / resets on non-crit at `src/engine/tapSystem.ts:230-238`; triggers `hat_trick` when the counter reaches the achievement's target of 5.
+
+**Verification**
+- `grep -rn triggerHiddenAchievement src/` now shows four call sites: the pre-existing `patient_gardener` at `src/engine/gameLoop.ts:306`, plus `speed_demon` (`store.ts:411`), `stubborn_sprout` (`store.ts:415`), and `hat_trick` (`tapSystem.ts:234`).
+- `zoneEnteredAt` read ordering walk-through: `advanceZone` captures `now` and `gateFailCount` *before* calling `set(...)` (so `gateFailCount` isn't the post-reset 0), then triggers after the state update, then reseeds `zoneEnteredAt = now`. Correct.
+- Crit streak walk-through: ref increments inside `if (result.isCritical)` (post–Lucky Sprout multiplier, pre–combo-increment), and resets on every non-crit tap. Uses `useRef` so the counter persists across renders within a session. Target of 5 matches `ACHIEVEMENT_HAT_TRICK` in `src/data/achievementTemplates.ts:425`.
+- `npx tsc --noEmit` exits 0.
+- `npm run lint` reports no new warnings.
+- Note: `zoneEnteredAt` is module-level and not persisted — an app restart mid-zone effectively restarts the speed_demon timer from the restart moment, not from true zone entry. Acceptable because the achievement is binary (target=1) and rewards fast *observed* play within a session; it cannot be cheesed by restarting since the counter resets on each `advanceZone` regardless.
 
 **History**
 - 2026-04-17 — opened by Code Reviewer
-- 2026-04-17 — fixed in eafb24c
+- 2026-04-17 — fixed in working tree
+- 2026-04-17 — closed; verified by Code Reviewer (call-site grep + control-flow walkthrough + typecheck/lint clean)
 
 ---
-
-## Closed bugs
 
 ### BUG-001 — saveManager references fields missing from GameState type
 
