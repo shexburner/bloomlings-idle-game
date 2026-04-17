@@ -29,6 +29,16 @@ const TICK_INTERVAL_MS = 100;
 /** How often (ms) to check if a Lucky Sprout should be triggered (foreground only). */
 const LUCKY_SPROUT_CHECK_INTERVAL_MS = 30_000;
 
+/** How often (ms) to run the passive achievement check (foreground only). */
+const ACHIEVEMENT_CHECK_INTERVAL_MS = 30_000;
+
+/** Offline duration that triggers the "Patient Gardener" hidden achievement (ms). */
+const PATIENT_GARDENER_THRESHOLD_MS = 24 * 60 * 60 * 1000;
+
+/** Hour range (local) for the "Night Owl" hidden achievement (midnight to 5 AM). */
+const NIGHT_OWL_START_HOUR = 0;
+const NIGHT_OWL_END_HOUR = 5;
+
 /** Combo decay window: reset combo if no tap for 1.5 seconds. */
 const COMBO_DECAY_MS = 1500;
 
@@ -191,6 +201,7 @@ export function useGameLoop(): void {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const lastTickRef = useRef<number>(Date.now());
   const luckySproutLastCheckRef = useRef<number>(Date.now());
+  const achievementLastCheckRef = useRef<number>(Date.now());
   // Pre-rolled target interval; re-rolled only after each spawn resolves so the
   // distribution stays uniform rather than biased toward the minimum.
   const luckySproutNextIntervalRef = useRef<number>(nextLuckySproutIntervalMs());
@@ -220,6 +231,12 @@ export function useGameLoop(): void {
         // Re-roll the interval for the next spawn cycle.
         luckySproutNextIntervalRef.current = nextLuckySproutIntervalMs();
       }
+    }
+
+    // Achievement check: every 30s of foreground play.
+    if (now - achievementLastCheckRef.current >= ACHIEVEMENT_CHECK_INTERVAL_MS) {
+      achievementLastCheckRef.current = now;
+      useGameStore.getState().checkAndGrantAchievements();
     }
 
     const result = gameTick(state, now, deltaMs);
@@ -281,6 +298,27 @@ export function useGameLoop(): void {
         state.setLastActiveAt(now);
         state.setLastTickAt(now);
         lastTickRef.current = now;
+
+        // --- Hidden achievement checks on foreground ---
+        if (offlineResult.sunlightEarned > 0) {
+          // "Patient Gardener": returned after exactly 24h (at the cap).
+          if (offlineResult.durationMs >= PATIENT_GARDENER_THRESHOLD_MS) {
+            useGameStore.getState().triggerHiddenAchievement("patient_gardener");
+          }
+          // "Night Owl": collecting offline earnings between midnight and 5 AM.
+          const hour = new Date(now).getHours();
+          if (hour >= NIGHT_OWL_START_HOUR && hour < NIGHT_OWL_END_HOUR) {
+            useGameStore.setState((s) => ({
+              stats: {
+                ...s.stats,
+                nightOwlOfflineCollections: s.stats.nightOwlOfflineCollections + 1,
+              },
+            }));
+            // Trigger passive check so the achievement is granted immediately
+            // if the counter crossed the threshold.
+            useGameStore.getState().checkAndGrantAchievements();
+          }
+        }
 
         // Clear any expired boosts
         const activeBoosts = state.activeBoosts.filter(

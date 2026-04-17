@@ -206,6 +206,8 @@ export const createBloomlingSlice: StateCreator<
     });
     // Reaching Elder stage can unlock new tag synergies.
     get().recomputeActiveSynergies();
+    // Evolution may complete growth achievements (Bloom/Elder stage).
+    get().checkAndGrantAchievements();
   },
 
   addToGarden: (instanceId: string, slotIndex: number) => {
@@ -285,6 +287,8 @@ export const createBloomlingSlice: StateCreator<
     });
     // Newly-placed Bloomlings may activate synergies.
     get().recomputeActiveSynergies();
+    // Discovery may complete collector/growth achievements.
+    get().checkAndGrantAchievements();
   },
 
   ensureInitialDiscoveries: () => {

@@ -12,6 +12,7 @@ import type { MMKV } from "react-native-mmkv";
 import { useGameStore } from "~/state/store";
 import type { GameStore } from "~/state/store";
 import type { SaveData, GameState } from "~/types/game";
+import { buildInitialAchievements } from "~/data/achievementTemplates";
 
 // -----------------------------------------------------------------------------
 // Constants
@@ -296,9 +297,15 @@ export function applySaveToStore(save: SaveData): void {
     activeBoosts: state.activeBoosts,
     adStates: state.adStates,
     daily: state.daily,
-    achievements: state.achievements,
+    // Merge saved achievements with current templates so achievements added
+    // after the save was created appear as uncompleted rather than absent.
+    achievements: { ...buildInitialAchievements(), ...(state.achievements ?? {}) },
     synergies: state.synergies,
-    stats: state.stats,
+    stats: {
+      ...state.stats,
+      // Default any new stat fields for saves that predate them.
+      nightOwlOfflineCollections: state.stats.nightOwlOfflineCollections ?? 0,
+    },
     settings: state.settings,
     lastTickAt: state.lastTickAt,
     lastActiveAt: state.lastActiveAt,
