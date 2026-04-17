@@ -576,6 +576,7 @@ export const useGameStore = create<GameStore>()((...args) => {
           const idleRate = totalSunlightPerSecondFromRegistry({
             bloomlings: state.bloomlings,
             garden: state.garden,
+            upgrades: state.upgrades,
           });
           // Guarantee a small payout if the player has no Garden production yet.
           bonusSunlight = Math.max(
@@ -586,10 +587,11 @@ export const useGameStore = create<GameStore>()((...args) => {
           break;
         }
         case LuckySproutReward.TapBoost: {
-          set({
+          set((s) => ({
             luckySproutTapBoostExpiresAt:
-              now + LUCKY_SPROUT_TAP_BOOST_DURATION_MS,
-          });
+              Math.max(s.luckySproutTapBoostExpiresAt ?? 0, now) +
+              LUCKY_SPROUT_TAP_BOOST_DURATION_MS,
+          }));
           break;
         }
         case LuckySproutReward.Dewdrop: {

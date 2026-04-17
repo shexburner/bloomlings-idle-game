@@ -12,6 +12,7 @@ import {
   getComboMultiplier,
 } from "~/state/selectors";
 import type { GameStore } from "~/state/store";
+import { LUCKY_SPROUT_TAP_BOOST_MULTIPLIER } from "./luckySprout";
 
 // -----------------------------------------------------------------------------
 // Constants
@@ -209,13 +210,21 @@ export function useTapHandler(): TapHandler {
 
     // tapMultiplier is already folded into baseTapValue via selectEffectiveTapValue,
     // so we pass 1.0 as the tapMultiplier to avoid double-multiplying.
-    const result = calculateTapReward(
+    const rawResult = calculateTapReward(
       baseTapValue,
       1.0,
       newComboCount,
       effectiveCritChance,
       effectiveCritMultiplier
     );
+
+    // Apply Lucky Sprout 2× tap boost if active.
+    const tapBoostActive =
+      state.luckySproutTapBoostExpiresAt !== null &&
+      now < state.luckySproutTapBoostExpiresAt;
+    const result: TapResult = tapBoostActive
+      ? { ...rawResult, sunlight: rawResult.sunlight * LUCKY_SPROUT_TAP_BOOST_MULTIPLIER }
+      : rawResult;
 
     // --- Apply state updates ---
     // Update combo (this also updates lastTapAt and sessionMaxCombo)

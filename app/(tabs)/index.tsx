@@ -10,6 +10,8 @@ import { CurrencyBar } from "~/components/garden/CurrencyBar";
 import { TapArea } from "~/components/garden/TapArea";
 import { TapFeedback, useTapFeedback } from "~/components/garden/TapFeedback";
 import { ComboMeter } from "~/components/garden/ComboMeter";
+import { ComboKeeperButton } from "~/components/garden/ComboKeeperButton";
+import { SunbeamBoostButton } from "~/components/garden/SunbeamBoostButton";
 import { ZoneProgress } from "~/components/garden/ZoneProgress";
 import { BloomlingDisplay } from "~/components/garden/BloomlingDisplay";
 import type { TapResult } from "~/engine/tapSystem";
@@ -41,10 +43,14 @@ export default function GardenScreen() {
         <TapFeedback entries={entries} />
       </TapArea>
 
-      {/* Combo meter positioned above the tab bar */}
+      {/* Combo meter + Combo Keeper pill positioned above the tab bar */}
       <View style={styles.comboRow}>
         <ComboMeter />
+        <ComboKeeperButton />
       </View>
+
+      {/* Sunbeam Boost FAB — absolutely positioned, visible from Zone 15 */}
+      <SunbeamBoostButton />
     </View>
   );
 }
@@ -58,7 +64,9 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   comboRow: {
+    flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     paddingBottom: 12,
   },
 });

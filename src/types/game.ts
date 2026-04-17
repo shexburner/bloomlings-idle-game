@@ -630,6 +630,14 @@ export interface GameState {
   lastActiveAt: number;
   /** Whether the game engine is currently running (app is in foreground). */
   engineRunning: boolean;
+  /** Timestamp of last Lucky Sprout trigger (pending or resolved). Persisted. */
+  lastLuckySproutAt: number | null;
+  /** Timestamp when Lucky Sprout 2× tap-boost expires, or null if inactive. Persisted. */
+  luckySproutTapBoostExpiresAt: number | null;
+  /** Timestamp of last Combo Keeper ad watch, used for the 30-min cooldown. Persisted. */
+  lastComboKeeperAt: number | null;
+  /** Queued Nectar multiplier for the next Rebirth, or null if none pending. Persisted. */
+  pendingNectarBonus: number | null;
   /** Feature unlock flags — tracks which features have been revealed to the player. */
   unlockedFeatures: {
     tapUpgradeShop: boolean;

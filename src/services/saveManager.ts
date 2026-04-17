@@ -69,6 +69,10 @@ function extractSaveState(
     lastTickAt: state.lastTickAt,
     lastActiveAt: state.lastActiveAt,
     unlockedFeatures: state.unlockedFeatures,
+    lastLuckySproutAt: state.lastLuckySproutAt,
+    luckySproutTapBoostExpiresAt: state.luckySproutTapBoostExpiresAt,
+    lastComboKeeperAt: state.lastComboKeeperAt,
+    pendingNectarBonus: state.pendingNectarBonus,
   };
 }
 
@@ -299,6 +303,10 @@ export function applySaveToStore(save: SaveData): void {
     lastTickAt: state.lastTickAt,
     lastActiveAt: state.lastActiveAt,
     unlockedFeatures: state.unlockedFeatures,
+    lastLuckySproutAt: state.lastLuckySproutAt ?? null,
+    luckySproutTapBoostExpiresAt: state.luckySproutTapBoostExpiresAt ?? null,
+    lastComboKeeperAt: state.lastComboKeeperAt ?? null,
+    pendingNectarBonus: state.pendingNectarBonus ?? null,
     // Re-initialize transient state
     combo: {
       count: 0,

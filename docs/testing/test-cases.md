@@ -1,8 +1,8 @@
 # Bloomlings — Test Case Catalog
 
 **Owner:** Quality Engineer Lead
-**Last updated:** 2026-04-14
-**Scope:** Phases 1–4 + offline-progress engine (Phase 5 ad touchpoints and in-progress idle/evolution-fix work excluded).
+**Last updated:** 2026-04-17
+**Scope:** Phases 1–5 (all shipped ad touchpoints covered; Gate Assist and Boss Smash excluded — engine loops not yet built).
 
 Priority key: **P0** = critical path, automated in `.maestro/`. **P1** = important, automated where feasible. **P2** = manual only.
 Automation key: `auto` (covered by a Maestro flow), `manual` (exploratory/manual only), `planned` (P1 flow stubbed with TODO).
@@ -144,7 +144,18 @@ IDs use `TC-<AREA>-<NNN>`.
 | TC-OFF-005 | Efficiency displayed | Any offline session | View modal | Shows "at N% offline rate" | P1 | manual |
 | TC-OFF-006 | No modal when lastActiveAt is recent | Launch within 60s of prior exit | Launch | Modal not shown | P2 | manual |
 
-## 11. Settings (`TC-SET`)
+## 11. Ad Touchpoints (`TC-AD`)
+
+| ID | Title | Pre | Steps | Expected | Pri | Auto |
+|----|-------|-----|-------|----------|-----|------|
+| TC-AD-001 | Lucky Sprout modal visible when pending | Seed `luckySproutPending=true` | Launch | `lucky-sprout-modal` visible | P1 | manual |
+| TC-AD-002 | Lucky Sprout dismiss clears modal | Modal visible | Tap `lucky-sprout-dismiss` | Modal dismissed | P1 | manual |
+| TC-AD-003 | Sunbeam FAB absent below Zone 15 | Fresh launch (Zone 1) | Garden tab | `sunbeam-boost-button` not present | P1 | auto |
+| TC-AD-004 | Sunbeam FAB visible at Zone 15+ | Seed `allTimeHighestZone=15` | Garden tab | `sunbeam-boost-button` visible | P1 | manual |
+| TC-AD-005 | Combo Keeper pill absent when combo < 50 | Fresh launch | Garden tab | `combo-keeper-button` not present | P1 | auto |
+| TC-AD-006 | Combo Keeper pill appears at combo ≥ 50 | Rapid-tap or seeded combo | Garden tab | `combo-keeper-button` visible | P1 | manual |
+
+## 12. Settings (`TC-SET`)
 
 | ID | Title | Pre | Steps | Expected | Pri | Auto |
 |----|-------|-----|-------|----------|-----|------|
@@ -173,13 +184,14 @@ IDs use `TC-<AREA>-<NNN>`.
 | Rebirth | 10 | 6 | 4 | 0 | 6 | 1 | 3 |
 | Nectar shop | 6 | 2 | 2 | 2 | 2 | 1 | 3 |
 | Offline progress | 6 | 2 | 3 | 1 | 2 | 1 | 3 |
+| Ad touchpoints | 6 | 0 | 6 | 0 | 2 | 0 | 4 |
 | Settings | 8 | 3 | 2 | 3 | 3 | 2 | 3 |
-| **Total** | **85** | **35** | **34** | **16** | **36** | **21** | **28** |
+| **Total** | **91** | **35** | **40** | **16** | **38** | **21** | **32** |
 
 ---
 
 ## Known limitations captured by this catalog
 
 - **Idle production shows 0/s until the idle/evolution fix lands.** TC-GRD-007 and several Evolution / Level-up cases will stay red until then. Do not mask them with skips — they are the regression canary.
-- **Ad touchpoints are placeholder-only.** No test cases reference ads beyond confirming the modal placeholder button is disabled (implicit in TC-OFF-002).
+- **Ad touchpoints (Phase 5):** Lucky Sprout, Sunbeam Boost, and Combo Keeper are covered by TC-AD-001–006. Gate Assist and Boss Smash remain out of scope — their engine loops are not yet built.
 - **Seed-dependent cases** require MMKV save injection (see `.maestro/seeds/`). Manual-only cases that need mid-game state without a seed script are flagged explicitly.
