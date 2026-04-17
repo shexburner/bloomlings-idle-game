@@ -64,7 +64,97 @@ Copy this block when filing a new bug. Give each bug a unique incrementing ID.
 
 ## Open bugs
 
-*(none)*
+### BUG-008 — Completionist achievement sunlight reward not granted
+
+- **Status:** open
+- **Severity:** low
+- **Reported by:** Code Reviewer
+- **Reported on:** 2026-04-17
+- **Branch / commit:** claude/review-readme-next-task-iznKG@b702117
+- **File(s):** src/state/store.ts (checkAndGrantAchievements — completionist second-pass block)
+- **Last updated:** 2026-04-17
+
+**Repro / evidence**
+In the completionist second-pass inside `checkAndGrantAchievements`, only the dewdrop reward is granted:
+```ts
+if (completionist.dewdropReward > 0) {
+  get().addDewdrops(completionist.dewdropReward);
+}
+// no addSunlight call
+```
+The main loop above it grants both. Completionist currently has `sunlightReward: 0` so there is no immediate player impact, but the pattern is inconsistent and will silently fail if the reward value is ever raised.
+
+**Expected**
+Both sunlight and dewdrop rewards are granted on completionist unlock, matching the pattern used for every other achievement.
+
+**Actual**
+Sunlight reward is skipped; only dewdrops are granted.
+
+**Fix**
+*(pending)*
+
+**History**
+- 2026-04-17 — opened by Code Reviewer
+
+---
+
+### BUG-009 — COMBO_KEEPER_COOLDOWN_MS duplicated across store and component
+
+- **Status:** open
+- **Severity:** low
+- **Reported by:** Code Reviewer
+- **Reported on:** 2026-04-17
+- **Branch / commit:** claude/review-readme-next-task-iznKG@b702117
+- **File(s):** src/state/store.ts (module-level constant), src/components/garden/ComboKeeperButton.tsx:17
+- **Last updated:** 2026-04-17
+
+**Repro / evidence**
+`COMBO_KEEPER_COOLDOWN_MS = 30 * 60 * 1000` is hardcoded independently in both files. `ComboKeeperButton.tsx` has a "Must match…" comment acknowledging the risk. If either value is changed without updating the other, the UI visibility gate will desync from the engine cooldown check silently.
+
+**Expected**
+Single source of truth: constant exported from `store.ts` (or a shared constants file) and imported by the component.
+
+**Actual**
+Two independent copies; drift will cause the button to appear or stay hidden at the wrong time.
+
+**Fix**
+*(pending)*
+
+**History**
+- 2026-04-17 — opened by Code Reviewer
+
+---
+
+### BUG-010 — speed_demon, stubborn_sprout, hat_trick achievements are permanently unattainable
+
+- **Status:** open
+- **Severity:** medium
+- **Reported by:** Code Reviewer
+- **Reported on:** 2026-04-17
+- **Branch / commit:** claude/review-readme-next-task-iznKG@b702117
+- **File(s):** src/engine/achievements.ts:46-50, src/engine/gameLoop.ts, src/engine/tapSystem.ts
+- **Last updated:** 2026-04-17
+
+**Repro / evidence**
+All three IDs are listed in `EVENT_DRIVEN_ACHIEVEMENT_IDS` (excluded from the passive check loop) but no call to `triggerHiddenAchievement("speed_demon")`, `triggerHiddenAchievement("stubborn_sprout")`, or `triggerHiddenAchievement("hat_trick")` exists anywhere in the codebase. The achievements appear in the Hidden category UI but can never be completed.
+
+- `speed_demon` — zone cleared in under 30 s: needs a call site in `advanceZone` comparing elapsed time since zone entry.
+- `stubborn_sprout` — fail a gate then clear it on the next attempt: needs a call site in `advanceZone` after `gateFailCount > 0`.
+- `hat_trick` — 3 critical taps in a row: needs a call site in `tapSystem.ts` tracking consecutive crit count.
+
+**Expected**
+All three achievements are attainable by players who meet the described conditions.
+
+**Actual**
+Achievements display in the UI but can never be granted.
+
+**Fix**
+*(pending)*
+
+**History**
+- 2026-04-17 — opened by Code Reviewer
+
+---
 
 ---
 
