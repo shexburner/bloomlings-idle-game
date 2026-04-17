@@ -42,7 +42,7 @@
 | Task | Persona | Output File | Status |
 |---|---|---|---|
 | AdMob integration | Engine Developer | `src/services/adManager.ts` | DONE |
-| 7 ad touchpoints | UI/UX + Engine | various | IN PROGRESS (2 / 7 — Double Offline, Dewdrop Garden) |
+| 7 ad touchpoints | UI/UX + Engine | various | IN PROGRESS (5 / 7 — Double Offline, Dewdrop Garden, Sunbeam Boost, Combo Keeper, Lucky Sprout) |
 | Dewdrop shop | UI/UX Developer | `app/(tabs)/dewdrop-shop.tsx` | DONE |
 | Offline progress | Engine Developer | `src/engine/offlineProgress.ts` | DONE |
 

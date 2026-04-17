@@ -17,6 +17,7 @@ import {
 } from "~/state/selectors";
 import type { GameStore } from "~/state/store";
 import { calculateOfflineProgress } from "./offlineProgress";
+import { nextLuckySproutIntervalMs } from "./luckySprout";
 
 // -----------------------------------------------------------------------------
 // Constants
@@ -24,6 +25,9 @@ import { calculateOfflineProgress } from "./offlineProgress";
 
 /** Target tick interval in milliseconds (~10 ticks/sec). */
 const TICK_INTERVAL_MS = 100;
+
+/** How often (ms) to check if a Lucky Sprout should be triggered (foreground only). */
+const LUCKY_SPROUT_CHECK_INTERVAL_MS = 30_000;
 
 /** Combo decay window: reset combo if no tap for 1.5 seconds. */
 const COMBO_DECAY_MS = 1500;
@@ -186,6 +190,7 @@ export function applyTick(
 export function useGameLoop(): void {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const lastTickRef = useRef<number>(Date.now());
+  const luckySproutLastCheckRef = useRef<number>(Date.now());
 
   const tick = useCallback(() => {
     const now = Date.now();
@@ -194,6 +199,19 @@ export function useGameLoop(): void {
 
     // Skip if delta is unreasonably small (< 10ms)
     if (deltaMs < 10) return;
+
+    // Lucky Sprout scheduler: check every 30s of foreground play.
+    if (now - luckySproutLastCheckRef.current >= LUCKY_SPROUT_CHECK_INTERVAL_MS) {
+      luckySproutLastCheckRef.current = now;
+      if (
+        !state.luckySproutPending &&
+        state.lastOfflineSession === null &&
+        (state.lastLuckySproutAt === null ||
+          now - state.lastLuckySproutAt > nextLuckySproutIntervalMs())
+      ) {
+        state.triggerLuckySprout();
+      }
+    }
 
     const result = gameTick(state, now, deltaMs);
     applyTick(state, state, result, now);

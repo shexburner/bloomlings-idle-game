@@ -13,6 +13,7 @@ import { initializeAds } from "~/services/adManager";
 import { useAutoSave, initializeFromDisk } from "~/services/saveManager";
 import { useGameStore } from "~/state/store";
 import { WelcomeBackModal } from "~/components/offline/WelcomeBackModal";
+import { LuckySproutModal } from "~/components/modals/LuckySproutModal";
 
 /** Custom dark theme for Bloomlings with forest-inspired colors. */
 const bloomlingsDarkTheme = {
@@ -62,6 +63,7 @@ export default function RootLayout() {
         />
       </Stack>
       <WelcomeBackModal />
+      <LuckySproutModal />
       <StatusBar style="light" />
     </ThemeProvider>
   );

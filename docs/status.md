@@ -57,7 +57,7 @@
 
 ## What's Next: Phase 5 — Monetization (1 task remaining)
 
-See `docs/roadmap.md` Phase 5: 6 remaining ad touchpoints (Sunbeam Boost, Dewdrop Garden, Lucky Sprout, Gate Assist, Boss Smash, Combo Keeper — each a thin consumer of `useRewardedAd("<unit>")` per the pattern established by `WelcomeBackModal` and `DewdropEarnCard`). Shop infrastructure for the Dewdrop economy is complete; Dewdrop Garden (the per-session idle-boost ad) is the only remaining Dewdrop-earn touchpoint.
+See `docs/roadmap.md` Phase 5: 5 of 7 ad touchpoints are now complete (Double Offline, Dewdrop Garden, Sunbeam Boost, Combo Keeper, Lucky Sprout). The two remaining touchpoints — Gate Assist and Boss Smash — are intentionally blocked: they depend on engine loops that do not yet exist. Gate Assist requires a zone-gate timer-decrement + consolation-bonus loop; Boss Smash requires a boss HP/damage/timer loop. Both state shapes are declared in `src/types/game.ts:527-541` but nothing writes to those fields. These are separate engine tickets.
 
 ### Dependencies / Notes for next session
 - The `idle_garden_slots` Sunlight upgrade from Phase 3 is a placeholder that may be retired now that the Nectar shop ships with `nectar_garden_expansion`. Both contribute to garden capacity via the engine; either can be deprecated without changing engine code.
