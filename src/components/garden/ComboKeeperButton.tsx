@@ -11,6 +11,8 @@ import { Pressable, StyleSheet, Text } from "react-native";
 
 import { useRewardedAd } from "~/services/adManager";
 import { useGameStore, COMBO_KEEPER_COOLDOWN_MS } from "~/state/store";
+import * as audioService from "~/services/audioService";
+import { boostHaptic } from "~/utils/haptics";
 
 const COMBO_THRESHOLD = 50;
 
@@ -47,9 +49,10 @@ export function ComboKeeperButton() {
       onReward: () => {
         const success = applyComboKeeper();
         setIsWatching(false);
-        // applyComboKeeper returns false if cooldown was concurrently violated —
-        // treat as a no-op (the button will hide itself once state updates).
-        void success;
+        if (success) {
+          boostHaptic();
+          audioService.play("boost");
+        }
       },
       onUnavailable: () => {
         setIsWatching(false);

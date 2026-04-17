@@ -107,18 +107,21 @@ export default function SettingsScreen() {
       <Text style={styles.sectionHeader}>Audio & Feedback</Text>
       <View style={styles.card}>
         <SettingRow
+          testID="settings-sfx-toggle"
           label="Sound Effects"
           value={sfxEnabled}
           onToggle={setSfxEnabled}
         />
         <View style={styles.separator} />
         <SettingRow
+          testID="settings-music-toggle"
           label="Music"
           value={musicEnabled}
           onToggle={setMusicEnabled}
         />
         <View style={styles.separator} />
         <SettingRow
+          testID="settings-haptics-toggle"
           label="Haptics"
           value={hapticsEnabled}
           onToggle={setHapticsEnabled}
@@ -173,16 +176,18 @@ export default function SettingsScreen() {
 // ---------------------------------------------------------------------------
 
 interface SettingRowProps {
+  testID?: string;
   label: string;
   value: boolean;
   onToggle: (value: boolean) => void;
 }
 
-function SettingRow({ label, value, onToggle }: SettingRowProps) {
+function SettingRow({ testID, label, value, onToggle }: SettingRowProps) {
   return (
     <View style={styles.row}>
       <Text style={styles.rowLabel}>{label}</Text>
       <Switch
+        testID={testID}
         value={value}
         onValueChange={onToggle}
         trackColor={{ false: COLORS.inputBorder, true: COLORS.accent }}
