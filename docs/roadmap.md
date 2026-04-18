@@ -50,8 +50,8 @@
 | Task | Persona | Output File | Status |
 |---|---|---|---|
 | Achievements | Engine + UI/UX | `src/engine/achievements.ts` | DONE |
-| Daily login + streaks | Engine Developer | `src/engine/dailyRewards.ts` | NOT STARTED |
-| Notifications | Engine Developer | `src/services/notifications.ts` | NOT STARTED |
+| Daily login + streaks | Engine Developer | `src/engine/dailyRewards.ts` | DONE |
+| Notifications | Engine Developer | `src/services/notificationService.ts` | DONE |
 | Sound + haptics | UI/UX Developer | `src/services/audio.ts` | NOT STARTED |
 | Performance pass | QA Tester | — | NOT STARTED |
 

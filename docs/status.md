@@ -8,7 +8,7 @@
 **Phase 3: Content & UI** — COMPLETE
 **Phase 4: Progression Systems** — COMPLETE (5 / 5 tasks done)
 **Phase 5: Monetization** — IN PROGRESS (3 / 4 tasks done; Gate Assist + Boss Smash blocked on engine)
-**Phase 6: Polish & Retention** — IN PROGRESS (1 / 5 tasks done)
+**Phase 6: Polish & Retention** — IN PROGRESS (3 / 5 tasks done)
 
 ## Completed Work
 
@@ -64,11 +64,13 @@
 
 Phase 5 is at a natural pause: 5 of 7 ad touchpoints ship; Gate Assist and Boss Smash are intentionally blocked on engine loops that don't yet exist. Phase 6 has begun with Achievements (see below).
 
+2. **Daily login + streaks** — DONE. `src/engine/dailyRewards.ts` — `getDailyReward(loginCycleDay, loginCyclesCompleted)` returns `{ sunlight, dewdrops, sunbeamBoostMs }` from the 7-day fixed table, scaling sunlight by `1 + cycles × 0.5` and dewdrops by `1 + cycles` on repeat cycles. `describeDailyReward(reward)` returns a user-facing string. Store: `rolloverDailyState()` extended to also track login `streakDays` (was only tracking `adStreakDays`); `claimDailyReward()` advances `loginCycleDay` (wraps at 7), increments `loginCyclesCompleted` on wrap, marks `todayRewardCollected: true`, and credits rewards. UI: `src/components/modals/DailyRewardModal.tsx` — no-ad modal pattern, visible when `!todayRewardCollected`; shows Day X of 7, streak badge, reward preview, "Collect" button. Mounted in `app/_layout.tsx`.
+
+3. **Notifications** — DONE. `src/services/notificationService.ts` — `requestNotificationPermissions()` on mount; `cancelGameNotifications()` on foreground; `scheduleGameNotifications(state)` on background. Four slots: `gardenMisses` (+4h), `offlineReady` (+12h), `streakReminder` (+20h, streak > 0 only), `boostExpired` (at soonest boost expiry). All respect `settings.notifications` toggles. `app.json` updated with `expo-notifications` plugin.
+
 ### Phase 6 remaining tasks
-1. **Daily login + streaks** (`src/engine/dailyRewards.ts`) — 7-day reward cycle UI, login-streak badge. The `daily` state in the store already tracks `loginCycleDay`, `streakDays`, `lastOpenDate`; needs a daily-reward modal and `claimDailyReward` action.
-2. **Notifications** (`src/services/notifications.ts`) — push notification scheduling on background: "your garden misses you" after 4h, "offline earnings waiting" after 12h. Requires Expo Notifications integration.
-3. **Sound + haptics** (`src/services/audio.ts`) — tap/crit/combo/prestige sound effects and haptic feedback on key events. Use Expo AV + Haptics APIs.
-4. **Performance pass** — profile render counts in Collection/Shop screens; memoize heavy selectors; check for unnecessary re-renders in the game loop path.
+1. **Sound + haptics** (`src/services/audio.ts`) — tap/crit/combo/prestige sound effects and haptic feedback on key events. Use Expo AV + Haptics APIs.
+2. **Performance pass** — profile render counts in Collection/Shop screens; memoize heavy selectors; check for unnecessary re-renders in the game loop path.
 
 ### Dependencies / Notes for next session
 - The `idle_garden_slots` Sunlight upgrade from Phase 3 is a placeholder that may be retired now that the Nectar shop ships with `nectar_garden_expansion`. Both contribute to garden capacity via the engine; either can be deprecated without changing engine code.

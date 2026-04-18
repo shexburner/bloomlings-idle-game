@@ -15,6 +15,8 @@ import { useAutoSave, initializeFromDisk } from "~/services/saveManager";
 import { useGameStore } from "~/state/store";
 import { WelcomeBackModal } from "~/components/offline/WelcomeBackModal";
 import { LuckySproutModal } from "~/components/modals/LuckySproutModal";
+import { DailyRewardModal } from "~/components/modals/DailyRewardModal";
+import { requestNotificationPermissions } from "~/services/notificationService";
 
 /** Custom dark theme for Bloomlings with forest-inspired colors. */
 const bloomlingsDarkTheme = {
@@ -44,7 +46,9 @@ export default function RootLayout() {
     initializeFromDisk();
     useGameStore.getState().ensureInitialDiscoveries();
     void initializeAds();
+<<<<<<< HEAD
     void audioService.init().then(() => audioService.syncMusic());
+    void requestNotificationPermissions();
   }, []);
 
   // Sync music on/off whenever the setting changes
@@ -55,6 +59,9 @@ export default function RootLayout() {
       }
     });
     return unsub;
+=======
+    void requestNotificationPermissions();
+>>>>>>> 1f082210a3cd7638ecb28ee43ee3f36e52f4a42a
   }, []);
 
   // Start the game loop (ticks ~10/sec, handles offline progress)
@@ -74,6 +81,7 @@ export default function RootLayout() {
       </Stack>
       <WelcomeBackModal />
       <LuckySproutModal />
+      <DailyRewardModal />
       <StatusBar style="light" />
     </ThemeProvider>
   );
