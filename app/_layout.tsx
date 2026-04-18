@@ -46,6 +46,7 @@ export default function RootLayout() {
     initializeFromDisk();
     useGameStore.getState().ensureInitialDiscoveries();
     void initializeAds();
+<<<<<<< HEAD
     void audioService.init().then(() => audioService.syncMusic());
     void requestNotificationPermissions();
   }, []);
@@ -58,6 +59,9 @@ export default function RootLayout() {
       }
     });
     return unsub;
+=======
+    void requestNotificationPermissions();
+>>>>>>> 1f082210a3cd7638ecb28ee43ee3f36e52f4a42a
   }, []);
 
   // Start the game loop (ticks ~10/sec, handles offline progress)
