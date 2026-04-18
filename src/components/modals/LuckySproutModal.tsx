@@ -15,6 +15,8 @@ import {
   rollLuckySproutReward,
   describeLuckySproutReward,
 } from "~/engine/luckySprout";
+import * as audioService from "~/services/audioService";
+import { boostHaptic } from "~/utils/haptics";
 
 // ---------------------------------------------------------------------------
 // Styling
@@ -77,7 +79,10 @@ export function LuckySproutModal() {
 
   // Reset local UI state whenever the modal opens or closes.
   useEffect(() => {
-    if (!luckySproutPending) {
+    if (luckySproutPending) {
+      boostHaptic();
+      audioService.play("luckySprout");
+    } else {
       setStatus("idle");
       setRewardDescription(null);
       setUnavailableReason(null);

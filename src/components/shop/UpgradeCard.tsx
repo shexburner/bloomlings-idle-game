@@ -9,6 +9,8 @@ import type { UpgradeTemplate } from "~/types/game";
 import { useGameStore } from "~/state/store";
 import { calculateUpgradeCost } from "~/state/selectors";
 import { formatNumber } from "~/utils/formatNumber";
+import * as audioService from "~/services/audioService";
+import { purchaseHaptic } from "~/utils/haptics";
 
 const COLORS = {
   cardBg: "#161b22",
@@ -126,6 +128,9 @@ export function UpgradeCard({ template, buyCount }: UpgradeCardProps) {
     for (let i = 0; i < effectiveBuyCount; i++) {
       buyUpgrade(template.id);
     }
+
+    purchaseHaptic();
+    audioService.play("purchase");
 
     // Flash animation
     flashAnim.setValue(1);

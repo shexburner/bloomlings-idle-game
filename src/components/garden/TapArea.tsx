@@ -6,6 +6,8 @@ import { type ReactNode } from "react";
 import { Pressable, StyleSheet } from "react-native";
 
 import { useTapHandler, type TapResult } from "~/engine/tapSystem";
+import * as audioService from "~/services/audioService";
+import { tapHaptic, critHaptic, comboMilestoneHaptic } from "~/utils/haptics";
 
 interface TapAreaProps {
   /** Called after each successful tap with the result. */
@@ -19,8 +21,21 @@ export function TapArea({ onTapResult, children }: TapAreaProps) {
 
   const handlePress = () => {
     const result = onTap();
-    if (result && onTapResult) {
-      onTapResult(result);
+    if (result) {
+      if (result.isCritical) {
+        critHaptic();
+        audioService.play("crit");
+      } else {
+        tapHaptic();
+        audioService.play("tap");
+      }
+      if (result.comboCount > 0 && result.comboCount % 25 === 0) {
+        comboMilestoneHaptic();
+        audioService.play("combo");
+      }
+      if (onTapResult) {
+        onTapResult(result);
+      }
     }
   };
 

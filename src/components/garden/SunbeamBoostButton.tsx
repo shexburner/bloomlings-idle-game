@@ -12,6 +12,8 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useRewardedAd } from "~/services/adManager";
 import { useGameStore } from "~/state/store";
 import { AdTouchpoint } from "~/types/game";
+import * as audioService from "~/services/audioService";
+import { boostHaptic } from "~/utils/haptics";
 
 const COLORS = {
   bg: "#2b1a00",
@@ -71,6 +73,8 @@ export function SunbeamBoostButton() {
       onReward: () => {
         applySunbeamBoost();
         setIsWatching(false);
+        boostHaptic();
+        audioService.play("boost");
       },
       onUnavailable: () => {
         setIsWatching(false);

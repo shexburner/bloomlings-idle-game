@@ -18,6 +18,8 @@ import {
 import type { GameStore } from "~/state/store";
 import { calculateOfflineProgress } from "./offlineProgress";
 import { nextLuckySproutIntervalMs } from "./luckySprout";
+import * as audioService from "~/services/audioService";
+import { zoneAdvanceHaptic, achievementHaptic } from "~/utils/haptics";
 
 // -----------------------------------------------------------------------------
 // Constants
@@ -236,11 +238,26 @@ export function useGameLoop(): void {
     // Achievement check: every 30s of foreground play.
     if (now - achievementLastCheckRef.current >= ACHIEVEMENT_CHECK_INTERVAL_MS) {
       achievementLastCheckRef.current = now;
+      const achievementsBefore = Object.values(
+        useGameStore.getState().achievements
+      ).filter((a) => a.completedAt !== null).length;
       useGameStore.getState().checkAndGrantAchievements();
+      const achievementsAfter = Object.values(
+        useGameStore.getState().achievements
+      ).filter((a) => a.completedAt !== null).length;
+      if (achievementsAfter > achievementsBefore) {
+        achievementHaptic();
+        audioService.play("achievement");
+      }
     }
 
     const result = gameTick(state, now, deltaMs);
     applyTick(state, state, result, now);
+
+    if (result.zoneThresholdReached) {
+      zoneAdvanceHaptic();
+      audioService.play("zoneAdvance");
+    }
 
     lastTickRef.current = now;
   }, []);
