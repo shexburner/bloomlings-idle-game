@@ -20,6 +20,10 @@ import { calculateOfflineProgress } from "./offlineProgress";
 import { nextLuckySproutIntervalMs } from "./luckySprout";
 import * as audioService from "~/services/audioService";
 import { zoneAdvanceHaptic, achievementHaptic } from "~/utils/haptics";
+import {
+  cancelGameNotifications,
+  scheduleGameNotifications,
+} from "~/services/notificationService";
 
 // -----------------------------------------------------------------------------
 // Constants
@@ -350,6 +354,7 @@ export function useGameLoop(): void {
           state.resetCombo();
         }
 
+        void cancelGameNotifications();
         startLoop();
       } else if (nextAppState === "background" || nextAppState === "inactive") {
         // App going to background — stop the loop and record the timestamp
@@ -357,6 +362,7 @@ export function useGameLoop(): void {
         useGameStore.getState().setLastTickAt(now);
         useGameStore.getState().setLastActiveAt(now);
         stopLoop();
+        void scheduleGameNotifications(useGameStore.getState());
       }
     };
 
