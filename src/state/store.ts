@@ -46,6 +46,7 @@ import {
   LUCKY_SPROUT_NECTAR_BONUS_MULTIPLIER,
   LUCKY_SPROUT_TAP_BOOST_DURATION_MS,
 } from "~/engine/luckySprout";
+import { getDailyReward } from "~/engine/dailyRewards";
 
 // -----------------------------------------------------------------------------
 // Touchpoint Constants (docs/design/05-ad-economy.md)
@@ -172,6 +173,8 @@ export interface MetaSlice {
    * Safe to call on every foreground; idempotent within a day.
    */
   rolloverDailyState: () => void;
+  /** Claim today's daily login reward. No-op if already collected today. */
+  claimDailyReward: () => void;
   /**
    * Consume one Zone Skip perk (if quantity > 0) and advance to the next
    * zone. Returns true on success, false if the perk is unavailable.
@@ -513,23 +516,54 @@ export const useGameStore = create<GameStore>()((...args) => {
       const { daily } = get();
       if (daily.lastOpenDate === today) return;
 
-      // Day advanced. If the previous day had at least one ad watched,
-      // extend the streak; otherwise reset it. A fresh save (empty
-      // lastOpenDate) starts a new streak at 0.
-      const streakContinues =
+      // Ad streak: extends if at least one ad was watched yesterday.
+      const adStreakContinues =
         daily.lastOpenDate !== "" && daily.adsWatchedToday > 0;
-      const nextStreak = streakContinues
+      const nextAdStreak = adStreakContinues
         ? Math.min(daily.adStreakDays + 1, 5)
         : 0;
+
+      // Login streak: extends if last open was yesterday (or this is a fresh save).
+      const yesterday = new Date(Date.now() - 86_400_000).toISOString().slice(0, 10);
+      const loginStreakContinues =
+        daily.lastOpenDate === "" || daily.lastOpenDate === yesterday;
+      const nextStreakDays = loginStreakContinues ? daily.streakDays + 1 : 1;
+
       set((state) => ({
         daily: {
           ...state.daily,
           lastOpenDate: today,
           adsWatchedToday: 0,
-          adStreakDays: nextStreak,
+          adStreakDays: nextAdStreak,
+          streakDays: nextStreakDays,
           todayRewardCollected: false,
         },
       }));
+    },
+
+    claimDailyReward: () => {
+      const { daily } = get();
+      if (daily.todayRewardCollected) return;
+
+      const reward = getDailyReward(daily.loginCycleDay, daily.loginCyclesCompleted);
+      const nextDay = daily.loginCycleDay >= 7 ? 1 : daily.loginCycleDay + 1;
+      const nextCycles =
+        daily.loginCycleDay >= 7
+          ? daily.loginCyclesCompleted + 1
+          : daily.loginCyclesCompleted;
+
+      set((s) => ({
+        daily: {
+          ...s.daily,
+          loginCycleDay: nextDay,
+          loginCyclesCompleted: nextCycles,
+          todayRewardCollected: true,
+        },
+      }));
+
+      if (reward.sunlight > 0) get().addSunlight(reward.sunlight);
+      if (reward.dewdrops > 0) get().addDewdrops(reward.dewdrops);
+      if (reward.sunbeamBoostMs > 0) get().applySunbeamBoost();
     },
 
     useZoneSkip: () => {
