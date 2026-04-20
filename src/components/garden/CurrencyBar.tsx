@@ -1,24 +1,15 @@
 // =============================================================================
-// CurrencyBar — Top bar showing Sunlight, Sunlight/sec, Nectar, Dewdrops
+// CurrencyBar — Top bar: Sunlight (animated), idle rate, Nectar, Dewdrops
 // =============================================================================
 
 import { useEffect, useRef, useState } from "react";
 import { Animated, StyleSheet, Text, View } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 
 import { useGameStore } from "~/state/store";
 import { totalSunlightPerSecondFromRegistry } from "~/state/selectors";
 import { formatNumber, formatRate } from "~/utils/formatNumber";
-
-/** Color palette for the currency bar. */
-const COLORS = {
-  background: "#1a1a2e",
-  glow: "#2d4a3e",
-  sunlight: "#ffd700",
-  nectar: "#e040fb",
-  dewdrop: "#4fc3f7",
-  text: "#e8f5e9",
-  textMuted: "#8a9b8e",
-};
+import { COLORS, FONTS, RADII, SHADOWS } from "@/constants/theme";
 
 export function CurrencyBar() {
   const sunlight = useGameStore((s) => s.resources.sunlight);
@@ -33,7 +24,7 @@ export function CurrencyBar() {
     })
   );
 
-  // Animated sunlight counter for smooth counting effect
+  // Animated sunlight counter
   const animatedSunlight = useRef(new Animated.Value(sunlight)).current;
   const displaySunlightRef = useRef(sunlight);
   const [displaySunlight, setDisplaySunlight] = useState(sunlight);
@@ -44,8 +35,6 @@ export function CurrencyBar() {
       duration: 200,
       useNativeDriver: false,
     }).start();
-
-    // Update displayed value periodically during animation
     const id = animatedSunlight.addListener(({ value }) => {
       const rounded = Math.floor(value);
       if (formatNumber(rounded) !== formatNumber(displaySunlightRef.current)) {
@@ -53,97 +42,97 @@ export function CurrencyBar() {
         setDisplaySunlight(rounded);
       }
     });
-
-    return () => {
-      animatedSunlight.removeListener(id);
-    };
+    return () => animatedSunlight.removeListener(id);
   }, [sunlight, animatedSunlight]);
 
   return (
-    <View testID="currency-bar" style={styles.container}>
-      {/* Sunlight - primary currency, takes full width on top */}
-      <View style={styles.primaryRow}>
-        <Text style={styles.sunlightIcon}>{"\u2600"}</Text>
-        <Text testID="currency-sunlight" style={styles.sunlightValue}>
+    <LinearGradient
+      testID="currency-bar"
+      colors={[COLORS.surface, COLORS.paperDeep]}
+      style={styles.container}
+    >
+      {/* Sunlight chip */}
+      <View style={[styles.chip, styles.chipSun]}>
+        <View style={[styles.dot, { backgroundColor: COLORS.sunlight, ...SHADOWS.glowSun }]} />
+        <Text testID="currency-sunlight" style={styles.chipValue}>
           {formatNumber(displaySunlight)}
         </Text>
-        <Text testID="currency-sunlight-rate" style={styles.rateText}>
-          {formatRate(idleRate)}
+        {idleRate > 0 && (
+          <Text testID="currency-sunlight-rate" style={styles.chipRate}>
+            {formatRate(idleRate)}/s
+          </Text>
+        )}
+      </View>
+
+      {/* Nectar chip */}
+      <View style={[styles.chip, styles.chipNectar]}>
+        <View style={[styles.dot, { backgroundColor: COLORS.nectar }]} />
+        <Text testID="currency-nectar" style={styles.chipValue}>
+          {formatNumber(nectar)}
         </Text>
       </View>
 
-      {/* Secondary currencies */}
-      <View style={styles.secondaryRow}>
-        <View style={styles.currencyChip}>
-          <Text style={styles.nectarIcon}>{"\u2727"}</Text>
-          <Text testID="currency-nectar" style={styles.nectarValue}>
-            {formatNumber(nectar)}
-          </Text>
-        </View>
-        <View style={styles.currencyChip}>
-          <Text style={styles.dewdropIcon}>{"\u25C6"}</Text>
-          <Text testID="currency-dewdrops" style={styles.dewdropValue}>
-            {formatNumber(dewdrops)}
-          </Text>
-        </View>
+      {/* Dewdrop chip */}
+      <View style={[styles.chip, styles.chipDew]}>
+        <View style={[styles.dot, { backgroundColor: COLORS.dewdrop }]} />
+        <Text testID="currency-dewdrops" style={styles.chipValue}>
+          {formatNumber(dewdrops)}
+        </Text>
       </View>
-    </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: COLORS.background,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.glow,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-  },
-  primaryRow: {
     flexDirection: "row",
+    gap: 6,
     alignItems: "center",
-    marginBottom: 4,
+    justifyContent: "center",
+    borderRadius: RADII.pill,
+    paddingVertical: 5,
+    paddingHorizontal: 5,
+    marginHorizontal: 16,
+    marginTop: 10,
+    ...SHADOWS.md,
+    // gilt border approximation via border
+    borderWidth: 1,
+    borderColor: `${COLORS.gilt}70`,
   },
-  sunlightIcon: {
-    fontSize: 20,
-    marginRight: 6,
-  },
-  sunlightValue: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: COLORS.sunlight,
+  chip: {
     flex: 1,
-  },
-  rateText: {
-    fontSize: 14,
-    color: COLORS.textMuted,
-    fontWeight: "500",
-  },
-  secondaryRow: {
-    flexDirection: "row",
-    gap: 16,
-  },
-  currencyChip: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 4,
+    gap: 5,
+    paddingVertical: 7,
+    paddingHorizontal: 11,
+    borderRadius: RADII.pill,
+    justifyContent: "center",
   },
-  nectarIcon: {
-    fontSize: 14,
-    color: COLORS.nectar,
+  chipSun: {
+    backgroundColor: COLORS.sunlightBg,
   },
-  nectarValue: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: COLORS.nectar,
+  chipNectar: {
+    backgroundColor: COLORS.nectarBg,
   },
-  dewdropIcon: {
-    fontSize: 12,
-    color: COLORS.dewdrop,
+  chipDew: {
+    backgroundColor: COLORS.dewdropBg,
   },
-  dewdropValue: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: COLORS.dewdrop,
+  dot: {
+    width: 11,
+    height: 11,
+    borderRadius: 6,
+  },
+  chipValue: {
+    fontFamily: FONTS.bodyBold,
+    fontSize: 13,
+    color: COLORS.ink,
+    fontVariant: ["tabular-nums"],
+  },
+  chipRate: {
+    fontFamily: FONTS.body,
+    fontSize: 10,
+    color: COLORS.ink3,
+    marginLeft: 1,
   },
 });

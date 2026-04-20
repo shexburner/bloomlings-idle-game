@@ -1,94 +1,183 @@
 // =============================================================================
-// Tab Layout — 5-tab navigation with dark forest theme
+// Tab Layout — Bloomlings parchment tab bar with custom SVG icons
 // =============================================================================
 
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import type { BottomTabBarButtonProps } from "@react-navigation/bottom-tabs";
 import { Tabs } from "expo-router";
-import { StyleSheet } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import Svg, { Path, Rect, Circle } from "react-native-svg";
 
-import { HapticTab } from "@/components/haptic-tab";
-import { IconSymbol } from "@/components/ui/icon-symbol";
+import { COLORS, FONTS, RADII, SHADOWS } from "@/constants/theme";
 
-/** Dark forest/garden color palette for the tab bar. */
-const TAB_COLORS = {
-  background: "#1a1a2e",
-  border: "#2d4a3e",
-  inactive: "#6b7b6e",
-  active: "#4caf50",
-  activeGlow: "#ffd700",
-};
+// -----------------------------------------------------------------------------
+// SVG Icons
+// -----------------------------------------------------------------------------
+
+function LeafIcon({ color }: { color: string }) {
+  return (
+    <Svg viewBox="0 0 24 24" width={22} height={22} fill="none" stroke={color} strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M5 19c0-7 6-13 14-14-1 8-7 14-14 14z" fill={color} opacity={0.25} />
+      <Path d="M5 19c0-7 6-13 14-14-1 8-7 14-14 14z" />
+      <Path d="M5 19c4-4 7-7 11-11" />
+    </Svg>
+  );
+}
+
+function ShopIcon({ color }: { color: string }) {
+  return (
+    <Svg viewBox="0 0 24 24" width={22} height={22} fill="none" stroke={color} strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M6 21h12l-2-4H8z" />
+      <Path d="M8 17V11a4 4 0 0 1 8 0v6" />
+      <Path d="M12 7V3" />
+      <Path d="M10 5l2-2 2 2" />
+    </Svg>
+  );
+}
+
+function CollectionIcon({ color }: { color: string }) {
+  return (
+    <Svg viewBox="0 0 24 24" width={22} height={22} fill="none" stroke={color} strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+      <Rect x="3" y="3" width="8" height="8" rx="2" />
+      <Rect x="13" y="3" width="8" height="8" rx="2" />
+      <Rect x="3" y="13" width="8" height="8" rx="2" />
+      <Rect x="13" y="13" width="8" height="8" rx="2" />
+    </Svg>
+  );
+}
+
+function DropIcon({ color }: { color: string }) {
+  return (
+    <Svg viewBox="0 0 24 24" width={22} height={22} fill="none" stroke={color} strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M12 3c-3 5-6 8-6 12a6 6 0 0 0 12 0c0-4-3-7-6-12z" fill={color} opacity={0.25} />
+      <Path d="M12 3c-3 5-6 8-6 12a6 6 0 0 0 12 0c0-4-3-7-6-12z" />
+      <Path d="M9 14c-.3 1 0 2 1 2.5" />
+    </Svg>
+  );
+}
+
+function RebirthIcon({ color }: { color: string }) {
+  return (
+    <Svg viewBox="0 0 24 24" width={22} height={22} fill="none" stroke={color} strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M20 12a8 8 0 1 1-3-6.2" />
+      <Path d="M20 4v4h-4" />
+    </Svg>
+  );
+}
+
+function SettingsIcon({ color }: { color: string }) {
+  return (
+    <Svg viewBox="0 0 24 24" width={22} height={22} fill="none" stroke={color} strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+      <Circle cx="12" cy="12" r="3" />
+      <Path d="M19.4 15a1.6 1.6 0 0 0 .32 1.77l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.6 1.6 0 0 0-1.77-.32 1.6 1.6 0 0 0-1 1.47V21a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-1-1.47 1.6 1.6 0 0 0-1.77.32l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.6 1.6 0 0 0 .32-1.77 1.6 1.6 0 0 0-1.47-1H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.47-1 1.6 1.6 0 0 0-.32-1.77l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.6 1.6 0 0 0 1.77.32h.01a1.6 1.6 0 0 0 1-1.47V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.47 1.6 1.6 0 0 0 1.77-.32l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.6 1.6 0 0 0-.32 1.77v.01a1.6 1.6 0 0 0 1.47 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.47 1z" />
+    </Svg>
+  );
+}
+
+// -----------------------------------------------------------------------------
+// Custom Tab Button — active gets sage gradient pill
+// -----------------------------------------------------------------------------
+
+function BloomlingsTabButton(props: BottomTabBarButtonProps) {
+  const { accessibilityState, onPress, onLongPress, children } = props;
+  const focused = accessibilityState?.selected ?? false;
+
+  return (
+    <Pressable
+      onPress={onPress}
+      onLongPress={onLongPress}
+      style={styles.tabButton}
+      accessibilityState={accessibilityState}
+    >
+      {focused ? (
+        <LinearGradient
+          colors={[COLORS.sageSoft, COLORS.sage]}
+          style={styles.activeTabPill}
+        >
+          {children}
+        </LinearGradient>
+      ) : (
+        <View style={styles.inactiveTabPill}>{children}</View>
+      )}
+    </Pressable>
+  );
+}
+
+// -----------------------------------------------------------------------------
+// Tab bar background — parchment gradient card
+// -----------------------------------------------------------------------------
+
+function TabBarBackground() {
+  return (
+    <LinearGradient
+      colors={[COLORS.surface, COLORS.paperDeep]}
+      style={StyleSheet.absoluteFill}
+    />
+  );
+}
+
+// -----------------------------------------------------------------------------
+// Layout
+// -----------------------------------------------------------------------------
 
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarActiveTintColor: TAB_COLORS.active,
-        tabBarInactiveTintColor: TAB_COLORS.inactive,
+        tabBarButton: BloomlingsTabButton,
+        tabBarActiveTintColor: COLORS.mossDeep,
+        tabBarInactiveTintColor: COLORS.ink3,
         tabBarStyle: styles.tabBar,
         tabBarLabelStyle: styles.tabLabel,
+        tabBarBackground: TabBarBackground,
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: "Garden",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={26} name="leaf.fill" color={color} />
-          ),
+          title: "GARDEN",
+          tabBarIcon: ({ color }) => <LeafIcon color={color} />,
         }}
       />
       <Tabs.Screen
         name="shop"
         options={{
-          title: "Shop",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={26} name="cart.fill" color={color} />
-          ),
+          title: "SHOP",
+          tabBarIcon: ({ color }) => <ShopIcon color={color} />,
         }}
       />
       <Tabs.Screen
         name="collection"
         options={{
-          title: "Collection",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={26} name="square.grid.2x2.fill" color={color} />
-          ),
+          title: "COLLECT",
+          tabBarIcon: ({ color }) => <CollectionIcon color={color} />,
         }}
       />
       <Tabs.Screen
         name="dewdrop-shop"
         options={{
-          title: "Dewdrops",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={26} name="drop.fill" color={color} />
-          ),
+          title: "DEWDROPS",
+          tabBarIcon: ({ color }) => <DropIcon color={color} />,
         }}
       />
       <Tabs.Screen
         name="rebirth"
         options={{
-          title: "Rebirth",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={26} name="arrow.2.circlepath" color={color} />
-          ),
+          title: "REBIRTH",
+          tabBarIcon: ({ color }) => <RebirthIcon color={color} />,
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
-          title: "Settings",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={26} name="gearshape.fill" color={color} />
-          ),
+          title: "SETTINGS",
+          tabBarIcon: ({ color }) => <SettingsIcon color={color} />,
         }}
       />
-      {/* Hide the legacy explore tab from navigation */}
       <Tabs.Screen
         name="explore"
-        options={{
-          href: null,
-        }}
+        options={{ href: null }}
       />
     </Tabs>
   );
@@ -96,15 +185,45 @@ export default function TabLayout() {
 
 const styles = StyleSheet.create({
   tabBar: {
-    backgroundColor: TAB_COLORS.background,
-    borderTopColor: TAB_COLORS.border,
-    borderTopWidth: 1,
-    height: 88,
-    paddingBottom: 8,
-    paddingTop: 8,
+    position: "absolute",
+    bottom: 16,
+    left: 12,
+    right: 12,
+    height: 72,
+    borderRadius: RADII.xl,
+    borderTopWidth: 0,
+    overflow: "hidden",
+    backgroundColor: "transparent",
+    borderWidth: 1,
+    borderColor: `${COLORS.gilt}60`,
+    ...SHADOWS.md,
+  },
+  tabButton: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 6,
+  },
+  activeTabPill: {
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: RADII.lg,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    borderWidth: 1,
+    borderColor: `${COLORS.gilt}80`,
+    gap: 2,
+  },
+  inactiveTabPill: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    gap: 2,
   },
   tabLabel: {
-    fontSize: 11,
-    fontWeight: "600",
+    fontFamily: FONTS.bodyBold,
+    fontSize: 8,
+    letterSpacing: 0.6,
   },
 });

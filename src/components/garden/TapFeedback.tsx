@@ -6,15 +6,10 @@ import { useCallback, useRef, useState } from "react";
 import { Animated, StyleSheet, Text, View } from "react-native";
 
 import { formatNumber } from "~/utils/formatNumber";
+import { COLORS, FONTS } from "@/constants/theme";
 
 /** Maximum concurrent floating numbers visible at once. */
 const POOL_SIZE = 8;
-
-/** Color palette. */
-const COLORS = {
-  normal: "#e8f5e9",
-  critical: "#ffd700",
-};
 
 /** A single floating tap feedback entry. */
 interface FeedbackEntry {
@@ -127,24 +122,24 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   text: {
-    fontWeight: "700",
+    fontFamily: FONTS.bodyBold,
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 4,
+    textShadowRadius: 6,
   },
   normalText: {
     fontSize: 20,
-    color: COLORS.normal,
-    textShadowColor: "rgba(0,0,0,0.6)",
+    color: COLORS.sunlight,
+    textShadowColor: `${COLORS.sunlight}60`,
   },
   criticalText: {
     fontSize: 28,
-    color: COLORS.critical,
-    textShadowColor: "rgba(255,215,0,0.4)",
+    color: COLORS.nectar,
+    textShadowColor: `${COLORS.nectar}50`,
   },
   critLabel: {
+    fontFamily: FONTS.bodyBold,
     fontSize: 12,
-    fontWeight: "800",
-    color: COLORS.critical,
+    color: COLORS.nectar,
     marginTop: -2,
   },
 });

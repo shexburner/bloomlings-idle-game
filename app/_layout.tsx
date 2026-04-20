@@ -7,6 +7,20 @@ import { DarkTheme, ThemeProvider } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
+import {
+  useFonts,
+  Fraunces_500Medium,
+  Fraunces_500Medium_Italic,
+  Fraunces_700Bold,
+  Fraunces_700Bold_Italic,
+} from "@expo-google-fonts/fraunces";
+import {
+  Nunito_400Regular,
+  Nunito_600SemiBold,
+  Nunito_700Bold,
+  Nunito_800ExtraBold,
+  Nunito_900Black,
+} from "@expo-google-fonts/nunito";
 
 import { useGameLoop } from "~/engine/gameLoop";
 import { initializeAds } from "~/services/adManager";
@@ -17,18 +31,19 @@ import { WelcomeBackModal } from "~/components/offline/WelcomeBackModal";
 import { LuckySproutModal } from "~/components/modals/LuckySproutModal";
 import { DailyRewardModal } from "~/components/modals/DailyRewardModal";
 import { requestNotificationPermissions } from "~/services/notificationService";
+import { COLORS } from "@/constants/theme";
 
-/** Custom dark theme for Bloomlings with forest-inspired colors. */
-const bloomlingsDarkTheme = {
+/** Navigation theme using the design system palette. */
+const bloomlingsTheme = {
   ...DarkTheme,
   colors: {
     ...DarkTheme.colors,
-    background: "#0d1117",
-    card: "#1a1a2e",
-    text: "#e8f5e9",
-    border: "#2d4a3e",
-    primary: "#4caf50",
-    notification: "#ffd700",
+    background: COLORS.biomeCradleBg,
+    card: COLORS.surface,
+    text: COLORS.ink,
+    border: COLORS.line,
+    primary: COLORS.moss,
+    notification: COLORS.sunlight,
   },
 };
 
@@ -37,16 +52,22 @@ export const unstable_settings = {
 };
 
 export default function RootLayout() {
-  // Load saved state on mount, then retroactively grant any Bloomling
-  // species the player's zone progress has earned. Fresh installs get
-  // Fernley auto-placed in garden slot 0 so idle production starts
-  // immediately; returning players pick up species their pre-fix save
-  // never recorded.
+  const [fontsLoaded] = useFonts({
+    Fraunces_500Medium,
+    Fraunces_500Medium_Italic,
+    Fraunces_700Bold,
+    Fraunces_700Bold_Italic,
+    Nunito_400Regular,
+    Nunito_600SemiBold,
+    Nunito_700Bold,
+    Nunito_800ExtraBold,
+    Nunito_900Black,
+  });
+
   useEffect(() => {
     initializeFromDisk();
     useGameStore.getState().ensureInitialDiscoveries();
     void initializeAds();
-<<<<<<< HEAD
     void audioService.init().then(() => audioService.syncMusic());
     void requestNotificationPermissions();
   }, []);
@@ -59,9 +80,6 @@ export default function RootLayout() {
       }
     });
     return unsub;
-=======
-    void requestNotificationPermissions();
->>>>>>> 1f082210a3cd7638ecb28ee43ee3f36e52f4a42a
   }, []);
 
   // Start the game loop (ticks ~10/sec, handles offline progress)
@@ -70,8 +88,11 @@ export default function RootLayout() {
   // Start auto-save (every 30s + on background)
   useAutoSave();
 
+  // Defer render until fonts are loaded to avoid unstyled flash.
+  if (!fontsLoaded) return null;
+
   return (
-    <ThemeProvider value={bloomlingsDarkTheme}>
+    <ThemeProvider value={bloomlingsTheme}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen
@@ -82,7 +103,7 @@ export default function RootLayout() {
       <WelcomeBackModal />
       <LuckySproutModal />
       <DailyRewardModal />
-      <StatusBar style="light" />
+      <StatusBar style="dark" />
     </ThemeProvider>
   );
 }

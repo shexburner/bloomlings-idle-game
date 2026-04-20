@@ -4,7 +4,10 @@
 
 import { useCallback } from "react";
 import { StyleSheet, View } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+import { COLORS } from "@/constants/theme";
 
 import { CurrencyBar } from "~/components/garden/CurrencyBar";
 import { TapArea } from "~/components/garden/TapArea";
@@ -28,7 +31,11 @@ export default function GardenScreen() {
   );
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <LinearGradient
+      colors={[COLORS.biomeCradleBg, COLORS.biomeCradleGlow, COLORS.biomeCradleBg, "#C8B878"]}
+      locations={[0, 0.15, 0.65, 1]}
+      style={[styles.container, { paddingTop: insets.top }]}
+    >
       {/* Currency display bar */}
       <CurrencyBar />
 
@@ -51,14 +58,13 @@ export default function GardenScreen() {
 
       {/* Sunbeam Boost FAB — absolutely positioned, visible from Zone 15 */}
       <SunbeamBoostButton />
-    </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0d1117",
   },
   zoneRow: {
     paddingVertical: 8,
