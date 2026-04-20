@@ -1,23 +1,15 @@
 // =============================================================================
-// BloomlingDisplay — Centered area for the active Bloomling with idle animation
+// BloomlingDisplay — Centered Bloomling with name-plate pill
 // =============================================================================
 
 import { useEffect, useRef } from "react";
 import { Animated, StyleSheet, Text, View } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 
 import { useGameStore } from "~/state/store";
-
-/** Color palette. */
-const COLORS = {
-  text: "#e8f5e9",
-  textMuted: "#8a9b8e",
-  accent: "#4caf50",
-  border: "#2d4a3e",
-  circleBg: "rgba(45,74,62,0.3)",
-};
+import { COLORS, FONTS, RADII, SHADOWS } from "@/constants/theme";
 
 export function BloomlingDisplay() {
-  // Get the first active bloomling in the garden (first non-null slot)
   const activeBloomling = useGameStore((s) => {
     for (const slotId of s.garden.slots) {
       if (slotId !== null && s.bloomlings[slotId]) {
@@ -27,58 +19,49 @@ export function BloomlingDisplay() {
     return null;
   });
 
-  // Gentle idle bounce animation
   const bounceAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     const animation = Animated.loop(
       Animated.sequence([
-        Animated.timing(bounceAnim, {
-          toValue: -8,
-          duration: 1200,
-          useNativeDriver: true,
-        }),
-        Animated.timing(bounceAnim, {
-          toValue: 0,
-          duration: 1200,
-          useNativeDriver: true,
-        }),
+        Animated.timing(bounceAnim, { toValue: -8, duration: 1400, useNativeDriver: true }),
+        Animated.timing(bounceAnim, { toValue: 0, duration: 1400, useNativeDriver: true }),
       ])
     );
     animation.start();
     return () => animation.stop();
   }, [bounceAnim]);
 
-  const displayName = activeBloomling
-    ? activeBloomling.templateId
-    : "Seedling";
-
+  const displayName = activeBloomling ? activeBloomling.templateId : "Seedling";
   const displayLevel = activeBloomling ? activeBloomling.level : 1;
-  const displayStage = activeBloomling
-    ? activeBloomling.evolutionStage
-    : "sprout";
+  const displayStage = activeBloomling ? activeBloomling.evolutionStage : "sprout";
+  const stageLabel = displayStage.charAt(0).toUpperCase() + displayStage.slice(1);
 
   return (
     <View style={styles.container}>
-      <Animated.View
-        style={[
-          styles.spriteArea,
-          { transform: [{ translateY: bounceAnim }] },
-        ]}
-      >
-        {/* Placeholder sprite circle — will be replaced with sprite art */}
-        <View style={styles.spriteCircle}>
-          <Text style={styles.spriteEmoji}>{"\uD83C\uDF31"}</Text>
-        </View>
-      </Animated.View>
-
-      <Text style={styles.name}>{displayName}</Text>
-      <View style={styles.infoRow}>
-        <Text style={styles.level}>Lv. {displayLevel}</Text>
-        <Text style={styles.stageBadge}>
-          {displayStage.charAt(0).toUpperCase() + displayStage.slice(1)}
-        </Text>
+      {/* Halo glow ring */}
+      <View style={styles.haloRing}>
+        <Animated.View style={[styles.spriteArea, { transform: [{ translateY: bounceAnim }] }]}>
+          {/* Bloomling sprite circle */}
+          <View style={styles.spriteCircle}>
+            <Text style={styles.spriteEmoji}>{"\uD83C\uDF31"}</Text>
+          </View>
+        </Animated.View>
       </View>
+
+      {/* Name plate pill */}
+      <LinearGradient
+        colors={[COLORS.surface, COLORS.paperDeep]}
+        style={styles.namePlate}
+      >
+        <Text style={styles.name}>{displayName}</Text>
+        <View style={styles.infoRow}>
+          <View style={styles.stageDot} />
+          <Text style={styles.stageText}>
+            Lv. {displayLevel} · {stageLabel}
+          </Text>
+        </View>
+      </LinearGradient>
     </View>
   );
 }
@@ -89,46 +72,65 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingVertical: 16,
   },
-  spriteArea: {
-    marginBottom: 12,
-  },
-  spriteCircle: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: COLORS.circleBg,
-    borderWidth: 2,
-    borderColor: COLORS.border,
+  haloRing: {
+    width: 160,
+    height: 160,
+    borderRadius: 80,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: `${COLORS.sunlight}18`,
+    borderWidth: 1,
+    borderColor: `${COLORS.sunlight}30`,
+    marginBottom: 14,
+    ...SHADOWS.glowSun,
+  },
+  spriteArea: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  spriteCircle: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: `${COLORS.sageSoft}60`,
+    borderWidth: 2,
+    borderColor: `${COLORS.gilt}70`,
+    justifyContent: "center",
+    alignItems: "center",
+    ...SHADOWS.glowMoss,
   },
   spriteEmoji: {
-    fontSize: 48,
+    fontSize: 58,
+  },
+  namePlate: {
+    alignItems: "center",
+    borderRadius: RADII.xl,
+    paddingVertical: 10,
+    paddingHorizontal: 24,
+    borderWidth: 1,
+    borderColor: `${COLORS.gilt}60`,
+    ...SHADOWS.md,
   },
   name: {
+    fontFamily: FONTS.display,
     fontSize: 20,
-    fontWeight: "700",
-    color: COLORS.text,
-    marginBottom: 4,
+    color: COLORS.ink,
+    marginBottom: 3,
   },
   infoRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: 5,
   },
-  level: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: COLORS.accent,
+  stageDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: COLORS.sage,
   },
-  stageBadge: {
+  stageText: {
+    fontFamily: FONTS.body,
     fontSize: 12,
-    fontWeight: "600",
-    color: COLORS.textMuted,
-    backgroundColor: "rgba(45,74,62,0.5)",
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 8,
-    overflow: "hidden",
+    color: COLORS.ink3,
   },
 });

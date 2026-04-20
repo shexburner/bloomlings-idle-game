@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <radialGradient id="lmBg" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#6FAE7C"></stop>
+      <stop offset="65%" stop-color="#2D5A3A"></stop>
+      <stop offset="100%" stop-color="#0E2815"></stop>
+    </radialGradient>
+    <radialGradient id="lmGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFE47A"></stop>
+      <stop offset="100%" stop-color="#F4B21C" stop-opacity="0"></stop>
+    </radialGradient>
+  </defs>
+  
+  <path d="M4 4 L60 4 L60 40 Q60 58 32 60 Q4 58 4 40 Z" fill="url(#lmBg)" stroke="#D4A74A" stroke-width="1.5"></path>
+  
+  <path d="M8 8 L56 8 L56 38 Q56 54 32 56 Q8 54 8 38 Z" fill="none" stroke="#D4A74A" stroke-width=".6" opacity=".7"></path>
+  
+  <circle cx="32" cy="30" r="20" fill="url(#lmGlow)"></circle>
+  
+  <path d="M32 48 Q32 38 32 30" stroke="#FBF0CF" stroke-width="2.5" stroke-linecap="round" fill="none"></path>
+  
+  <path d="M32 34 Q20 30 16 20 Q26 18 32 30 Z" fill="#C3DFA8"></path>
+  
+  <path d="M32 30 Q44 26 48 16 Q38 14 32 26 Z" fill="#FFE47A"></path>
+  
+  <circle cx="32" cy="46" r="2.5" fill="#F4B21C"></circle>
+  <circle cx="32" cy="46" r="1" fill="#FFF0C8"></circle>
+  
+  <g fill="#FFE47A">
+    <circle cx="18" cy="14" r="1"></circle>
+    <circle cx="46" cy="44" r="1"></circle>
+  </g>
+</svg>

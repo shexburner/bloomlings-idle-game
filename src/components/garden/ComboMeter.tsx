@@ -1,23 +1,17 @@
 // =============================================================================
-// ComboMeter — Displays current combo count and multiplier
+// ComboMeter — Gilt pill: bolt badge, combo count, fill bar
 // =============================================================================
 
 import { useEffect, useRef } from "react";
 import { Animated, StyleSheet, Text, View } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 
 import { useGameStore } from "~/state/store";
 import { getComboMultiplier } from "~/state/selectors";
+import { COLORS, FONTS, RADII, SHADOWS } from "@/constants/theme";
 
-/** Color palette. */
-const COLORS = {
-  text: "#e8f5e9",
-  accent: "#4caf50",
-  highCombo: "#ffd700",
-  glow: "rgba(255,215,0,0.3)",
-};
-
-/** Threshold for "high combo" visual effects. */
 const HIGH_COMBO_THRESHOLD = 50;
+const BAR_MAX = 100;
 
 export function ComboMeter() {
   const comboCount = useGameStore((s) => s.combo.count);
@@ -25,30 +19,19 @@ export function ComboMeter() {
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
-
   const isHighCombo = comboCount >= HIGH_COMBO_THRESHOLD;
 
-  // Fade in/out based on combo activity
   useEffect(() => {
-    if (comboCount > 0) {
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 150,
-        useNativeDriver: true,
-      }).start();
-    } else {
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
-    }
+    Animated.timing(fadeAnim, {
+      toValue: comboCount > 0 ? 1 : 0,
+      duration: comboCount > 0 ? 150 : 300,
+      useNativeDriver: true,
+    }).start();
   }, [comboCount, fadeAnim]);
 
-  // Pulse effect on each combo increment
   useEffect(() => {
     if (comboCount > 0) {
-      scaleAnim.setValue(1.15);
+      scaleAnim.setValue(1.12);
       Animated.spring(scaleAnim, {
         toValue: 1,
         friction: 5,
@@ -58,110 +41,118 @@ export function ComboMeter() {
     }
   }, [comboCount, scaleAnim]);
 
-  // High-combo pulsing glow
-  const pulseAnim = useRef(new Animated.Value(0)).current;
+  const fillWidth = Math.min(comboCount / BAR_MAX, 1) * 70;
 
-  useEffect(() => {
-    if (isHighCombo) {
-      const pulse = Animated.loop(
-        Animated.sequence([
-          Animated.timing(pulseAnim, {
-            toValue: 1,
-            duration: 600,
-            useNativeDriver: true,
-          }),
-          Animated.timing(pulseAnim, {
-            toValue: 0,
-            duration: 600,
-            useNativeDriver: true,
-          }),
-        ])
-      );
-      pulse.start();
-      return () => {
-        pulse.stop();
-      };
-    }
-
-    pulseAnim.setValue(0);
-    return undefined;
-  }, [isHighCombo, pulseAnim]);
-
-  if (comboCount === 0) {
-    return null;
-  }
-
-  const glowOpacity = isHighCombo
-    ? pulseAnim.interpolate({
-        inputRange: [0, 1],
-        outputRange: [0.3, 0.8],
-      })
-    : 0;
+  if (comboCount === 0) return null;
 
   return (
     <Animated.View
       testID="combo-meter"
-      style={[
-        styles.container,
-        {
-          opacity: fadeAnim,
-          transform: [{ scale: scaleAnim }],
-        },
-      ]}
+      style={[styles.wrapper, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}
     >
-      {isHighCombo && (
-        <Animated.View
-          style={[styles.glowOverlay, { opacity: glowOpacity }]}
-        />
-      )}
-      <Text
-        testID="combo-count"
-        style={[styles.comboText, isHighCombo && styles.highComboText]}
-      >
-        x{comboCount} Combo
-      </Text>
-      <Text
-        testID="combo-multiplier"
-        style={[
-          styles.multiplierText,
-          isHighCombo && styles.highMultiplierText,
-        ]}
-      >
-        ({comboMultiplier.toFixed(2)}x)
-      </Text>
+      <LinearGradient colors={[COLORS.surface, COLORS.paperDeep]} style={styles.container}>
+        {/* Bolt badge */}
+        <LinearGradient
+          colors={[COLORS.sunlightHi, COLORS.sunlight]}
+          style={styles.boltBadge}
+        >
+          <Text style={styles.boltEmoji}>⚡</Text>
+        </LinearGradient>
+
+        {/* Center: count + multiplier */}
+        <View style={styles.center}>
+          <View style={styles.countRow}>
+            <Text testID="combo-count" style={[styles.comboCount, isHighCombo && styles.highComboCount]}>
+              {comboCount}
+            </Text>
+            <Text testID="combo-multiplier" style={[styles.multText, isHighCombo && styles.highMultText]}>
+              {" "}×{comboMultiplier.toFixed(2)}
+            </Text>
+          </View>
+          <Text style={styles.comboLabel}>COMBO</Text>
+        </View>
+
+        {/* Fill bar */}
+        <View style={styles.barTrack}>
+          <LinearGradient
+            colors={isHighCombo ? [COLORS.nectarHi, COLORS.nectar] : [COLORS.sunlightHi, COLORS.sunlight]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={[styles.barFill, { width: fillWidth }]}
+          />
+        </View>
+      </LinearGradient>
     </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
+  wrapper: {
+    borderRadius: RADII.pill,
+    ...SHADOWS.md,
+  },
   container: {
+    flexDirection: "row",
     alignItems: "center",
+    gap: 10,
     paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 16,
-    backgroundColor: "rgba(26,26,46,0.8)",
+    paddingHorizontal: 12,
+    borderRadius: RADII.pill,
+    borderWidth: 1,
+    borderColor: `${COLORS.gilt}60`,
+  },
+  boltBadge: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: `${COLORS.gilt}80`,
+  },
+  boltEmoji: {
+    fontSize: 14,
+  },
+  center: {
+    alignItems: "center",
+    minWidth: 70,
+  },
+  countRow: {
+    flexDirection: "row",
+    alignItems: "baseline",
+  },
+  comboCount: {
+    fontFamily: FONTS.bodyBlack,
+    fontSize: 20,
+    color: COLORS.ink,
+    fontVariant: ["tabular-nums"],
+  },
+  highComboCount: {
+    color: COLORS.nectar,
+  },
+  multText: {
+    fontFamily: FONTS.displayMediumItalic,
+    fontSize: 14,
+    color: COLORS.sunlight,
+  },
+  highMultText: {
+    color: COLORS.nectar,
+  },
+  comboLabel: {
+    fontFamily: FONTS.body,
+    fontSize: 9,
+    color: COLORS.ink3,
+    letterSpacing: 0.8,
+  },
+  barTrack: {
+    width: 70,
+    height: 5,
+    backgroundColor: "rgba(42,34,24,0.12)",
+    borderRadius: RADII.pill,
     overflow: "hidden",
   },
-  glowOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: COLORS.glow,
-    borderRadius: 16,
-  },
-  comboText: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: COLORS.accent,
-  },
-  highComboText: {
-    color: COLORS.highCombo,
-  },
-  multiplierText: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: COLORS.text,
-    marginTop: 2,
-  },
-  highMultiplierText: {
-    color: COLORS.highCombo,
+  barFill: {
+    height: "100%",
+    borderRadius: RADII.pill,
   },
 });

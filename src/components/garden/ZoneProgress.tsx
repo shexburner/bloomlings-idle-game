@@ -1,24 +1,15 @@
 // =============================================================================
-// ZoneProgress — Zone number, name, and progress bar toward clearing
+// ZoneProgress — Biome name, zone number, golden progress bar
 // =============================================================================
 
 import { StyleSheet, Text, View } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 
 import { useGameStore } from "~/state/store";
 import { getZoneThreshold } from "~/state/selectors";
+import { formatNumber } from "~/utils/formatNumber";
+import { COLORS, FONTS, RADII, SHADOWS } from "@/constants/theme";
 
-/** Color palette. */
-const COLORS = {
-  background: "rgba(26,26,46,0.9)",
-  barTrack: "#2d4a3e",
-  barFill: "#4caf50",
-  barFillGold: "#ffd700",
-  text: "#e8f5e9",
-  textMuted: "#8a9b8e",
-  border: "#2d4a3e",
-};
-
-/** Map zone ranges to biome display names. */
 function getBiomeName(zoneNumber: number): string {
   if (zoneNumber <= 25) return "The Mossy Cradle";
   if (zoneNumber <= 50) return "Sunlit Glade";
@@ -32,88 +23,120 @@ function getBiomeName(zoneNumber: number): string {
 
 export function ZoneProgress() {
   const currentZone = useGameStore((s) => s.zoneProgress.currentZone);
-  const currentProgress = useGameStore(
-    (s) => s.zoneProgress.currentZoneProgress
-  );
+  const currentProgress = useGameStore((s) => s.zoneProgress.currentZoneProgress);
 
   const threshold = getZoneThreshold(currentZone);
   const progressPercent = Math.min(currentProgress / threshold, 1);
   const biomeName = getBiomeName(currentZone);
-
-  // Use gold fill color when progress is above 75%
-  const fillColor =
-    progressPercent > 0.75 ? COLORS.barFillGold : COLORS.barFill;
+  const isGateZone = (currentZone % 5) === 4;
 
   return (
     <View testID="zone-progress" style={styles.container}>
       <View style={styles.headerRow}>
-        <Text testID="zone-label" style={styles.zoneLabel}>
-          Zone {currentZone}
-        </Text>
         <Text testID="zone-biome" style={styles.biomeName}>
           {biomeName}
         </Text>
+        <View style={styles.headerRight}>
+          {isGateZone && (
+            <View style={styles.gatePill}>
+              <Text style={styles.gateLabel}>GATE</Text>
+            </View>
+          )}
+          <Text testID="zone-label" style={styles.zoneLabel}>
+            Zone {currentZone}
+          </Text>
+        </View>
       </View>
+
+      {/* Progress bar */}
       <View style={styles.barTrack}>
-        <View
+        <LinearGradient
           testID="zone-progress-fill"
-          style={[
-            styles.barFill,
-            {
-              width: `${Math.round(progressPercent * 100)}%`,
-              backgroundColor: fillColor,
-            },
-          ]}
+          colors={[COLORS.sunlightHi, COLORS.sunlight]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={[styles.barFill, { width: `${Math.round(progressPercent * 100)}%` }]}
         />
       </View>
-      <Text testID="zone-progress-percent" style={styles.progressText}>
-        {Math.round(progressPercent * 100)}%
-      </Text>
+
+      {/* Sub-row: progress numbers */}
+      <View style={styles.subRow}>
+        <Text testID="zone-progress-percent" style={styles.subText}>
+          {Math.round(progressPercent * 100)}%
+        </Text>
+        <Text style={styles.subText}>
+          {formatNumber(currentProgress)} / {formatNumber(threshold)}
+        </Text>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    backgroundColor: COLORS.background,
-    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    backgroundColor: `${COLORS.surface}E0`,
+    borderRadius: RADII.md,
     marginHorizontal: 16,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: `${COLORS.gilt}55`,
+    ...SHADOWS.sm,
   },
   headerRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 6,
+    marginBottom: 7,
   },
-  zoneLabel: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: COLORS.text,
+  headerRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
   },
   biomeName: {
+    fontFamily: FONTS.displayMediumItalic,
     fontSize: 13,
-    fontWeight: "500",
-    color: COLORS.textMuted,
-    fontStyle: "italic",
+    color: COLORS.ink2,
+  },
+  zoneLabel: {
+    fontFamily: FONTS.bodyBold,
+    fontSize: 13,
+    color: COLORS.ink,
+  },
+  gatePill: {
+    backgroundColor: COLORS.nectarBg,
+    borderRadius: RADII.pill,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderWidth: 1,
+    borderColor: `${COLORS.nectar}40`,
+  },
+  gateLabel: {
+    fontFamily: FONTS.bodyBold,
+    fontSize: 9,
+    color: COLORS.nectar,
+    letterSpacing: 0.5,
   },
   barTrack: {
-    height: 10,
-    backgroundColor: COLORS.barTrack,
-    borderRadius: 5,
+    height: 8,
+    backgroundColor: "rgba(42,34,24,0.10)",
+    borderRadius: RADII.pill,
     overflow: "hidden",
   },
   barFill: {
     height: "100%",
-    borderRadius: 5,
+    borderRadius: RADII.pill,
   },
-  progressText: {
-    fontSize: 11,
-    color: COLORS.textMuted,
-    textAlign: "right",
-    marginTop: 4,
+  subRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 5,
+  },
+  subText: {
+    fontFamily: FONTS.body,
+    fontSize: 10,
+    color: COLORS.ink3,
+    fontVariant: ["tabular-nums"],
   },
 });

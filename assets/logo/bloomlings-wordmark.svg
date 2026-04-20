@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 80" width="360" height="80">
+  <defs>
+    <radialGradient id="wmShield" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#6FAE7C"></stop>
+      <stop offset="65%" stop-color="#2D5A3A"></stop>
+      <stop offset="100%" stop-color="#0E2815"></stop>
+    </radialGradient>
+    <linearGradient id="wmGold" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#FFE47A"></stop>
+      <stop offset=".5" stop-color="#D4A74A"></stop>
+      <stop offset="1" stop-color="#8A5A1A"></stop>
+    </linearGradient>
+  </defs>
+  
+  <path d="M8 10 L64 10 L64 46 Q64 64 36 66 Q8 64 8 46 Z" fill="url(#wmShield)" stroke="url(#wmGold)" stroke-width="1.5"></path>
+  <path d="M36 54 Q36 44 36 36" stroke="#FBF0CF" stroke-width="2.5" stroke-linecap="round" fill="none"></path>
+  <path d="M36 40 Q24 36 20 26 Q30 24 36 36 Z" fill="#C3DFA8"></path>
+  <path d="M36 36 Q48 32 52 22 Q42 20 36 32 Z" fill="#FFE47A"></path>
+  <circle cx="36" cy="52" r="2.5" fill="#F4B21C"></circle>
+  
+  <text x="82" y="52" font-family="Cormorant Garamond, Fraunces, Georgia, serif" font-weight="700" font-style="italic" font-size="42" fill="#1A1225" letter-spacing="0">Bloomlings</text>
+  
+  <path d="M82 60 L272 60" stroke="url(#wmGold)" stroke-width="1.2"></path>
+  <circle cx="78" cy="60" r="1.6" fill="url(#wmGold)"></circle>
+  <circle cx="276" cy="60" r="1.6" fill="url(#wmGold)"></circle>
+</svg>

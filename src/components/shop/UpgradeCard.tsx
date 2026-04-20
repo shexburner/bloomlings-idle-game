@@ -1,9 +1,10 @@
 // =============================================================================
-// UpgradeCard — Single upgrade: name, description, level, cost, buy button
+// UpgradeCard — Parchment card: gilt hairline, icon well, italic desc, buy btn
 // =============================================================================
 
 import { useRef } from "react";
 import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 
 import type { UpgradeTemplate } from "~/types/game";
 import { useGameStore } from "~/state/store";
@@ -11,30 +12,13 @@ import { calculateUpgradeCost } from "~/state/selectors";
 import { formatNumber } from "~/utils/formatNumber";
 import * as audioService from "~/services/audioService";
 import { purchaseHaptic } from "~/utils/haptics";
-
-const COLORS = {
-  cardBg: "#161b22",
-  border: "#2d4a3e",
-  text: "#e8f5e9",
-  textMuted: "#8a9b8e",
-  buyAffordable: "#4caf50",
-  buyAffordableText: "#0d1117",
-  buyUnaffordable: "#3a3a4a",
-  buyUnaffordableText: "#6b7b6e",
-  costText: "#ffd700",
-  levelText: "#4fc3f7",
-  flash: "rgba(76,175,80,0.3)",
-};
+import { COLORS, FONTS, RADII, SHADOWS } from "@/constants/theme";
 
 interface UpgradeCardProps {
   template: UpgradeTemplate;
   buyCount: number;
 }
 
-/**
- * Calculate the total cost for buying `count` levels starting from `currentLevel`.
- * Uses geometric series: sum of baseCost * scaling^(currentLevel+1) ... baseCost * scaling^(currentLevel+count).
- */
 function calculateBulkCost(
   baseCost: number,
   scaling: number,
@@ -45,7 +29,6 @@ function calculateBulkCost(
   const levelsAvailable =
     maxLevel !== null ? Math.min(count, maxLevel - currentLevel) : count;
   if (levelsAvailable <= 0) return Infinity;
-
   let total = 0;
   for (let i = 1; i <= levelsAvailable; i++) {
     total += calculateUpgradeCost(baseCost, scaling, currentLevel + i);
@@ -53,9 +36,6 @@ function calculateBulkCost(
   return total;
 }
 
-/**
- * Calculate max levels affordable given current sunlight.
- */
 function calculateMaxLevels(
   baseCost: number,
   scaling: number,
@@ -66,7 +46,6 @@ function calculateMaxLevels(
   const cap = maxLevel !== null ? maxLevel - currentLevel : 1000;
   let total = 0;
   let count = 0;
-
   for (let i = 1; i <= cap; i++) {
     const cost = calculateUpgradeCost(baseCost, scaling, currentLevel + i);
     if (total + cost > sunlight) break;
@@ -77,196 +56,218 @@ function calculateMaxLevels(
 }
 
 export function UpgradeCard({ template, buyCount }: UpgradeCardProps) {
-  const currentLevel = useGameStore(
-    (s) => s.upgrades[template.id]?.level ?? 0
-  );
+  const currentLevel = useGameStore((s) => s.upgrades[template.id]?.level ?? 0);
   const sunlight = useGameStore((s) => s.resources.sunlight);
   const buyUpgrade = useGameStore((s) => s.buyUpgrade);
   const spendSunlight = useGameStore((s) => s.spendSunlight);
 
   const flashAnim = useRef(new Animated.Value(0)).current;
 
-  // Calculate effective buy count (-1 = max)
   const effectiveBuyCount =
     buyCount < 0
-      ? calculateMaxLevels(
-          template.baseCost,
-          template.costScaling,
-          currentLevel,
-          template.maxLevel,
-          sunlight
-        )
-      : Math.min(
-          buyCount,
-          template.maxLevel !== null
-            ? template.maxLevel - currentLevel
-            : buyCount
-        );
+      ? calculateMaxLevels(template.baseCost, template.costScaling, currentLevel, template.maxLevel, sunlight)
+      : Math.min(buyCount, template.maxLevel !== null ? template.maxLevel - currentLevel : buyCount);
 
   const isMaxed = template.maxLevel !== null && currentLevel >= template.maxLevel;
 
   const totalCost = isMaxed
     ? Infinity
-    : calculateBulkCost(
-        template.baseCost,
-        template.costScaling,
-        currentLevel,
-        effectiveBuyCount,
-        template.maxLevel
-      );
+    : calculateBulkCost(template.baseCost, template.costScaling, currentLevel, effectiveBuyCount, template.maxLevel);
 
   const canAfford = !isMaxed && sunlight >= totalCost && effectiveBuyCount > 0;
 
   const handleBuy = () => {
     if (!canAfford) return;
-
-    // Spend sunlight for the total cost
     const success = spendSunlight(totalCost);
     if (!success) return;
-
-    // Buy upgrades one at a time (store increments level by 1)
     for (let i = 0; i < effectiveBuyCount; i++) {
       buyUpgrade(template.id);
     }
-
     purchaseHaptic();
     audioService.play("purchase");
-
-    // Flash animation
     flashAnim.setValue(1);
-    Animated.timing(flashAnim, {
-      toValue: 0,
-      duration: 300,
-      useNativeDriver: false,
-    }).start();
+    Animated.timing(flashAnim, { toValue: 0, duration: 300, useNativeDriver: false }).start();
   };
 
-  const flashBg = flashAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["transparent", COLORS.flash],
-  });
-
   const effectDescription = `+${formatNumber(template.effectPerLevel * 100, 0)}% per level`;
-
   const cardId = template.id.replace(/_/g, "-");
 
   return (
     <Animated.View
       testID={`upgrade-card-${cardId}`}
-      style={[styles.card, { backgroundColor: flashBg }]}
+      style={[styles.cardWrap, { backgroundColor: flashAnim.interpolate({ inputRange: [0, 1], outputRange: ["transparent", `${COLORS.sage}30`] }) }]}
     >
-      <View style={styles.cardInner}>
-        <View style={styles.info}>
-          <View style={styles.nameRow}>
-            <Text style={styles.name}>{template.name}</Text>
-            <Text testID={`upgrade-level-${cardId}`} style={styles.level}>
-              Lv. {currentLevel}
-            </Text>
-          </View>
-          <Text style={styles.description}>{template.description}</Text>
-          <Text style={styles.effect}>{effectDescription}</Text>
-        </View>
+      <LinearGradient colors={[COLORS.surface, COLORS.paperDeep]} style={styles.card}>
+        {/* Gilt hairline */}
+        <View style={styles.hairline} />
 
-        <Pressable
-          testID={`upgrade-buy-${cardId}`}
-          style={[styles.buyButton, canAfford ? styles.buyAffordable : styles.buyUnaffordable]}
-          onPress={handleBuy}
-          disabled={!canAfford}
-        >
-          {isMaxed ? (
-            <Text style={styles.buyTextDisabled}>MAX</Text>
+        <View style={styles.cardInner}>
+          {/* Icon well */}
+          <LinearGradient colors={[COLORS.sageSoft, COLORS.moss]} style={styles.iconWell}>
+            <Text style={styles.iconEmoji}>🌿</Text>
+          </LinearGradient>
+
+          {/* Info */}
+          <View style={styles.info}>
+            <View style={styles.nameRow}>
+              <Text style={styles.name}>{template.name}</Text>
+              <Text testID={`upgrade-level-${cardId}`} style={styles.level}>
+                Lv. {currentLevel}
+              </Text>
+            </View>
+            <Text style={styles.description}>{template.description}</Text>
+            <Text style={styles.effect}>{effectDescription}</Text>
+          </View>
+
+          {/* Buy button */}
+          {canAfford ? (
+            <Pressable
+              testID={`upgrade-buy-${cardId}`}
+              onPress={handleBuy}
+              style={styles.buyWrap}
+            >
+              <LinearGradient
+                colors={[COLORS.sage, COLORS.moss, COLORS.mossDeep]}
+                style={styles.buyButton}
+              >
+                <Text style={styles.buyText}>
+                  {isMaxed ? "MAX" : `Buy${effectiveBuyCount > 1 ? ` ×${effectiveBuyCount}` : ""}`}
+                </Text>
+                {!isMaxed && (
+                  <Text style={styles.costText}>☀ {formatNumber(totalCost)}</Text>
+                )}
+              </LinearGradient>
+            </Pressable>
           ) : (
-            <>
-              <Text style={canAfford ? styles.buyText : styles.buyTextDisabled}>
-                Buy{effectiveBuyCount > 1 ? ` x${effectiveBuyCount}` : ""}
-              </Text>
-              <Text style={[styles.costText, !canAfford && styles.costTextDisabled]}>
-                {"\u2600"} {formatNumber(totalCost)}
-              </Text>
-            </>
+            <Pressable
+              testID={`upgrade-buy-${cardId}`}
+              onPress={handleBuy}
+              disabled
+              style={styles.buyWrap}
+            >
+              <View style={styles.buyButtonDisabled}>
+                <Text style={styles.buyTextDisabled}>
+                  {isMaxed ? "MAX" : `Buy${effectiveBuyCount > 1 ? ` ×${effectiveBuyCount}` : ""}`}
+                </Text>
+                {!isMaxed && (
+                  <Text style={styles.costTextDisabled}>☀ {formatNumber(totalCost)}</Text>
+                )}
+              </View>
+            </Pressable>
           )}
-        </Pressable>
-      </View>
+        </View>
+      </LinearGradient>
     </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
+  cardWrap: {
     marginHorizontal: 16,
-    marginVertical: 4,
-    borderRadius: 12,
+    marginVertical: 5,
+    borderRadius: RADII.lg,
+    ...SHADOWS.md,
+  },
+  card: {
+    borderRadius: RADII.lg,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: `${COLORS.gilt}50`,
     overflow: "hidden",
+  },
+  hairline: {
+    height: 1,
+    backgroundColor: `${COLORS.gilt}80`,
   },
   cardInner: {
     flexDirection: "row",
     alignItems: "center",
     padding: 12,
-    backgroundColor: COLORS.cardBg,
+    gap: 10,
+  },
+  iconWell: {
+    width: 42,
+    height: 42,
+    borderRadius: RADII.md,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: `${COLORS.gilt}70`,
+    flexShrink: 0,
+  },
+  iconEmoji: {
+    fontSize: 20,
   },
   info: {
     flex: 1,
-    marginRight: 12,
   },
   nameRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: 6,
     marginBottom: 2,
   },
   name: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: COLORS.text,
+    fontFamily: FONTS.bodyBold,
+    fontSize: 14,
+    color: COLORS.ink,
   },
   level: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: COLORS.levelText,
+    fontFamily: FONTS.body,
+    fontSize: 10,
+    color: COLORS.ink3,
   },
   description: {
-    fontSize: 12,
-    color: COLORS.textMuted,
+    fontFamily: FONTS.displayMediumItalic,
+    fontSize: 11,
+    color: COLORS.ink2,
     marginBottom: 2,
   },
   effect: {
-    fontSize: 11,
-    color: COLORS.textMuted,
-    fontStyle: "italic",
+    fontFamily: FONTS.bodyBold,
+    fontSize: 10,
+    color: COLORS.sage,
+  },
+  buyWrap: {
+    flexShrink: 0,
   },
   buyButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    borderRadius: RADII.pill,
     alignItems: "center",
     justifyContent: "center",
-    minWidth: 80,
+    minWidth: 76,
+    ...SHADOWS.sm,
   },
-  buyAffordable: {
-    backgroundColor: COLORS.buyAffordable,
-  },
-  buyUnaffordable: {
-    backgroundColor: COLORS.buyUnaffordable,
+  buyButtonDisabled: {
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    borderRadius: RADII.pill,
+    alignItems: "center",
+    justifyContent: "center",
+    minWidth: 76,
+    backgroundColor: COLORS.surface2,
   },
   buyText: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: COLORS.buyAffordableText,
+    fontFamily: FONTS.bodyBold,
+    fontSize: 13,
+    color: COLORS.surface,
   },
   buyTextDisabled: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: COLORS.buyUnaffordableText,
+    fontFamily: FONTS.bodyBold,
+    fontSize: 13,
+    color: COLORS.ink3,
   },
   costText: {
-    fontSize: 11,
-    fontWeight: "600",
-    color: COLORS.costText,
-    marginTop: 2,
+    fontFamily: FONTS.bodyBold,
+    fontSize: 10,
+    color: COLORS.sunlightHi,
+    marginTop: 1,
   },
   costTextDisabled: {
-    color: COLORS.buyUnaffordableText,
+    fontFamily: FONTS.body,
+    fontSize: 10,
+    color: COLORS.ink3,
+    marginTop: 1,
   },
 });
