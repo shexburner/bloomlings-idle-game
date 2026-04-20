@@ -7,8 +7,8 @@
 **Phase 2: Core Engine** — COMPLETE
 **Phase 3: Content & UI** — COMPLETE
 **Phase 4: Progression Systems** — COMPLETE (5 / 5 tasks done)
-**Phase 5: Monetization** — IN PROGRESS (3 / 4 tasks done; Gate Assist + Boss Smash blocked on engine)
-**Phase 6: Polish & Retention** — IN PROGRESS (3 / 5 tasks done)
+**Phase 5: Monetization** — COMPLETE (5/7 ad touchpoints shipped; Gate Assist + Boss Smash intentionally blocked on unbuilt engine loops)
+**Phase 6: Polish & Retention** — COMPLETE (5 / 5 tasks done)
 
 ## Completed Work
 
@@ -60,17 +60,24 @@
 
 3. **Dewdrop shop + Watch &amp; Earn** — DONE. New catalog `src/data/perkTemplates.ts` defines five gameplay perks with stable IDs consumed by engine code: `dewdrop_bonus_slot` (permanent +1 Garden slot, stacks in `applyCapacityChange`), `offline_boost` (permanent, raises `getOfflineEfficiency` floor from 50% → 75%), `zone_skip` (consumable, invokes `store.advanceZone()` via `useZoneSkip`), `rebirth_boost` (consumable, auto-consumed by `executeRebirth` for +50% Nectar), `evolution_shard` (consumable, auto-consumed by `bloomlingSlice.evolveBloomling` to halve the next evolution cost). Engine updates: `offlineProgress.getOfflineEfficiency` now reads `state.perks`; `rebirth.calculateNectarEarned` / `getRebirthPreview` accept an optional `rebirthBoostMultiplier`; `evolution.canEvolve` / `getEvolutionCost` accept an optional `discountFactor`. New store actions on MetaSlice: `buyPerk(perkId)` (spends Dewdrops via `spendDewdrops`, writes/merges a `Perk` entry, re-syncs Garden capacity for the bonus-slot perk), `recordDewdropAdReward()` (returns Dewdrops granted: 1 base + 1 on every 3rd ad of the day + up to +5 from `adStreakDays`, bumps `stats.totalAdsWatched`, stamps `daily.lastDewdropAdAt` for the cooldown clock, caps at `daily.dailyAdCap` = 15/day), `rolloverDailyState()` (resets `adsWatchedToday` on calendar-day change and extends/resets `adStreakDays`, idempotent within a day — invoked by `gameLoop` on every foreground), `useZoneSkip()` (consumes one `zone_skip` charge and calls `advanceZone`). New `DailyState.lastDewdropAdAt: number | null` persists the 3-minute cooldown across sessions. UI: `src/components/dewdrop/DewdropShop.tsx` is a top-level tab gated at Zone 20 (`allTimeHighestZone`) with a locked-state progress bar; `DewdropEarnCard.tsx` wraps `useRewardedAd("dewdropGarden")` with a live 3-minute cooldown countdown, daily-cap readout, 3rd-ad + streak bonus breakdown, and an in-UI +N flash on reward; `PerkCard.tsx` renders "Buy" for permanent perks (flipping to "Owned" after purchase), a quantity badge for consumables, and a "Use" button exclusively on Zone Skip. New route `app/(tabs)/dewdrop-shop.tsx` and `drop.fill` → `water-drop` mapping in `components/ui/icon-symbol.tsx`. Tab bar now has six tabs: Garden / Shop / Collection / Dewdrops / Rebirth / Settings.
 
-## What's Next: Phase 6 — Polish & Retention (4 tasks remaining)
+## What's Next: Phase 7 — Prestige Layer 2 & Endgame
 
-Phase 5 is at a natural pause: 5 of 7 ad touchpoints ship; Gate Assist and Boss Smash are intentionally blocked on engine loops that don't yet exist. Phase 6 has begun with Achievements (see below).
+Phases 1–6 are complete. Phase 5 shipped 5/7 ad touchpoints; Gate Assist and Boss Smash remain intentionally blocked on unbuilt engine loops (gate timer + boss HP/damage). Phase 6 is fully done.
 
 2. **Daily login + streaks** — DONE. `src/engine/dailyRewards.ts` — `getDailyReward(loginCycleDay, loginCyclesCompleted)` returns `{ sunlight, dewdrops, sunbeamBoostMs }` from the 7-day fixed table, scaling sunlight by `1 + cycles × 0.5` and dewdrops by `1 + cycles` on repeat cycles. `describeDailyReward(reward)` returns a user-facing string. Store: `rolloverDailyState()` extended to also track login `streakDays` (was only tracking `adStreakDays`); `claimDailyReward()` advances `loginCycleDay` (wraps at 7), increments `loginCyclesCompleted` on wrap, marks `todayRewardCollected: true`, and credits rewards. UI: `src/components/modals/DailyRewardModal.tsx` — no-ad modal pattern, visible when `!todayRewardCollected`; shows Day X of 7, streak badge, reward preview, "Collect" button. Mounted in `app/_layout.tsx`.
 
 3. **Notifications** — DONE. `src/services/notificationService.ts` — `requestNotificationPermissions()` on mount; `cancelGameNotifications()` on foreground; `scheduleGameNotifications(state)` on background. Four slots: `gardenMisses` (+4h), `offlineReady` (+12h), `streakReminder` (+20h, streak > 0 only), `boostExpired` (at soonest boost expiry). All respect `settings.notifications` toggles. `app.json` updated with `expo-notifications` plugin.
 
-### Phase 6 remaining tasks
-1. **Sound + haptics** (`src/services/audio.ts`) — tap/crit/combo/prestige sound effects and haptic feedback on key events. Use Expo AV + Haptics APIs.
-2. **Performance pass** — profile render counts in Collection/Shop screens; memoize heavy selectors; check for unnecessary re-renders in the game loop path.
+4. **Sound + haptics** — DONE. `src/services/audioService.ts` — tap, crit, combo-break, zone-advance, achievement, boost, luckySprout, and background music. `src/utils/haptics.ts` — `tapHaptic`, `critHaptic`, `zoneAdvanceHaptic`, `achievementHaptic`, `boostHaptic`. Wired into `useTapHandler`, `useGameLoop`, and all modal/button components.
+
+### Phase 7 completed
+- **Transcendence system** — DONE. `src/engine/transcendence.ts` — pure engine: `calculateEssenceEarned(prestige)` (formula: `floor(1 * (totalNectarSpent/50)^1.8)`), `canTranscend(prestige)` (requires 10+ Rebirths AND Zone 150+), `getTranscendencePreview(prestige)` (returns `TranscendencePreview` for UI), `resetBloomlingsForTranscendence(bloomlings)` (all → Sprout/level 1/out-of-garden). `prestigeSlice.executeTranscendence` is now a thin wrapper (same pattern as `executeRebirth`). Removed duplicated essence formula constants from `selectors.ts`.
+
+### Phase 7 remaining tasks
+1. **Performance pass** — profile render counts in Collection/Shop screens; memoize heavy selectors; check for unnecessary re-renders in the game loop path. (QA Tester)
+2. **Essence shop UI** — tab or modal for spending Essence on permanent upgrades. Needs `getTranscendencePreview` wired in for the Transcendence confirmation screen. (UI/UX Developer)
+3. **Biomes 5–8 content** — Bloomling designs, zone names, flavor text. (Content Creator)
+4. **Legendary/Mythic Bloomlings** — stats, abilities, evolution paths. (Content Creator)
 
 ### Dependencies / Notes for next session
 - The `idle_garden_slots` Sunlight upgrade from Phase 3 is a placeholder that may be retired now that the Nectar shop ships with `nectar_garden_expansion`. Both contribute to garden capacity via the engine; either can be deprecated without changing engine code.

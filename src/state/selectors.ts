@@ -29,11 +29,6 @@ import {
 const ZONE_THRESHOLD_BASE = 50;
 const ZONE_THRESHOLD_SCALING = 1.12;
 
-/** Essence formula constants (from 04-prestige-systems.md) */
-const ESSENCE_BASE = 1;
-const ESSENCE_THRESHOLD = 50;
-const ESSENCE_EXPONENT = 1.8;
-
 /** Evolution stage production multipliers */
 const EVOLUTION_MULTIPLIERS: Record<EvolutionStage, number> = {
   [EvolutionStage.Sprout]: 1,
@@ -312,21 +307,6 @@ export function calculateNectarOnRebirth(
   );
 }
 
-/**
- * Essence earned on Transcendence.
- * Formula: floor(baseEssence * (totalNectarSpent / essenceThreshold)^essenceExponent)
- * From docs/design/04-prestige-systems.md
- */
-export function calculateEssenceOnTranscendence(
-  state: Pick<GameStore, "prestige">
-): number {
-  const totalSpent = state.prestige.totalNectarSpent;
-  if (totalSpent < ESSENCE_THRESHOLD) return 0;
-
-  return Math.floor(
-    ESSENCE_BASE * Math.pow(totalSpent / ESSENCE_THRESHOLD, ESSENCE_EXPONENT)
-  );
-}
 
 // -----------------------------------------------------------------------------
 // Combo

@@ -3,12 +3,14 @@
 // =============================================================================
 import type { StateCreator } from "zustand";
 import type { PrestigeState } from "~/types/game";
-import { EvolutionStage } from "~/types/game";
-import { calculateEssenceOnTranscendence } from "../selectors";
 import { initialResources } from "./resourceSlice";
 import { initialCombo } from "./comboSlice";
 import { initialUpgrades } from "./upgradeSlice";
 import type { GameStore } from "../store";
+import {
+  calculateEssenceEarned,
+  resetBloomlingsForTranscendence,
+} from "~/engine/transcendence";
 import {
   calculateNectarEarned,
   resetBloomlingsForRebirth,
@@ -170,7 +172,7 @@ export const createPrestigeSlice: StateCreator<
 
   executeTranscendence: () => {
     const state = get();
-    const essenceEarned = calculateEssenceOnTranscendence(state);
+    const essenceEarned = calculateEssenceEarned(state.prestige);
 
     set(() => ({
       resources: {
@@ -179,26 +181,13 @@ export const createPrestigeSlice: StateCreator<
         dewdrops: state.resources.dewdrops,
         totalSunlightEarned: state.resources.totalSunlightEarned,
       },
-      // Reset all bloomling levels to 1, Sprout stage
-      bloomlings: Object.fromEntries(
-        Object.entries(state.bloomlings).map(([id, b]) => [
-          id,
-          {
-            ...b,
-            level: 1,
-            evolutionStage: EvolutionStage.Sprout,
-            inGarden: false,
-            gardenSlot: null,
-          },
-        ])
-      ),
+      bloomlings: resetBloomlingsForTranscendence(state.bloomlings),
       garden: {
         ...state.garden,
         slots: state.garden.slots.map(() => null),
         activeSynergyIds: [],
         specialMeterProgress: 0,
       },
-      // Reset ALL upgrades (including Nectar upgrades)
       upgrades: initialUpgrades,
       zoneProgress: {
         currentZone: 1,
@@ -233,12 +222,8 @@ export const createPrestigeSlice: StateCreator<
       },
       lastTickAt: Date.now(),
     }));
-    // Full upgrade wipe removes slot-granting upgrades too; recompute capacity.
     get().syncGardenCapacity();
-    // Transcendence resets to zone 1. Re-run discovery so the player is
-    // guaranteed a Fernley auto-placed in the garden for the new run.
     get().discoverBloomlingsForZone(1);
-    // Check transcendence achievements.
     get().checkAndGrantAchievements();
   },
 });
