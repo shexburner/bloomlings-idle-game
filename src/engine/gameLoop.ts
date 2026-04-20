@@ -16,7 +16,10 @@ import {
   hasReachedZoneThreshold,
 } from "~/state/selectors";
 import type { GameStore } from "~/state/store";
-import { calculateOfflineProgress } from "./offlineProgress";
+import {
+  calculateOfflineProgress,
+  type OfflineProgressResult,
+} from "./offlineProgress";
 import { nextLuckySproutIntervalMs } from "./luckySprout";
 import * as audioService from "~/services/audioService";
 import { zoneAdvanceHaptic, achievementHaptic } from "~/utils/haptics";
@@ -191,6 +194,62 @@ export function applyTick(
 }
 
 // -----------------------------------------------------------------------------
+// Offline Progress Application
+// -----------------------------------------------------------------------------
+
+/**
+ * Apply offline progress to the store for the period since `lastTickAt`.
+ *
+ * Safe to call on cold start (when lastTickAt > 0) and on foreground resume.
+ * Guards against brand-new saves (lastTickAt === 0) and zero-duration windows.
+ *
+ * @returns The OfflineProgressResult if progress was computed, null otherwise.
+ */
+export function applyOfflineProgress(now: number): OfflineProgressResult | null {
+  const state = useGameStore.getState();
+
+  // Brand-new save — nothing to credit yet.
+  if (state.lastTickAt <= 0) return null;
+
+  const result = calculateOfflineProgress(state, state.lastTickAt, now);
+
+  if (result.sunlightEarned > 0) {
+    state.addSunlight(result.sunlightEarned);
+    state.addZoneProgress(result.sunlightEarned);
+  }
+
+  if (result.sunlightEarned > 0 && result.durationMs >= OFFLINE_MODAL_MIN_MS) {
+    state.setLastOfflineSession({
+      sunlightEarned: result.sunlightEarned,
+      durationMs: result.durationMs,
+      wasCapped: result.wasCapped,
+      efficiency: result.efficiency,
+    });
+  }
+
+  if (result.sunlightEarned > 0) {
+    if (result.durationMs >= PATIENT_GARDENER_THRESHOLD_MS) {
+      useGameStore.getState().triggerHiddenAchievement("patient_gardener");
+    }
+    const hour = new Date(now).getHours();
+    if (hour >= NIGHT_OWL_START_HOUR && hour < NIGHT_OWL_END_HOUR) {
+      useGameStore.setState((s) => ({
+        stats: {
+          ...s.stats,
+          nightOwlOfflineCollections: s.stats.nightOwlOfflineCollections + 1,
+        },
+      }));
+      useGameStore.getState().checkAndGrantAchievements();
+    }
+  }
+
+  state.setLastActiveAt(now);
+  state.setLastTickAt(now);
+
+  return result;
+}
+
+// -----------------------------------------------------------------------------
 // useGameLoop Hook
 // -----------------------------------------------------------------------------
 
@@ -284,64 +343,16 @@ export function useGameLoop(): void {
   useEffect(() => {
     const handleAppStateChange = (nextAppState: AppStateStatus) => {
       if (nextAppState === "active") {
-        // App coming to foreground — roll the daily counters first so
-        // streaks / caps reflect the current calendar day before any
-        // Dewdrop-shop interactions happen later in this session.
+        // Roll daily counters first so streaks/caps reflect the current
+        // calendar day before any Dewdrop-shop interactions happen.
         useGameStore.getState().rolloverDailyState();
-        // App coming to foreground — calculate offline progress
-        const state = useGameStore.getState();
+
         const now = Date.now();
-        const offlineResult = calculateOfflineProgress(
-          state,
-          state.lastTickAt,
-          now
-        );
-
-        if (offlineResult.sunlightEarned > 0) {
-          state.addSunlight(offlineResult.sunlightEarned);
-          state.addZoneProgress(offlineResult.sunlightEarned);
-        }
-
-        // Surface a welcome-back summary for the UI. Skip for very short
-        // away windows (tab switches, etc.) to keep the modal non-annoying.
-        if (
-          offlineResult.sunlightEarned > 0 &&
-          offlineResult.durationMs >= OFFLINE_MODAL_MIN_MS
-        ) {
-          state.setLastOfflineSession({
-            sunlightEarned: offlineResult.sunlightEarned,
-            durationMs: offlineResult.durationMs,
-            wasCapped: offlineResult.wasCapped,
-            efficiency: offlineResult.efficiency,
-          });
-        }
-
-        state.setLastActiveAt(now);
-        state.setLastTickAt(now);
+        applyOfflineProgress(now);
         lastTickRef.current = now;
 
-        // --- Hidden achievement checks on foreground ---
-        if (offlineResult.sunlightEarned > 0) {
-          // "Patient Gardener": returned after exactly 24h (at the cap).
-          if (offlineResult.durationMs >= PATIENT_GARDENER_THRESHOLD_MS) {
-            useGameStore.getState().triggerHiddenAchievement("patient_gardener");
-          }
-          // "Night Owl": collecting offline earnings between midnight and 5 AM.
-          const hour = new Date(now).getHours();
-          if (hour >= NIGHT_OWL_START_HOUR && hour < NIGHT_OWL_END_HOUR) {
-            useGameStore.setState((s) => ({
-              stats: {
-                ...s.stats,
-                nightOwlOfflineCollections: s.stats.nightOwlOfflineCollections + 1,
-              },
-            }));
-            // Trigger passive check so the achievement is granted immediately
-            // if the counter crossed the threshold.
-            useGameStore.getState().checkAndGrantAchievements();
-          }
-        }
-
         // Clear any expired boosts
+        const state = useGameStore.getState();
         const activeBoosts = state.activeBoosts.filter(
           (b) => b.expiresAt > now
         );
@@ -371,7 +382,14 @@ export function useGameLoop(): void {
       handleAppStateChange
     );
 
-    // Start the loop immediately
+    // Cold-start: apply any offline progress accumulated since the last save.
+    // AppState does not fire "active" on initial mount, so we must handle it
+    // here explicitly.
+    useGameStore.getState().rolloverDailyState();
+    const coldStartNow = Date.now();
+    applyOfflineProgress(coldStartNow);
+    lastTickRef.current = coldStartNow;
+
     startLoop();
 
     return () => {

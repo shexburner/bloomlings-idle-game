@@ -11,6 +11,8 @@
     "lint": "expo lint",
     "docs:compact": "python3 docs/build_compact_docs.py",
     "appium": "appium",
+    "test": "jest",
+    "test:watch": "jest --watch",
     "test:e2e": "nightwatch --env android.device",
     "test:e2e:smoke": "nightwatch --env smoke e2e/tests/smoke"
   },
@@ -52,12 +54,15 @@
   },
   "devDependencies": {
     "@nightwatch/mobile-helper": "^2.0.0",
+    "@types/jest": "^29.5.14",
     "@types/react": "~19.1.0",
     "appium": "^3.3.0",
     "appium-uiautomator2-driver": "^7.1.2",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
+    "jest": "^29.7.0",
     "nightwatch": "^3.15.0",
+    "ts-jest": "^29.4.9",
     "typescript": "~5.9.2"
   },
   "private": true

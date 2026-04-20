@@ -24,8 +24,8 @@ const CURRENT_SAVE_VERSION = 1;
 /** MMKV storage key for the game save. */
 const SAVE_KEY = "bloomlings_save";
 
-/** Auto-save interval in milliseconds (30 seconds). */
-const AUTO_SAVE_INTERVAL_MS = 30_000;
+/** Auto-save interval in milliseconds (5 seconds). */
+const AUTO_SAVE_INTERVAL_MS = 5_000;
 
 // -----------------------------------------------------------------------------
 // MMKV Instance
