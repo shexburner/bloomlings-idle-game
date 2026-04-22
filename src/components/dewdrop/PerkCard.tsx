@@ -7,6 +7,7 @@
 // respective engine flows (Rebirth, Evolution) automatically.
 // =============================================================================
 
+import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { PERK_ID, type PerkTemplate } from "~/data/perkTemplates";
@@ -36,7 +37,7 @@ interface PerkCardProps {
   template: PerkTemplate;
 }
 
-export function PerkCard({ template }: PerkCardProps) {
+export const PerkCard = React.memo(function PerkCard({ template }: PerkCardProps) {
   const dewdrops = useGameStore((s) => s.resources.dewdrops);
   const perk = useGameStore((s) => s.perks[template.id]);
   const buyPerk = useGameStore((s) => s.buyPerk);
@@ -92,6 +93,7 @@ export function PerkCard({ template }: PerkCardProps) {
                 </Pressable>
               )}
               <Pressable
+                testID={`perk-buy-${template.id}`}
                 style={[
                   styles.buyButton,
                   canAfford ? styles.buyAffordable : styles.buyUnaffordable,
@@ -121,7 +123,7 @@ export function PerkCard({ template }: PerkCardProps) {
       </View>
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   card: {

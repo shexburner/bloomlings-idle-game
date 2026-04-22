@@ -6,7 +6,7 @@
 // Tapping a discovered Bloomling opens the detail view.
 // =============================================================================
 
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 
 import type { BloomlingTemplate, Bloomling } from "~/types/game";
@@ -63,12 +63,14 @@ export function CollectionGrid() {
   }, []);
 
   // Count discovered
-  const discoveredCount = BLOOMLING_TEMPLATES.filter((t) => {
-    const instances = Object.values(bloomlings);
-    return instances.some(
-      (b) => b.templateId === t.id && b.unlocked
-    );
-  }).length;
+  const discoveredCount = useMemo(
+    () =>
+      BLOOMLING_TEMPLATES.filter((t) => {
+        const instances = Object.values(bloomlings);
+        return instances.some((b) => b.templateId === t.id && b.unlocked);
+      }).length,
+    [bloomlings]
+  );
 
   const renderItem = useCallback(
     ({ item }: { item: BloomlingTemplate }) => {

@@ -2,7 +2,7 @@
 // CurrencyBar — Top bar: Sunlight (animated), idle rate, Nectar, Dewdrops
 // =============================================================================
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Animated, StyleSheet, Text, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -16,12 +16,13 @@ export function CurrencyBar() {
   const nectar = useGameStore((s) => s.resources.nectar);
   const dewdrops = useGameStore((s) => s.resources.dewdrops);
 
-  const idleRate = useGameStore((s) =>
-    totalSunlightPerSecondFromRegistry({
-      bloomlings: s.bloomlings,
-      garden: s.garden,
-      upgrades: s.upgrades,
-    })
+  const bloomlings = useGameStore((s) => s.bloomlings);
+  const garden = useGameStore((s) => s.garden);
+  const upgrades = useGameStore((s) => s.upgrades);
+
+  const idleRate = useMemo(
+    () => totalSunlightPerSecondFromRegistry({ bloomlings, garden, upgrades }),
+    [bloomlings, garden, upgrades]
   );
 
   // Animated sunlight counter
