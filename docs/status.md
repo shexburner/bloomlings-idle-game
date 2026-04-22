@@ -9,6 +9,8 @@
 **Phase 4: Progression Systems** — COMPLETE (5 / 5 tasks done)
 **Phase 5: Monetization** — COMPLETE (5/7 ad touchpoints shipped; Gate Assist + Boss Smash intentionally blocked on unbuilt engine loops)
 **Phase 6: Polish & Retention** — COMPLETE (5 / 5 tasks done)
+**Phase 7: Prestige Layer 2 & Endgame** — COMPLETE (4 / 4 tasks done)
+**Phase 8: Launch Prep** — IN PROGRESS
 
 ## Completed Work
 
@@ -60,9 +62,26 @@
 
 3. **Dewdrop shop + Watch &amp; Earn** — DONE. New catalog `src/data/perkTemplates.ts` defines five gameplay perks with stable IDs consumed by engine code: `dewdrop_bonus_slot` (permanent +1 Garden slot, stacks in `applyCapacityChange`), `offline_boost` (permanent, raises `getOfflineEfficiency` floor from 50% → 75%), `zone_skip` (consumable, invokes `store.advanceZone()` via `useZoneSkip`), `rebirth_boost` (consumable, auto-consumed by `executeRebirth` for +50% Nectar), `evolution_shard` (consumable, auto-consumed by `bloomlingSlice.evolveBloomling` to halve the next evolution cost). Engine updates: `offlineProgress.getOfflineEfficiency` now reads `state.perks`; `rebirth.calculateNectarEarned` / `getRebirthPreview` accept an optional `rebirthBoostMultiplier`; `evolution.canEvolve` / `getEvolutionCost` accept an optional `discountFactor`. New store actions on MetaSlice: `buyPerk(perkId)` (spends Dewdrops via `spendDewdrops`, writes/merges a `Perk` entry, re-syncs Garden capacity for the bonus-slot perk), `recordDewdropAdReward()` (returns Dewdrops granted: 1 base + 1 on every 3rd ad of the day + up to +5 from `adStreakDays`, bumps `stats.totalAdsWatched`, stamps `daily.lastDewdropAdAt` for the cooldown clock, caps at `daily.dailyAdCap` = 15/day), `rolloverDailyState()` (resets `adsWatchedToday` on calendar-day change and extends/resets `adStreakDays`, idempotent within a day — invoked by `gameLoop` on every foreground), `useZoneSkip()` (consumes one `zone_skip` charge and calls `advanceZone`). New `DailyState.lastDewdropAdAt: number | null` persists the 3-minute cooldown across sessions. UI: `src/components/dewdrop/DewdropShop.tsx` is a top-level tab gated at Zone 20 (`allTimeHighestZone`) with a locked-state progress bar; `DewdropEarnCard.tsx` wraps `useRewardedAd("dewdropGarden")` with a live 3-minute cooldown countdown, daily-cap readout, 3rd-ad + streak bonus breakdown, and an in-UI +N flash on reward; `PerkCard.tsx` renders "Buy" for permanent perks (flipping to "Owned" after purchase), a quantity badge for consumables, and a "Use" button exclusively on Zone Skip. New route `app/(tabs)/dewdrop-shop.tsx` and `drop.fill` → `water-drop` mapping in `components/ui/icon-symbol.tsx`. Tab bar now has six tabs: Garden / Shop / Collection / Dewdrops / Rebirth / Settings.
 
-## What's Next: Phase 7 — Prestige Layer 2 & Endgame
+### Phase 8: Launch Prep (IN PROGRESS)
 
-Phases 1–6 are complete. Phase 5 shipped 5/7 ad touchpoints; Gate Assist and Boss Smash remain intentionally blocked on unbuilt engine loops (gate timer + boss HP/damage). Phase 6 is fully done.
+1. **Beta testing checklist** — DONE. `docs/launch/beta-checklist.md` — comprehensive pre-beta gate: build verification (tsc/lint/jest/e2e), feature completeness matrix (29/31 shipped), known limitations, device testing matrix (6 devices), performance benchmarks (60fps/<200MB/<5% battery), save system verification (6 scenarios), ad system verification (8 scenarios), crash-free target (>99.5%), beta distribution plan (TestFlight + Google Play Internal Testing), feedback collection method (in-app + survey + crash reporting), beta timeline (2 weeks minimum), tester targets (50–100).
+
+2. **Soft launch plan** — DONE. `docs/launch/soft-launch-plan.md` — 4-phase strategy: Internal Beta (1 week, team) → Closed Beta (2 weeks, 50–100 testers) → Soft Launch (2 weeks, NZ + Philippines) → Global Launch. Each phase has entry/exit criteria and key metrics. Includes go/no-go decision framework, rollback plan (severity 1/2/3), day-1 patch expectations, post-launch monitoring cadence (daily/weekly/monthly), production ad unit ID swap checklist, and app store submission timeline with coordinated iOS+Android release strategy.
+
+3. **Full QA pass** — NOT STARTED. Pending: run all P0 test cases, device matrix testing, performance profiling.
+
+4. **App store assets** — NOT STARTED. Pending: screenshots, app description, keywords, privacy policy, content rating.
+
+5. **Analytics integration** — NOT STARTED. Pending: session tracking, retention events, ad revenue tracking.
+
+## What's Next
+
+Phase 8 is in progress. Immediate next steps:
+- Execute the beta checklist (build verification, device testing, performance benchmarks)
+- Set up crash reporting (Sentry or EAS crash logs)
+- Create app store assets (screenshots on all 6 target devices)
+- Integrate analytics before soft launch
+- Swap ad test IDs to production before any store submission
 
 2. **Daily login + streaks** — DONE. `src/engine/dailyRewards.ts` — `getDailyReward(loginCycleDay, loginCyclesCompleted)` returns `{ sunlight, dewdrops, sunbeamBoostMs }` from the 7-day fixed table, scaling sunlight by `1 + cycles × 0.5` and dewdrops by `1 + cycles` on repeat cycles. `describeDailyReward(reward)` returns a user-facing string. Store: `rolloverDailyState()` extended to also track login `streakDays` (was only tracking `adStreakDays`); `claimDailyReward()` advances `loginCycleDay` (wraps at 7), increments `loginCyclesCompleted` on wrap, marks `todayRewardCollected: true`, and credits rewards. UI: `src/components/modals/DailyRewardModal.tsx` — no-ad modal pattern, visible when `!todayRewardCollected`; shows Day X of 7, streak badge, reward preview, "Collect" button. Mounted in `app/_layout.tsx`.
 
