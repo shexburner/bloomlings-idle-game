@@ -47,6 +47,7 @@ import {
   LUCKY_SPROUT_TAP_BOOST_DURATION_MS,
 } from "~/engine/luckySprout";
 import { getDailyReward } from "~/engine/dailyRewards";
+import { trackEvent } from "~/services/analyticsService";
 
 // -----------------------------------------------------------------------------
 // Touchpoint Constants (docs/design/05-ad-economy.md)
@@ -413,6 +414,7 @@ export const useGameStore = create<GameStore>()((...args) => {
       if (now - zoneEnteredAt < 30_000) {
         get().triggerHiddenAchievement("speed_demon");
       }
+      trackEvent("zone_cleared", { zone_number: get().zoneProgress.currentZone - 1 });
       // BUG-010: stubborn_sprout — cleared a gate after at least one failure
       if (gateFailCount > 0) {
         get().triggerHiddenAchievement("stubborn_sprout");
@@ -473,6 +475,7 @@ export const useGameStore = create<GameStore>()((...args) => {
           },
         };
       });
+      trackEvent("perk_purchased", { perk_id: perkId });
       // Purchasing the Extra Garden Slot perk immediately expands capacity.
       if (perkId === DEWDROP_SLOT_PERK_ID) {
         get().syncGardenCapacity();
@@ -508,6 +511,7 @@ export const useGameStore = create<GameStore>()((...args) => {
           totalAdsWatched: state.stats.totalAdsWatched + 1,
         },
       }));
+      trackEvent("ad_watched", { ad_unit: "dewdropGarden", reward_type: "dewdrops" });
       return total;
     },
 
@@ -560,6 +564,7 @@ export const useGameStore = create<GameStore>()((...args) => {
           todayRewardCollected: true,
         },
       }));
+      trackEvent("daily_reward_claimed", { day: daily.loginCycleDay, streak: daily.streakDays });
 
       if (reward.sunlight > 0) get().addSunlight(reward.sunlight);
       if (reward.dewdrops > 0) get().addDewdrops(reward.dewdrops);
@@ -721,6 +726,7 @@ export const useGameStore = create<GameStore>()((...args) => {
       const state = get();
       const newlyCompleted = checkAchievements(state);
       if (newlyCompleted.length === 0) return;
+      for (const id of newlyCompleted) trackEvent("achievement_unlocked", { achievement_id: id });
 
       const now = Date.now();
       let totalSunlight = 0;

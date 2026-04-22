@@ -27,6 +27,7 @@ import {
   cancelGameNotifications,
   scheduleGameNotifications,
 } from "~/services/notificationService";
+import { trackEvent } from "~/services/analyticsService";
 
 // -----------------------------------------------------------------------------
 // Constants
@@ -34,6 +35,10 @@ import {
 
 /** Target tick interval in milliseconds (~10 ticks/sec). */
 const TICK_INTERVAL_MS = 100;
+
+/** Module-level session counter for analytics (not persisted). */
+let sessionCount = 0;
+let sessionStartedAt = Date.now();
 
 /** How often (ms) to check if a Lucky Sprout should be triggered (foreground only). */
 const LUCKY_SPROUT_CHECK_INTERVAL_MS = 30_000;
@@ -367,7 +372,10 @@ export function useGameLoop(): void {
 
         void cancelGameNotifications();
         startLoop();
+        trackEvent("session_start", { session_count: ++sessionCount });
+        sessionStartedAt = Date.now();
       } else if (nextAppState === "background" || nextAppState === "inactive") {
+        trackEvent("session_end", { duration_seconds: Math.round((Date.now() - sessionStartedAt) / 1000) });
         // App going to background — stop the loop and record the timestamp
         const now = Date.now();
         useGameStore.getState().setLastTickAt(now);
@@ -389,6 +397,8 @@ export function useGameLoop(): void {
     const coldStartNow = Date.now();
     applyOfflineProgress(coldStartNow);
     lastTickRef.current = coldStartNow;
+    trackEvent("session_start", { session_count: ++sessionCount });
+    sessionStartedAt = coldStartNow;
 
     startLoop();
 
