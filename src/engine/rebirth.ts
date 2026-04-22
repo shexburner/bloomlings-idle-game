@@ -110,13 +110,15 @@ export function calculateNectarEarned(
   highestZone: number,
   nectarRootsLevel: number = 0,
   rebirthBoostMultiplier: number = 1,
+  ancientWisdomLevel: number = 0,
 ): number {
   if (highestZone < REBIRTH_UNLOCK_ZONE) return 0;
 
   const raw =
     NECTAR_BASE * Math.pow(highestZone / NECTAR_THRESHOLD, NECTAR_EXPONENT);
   const nectarMultiplier = 1 + nectarRootsLevel * 0.1;
-  return Math.floor(raw * nectarMultiplier * rebirthBoostMultiplier);
+  const wisdomMultiplier = Math.pow(1.5, ancientWisdomLevel);
+  return Math.floor(raw * nectarMultiplier * wisdomMultiplier * rebirthBoostMultiplier);
 }
 
 // -----------------------------------------------------------------------------
@@ -284,13 +286,19 @@ export function filterUpgradesForRebirth(
  *
  * Level 0 → Zone 1, Level 1 → Zone 5, Level 2 → Zone 10, etc.
  */
-export function getStartingZone(seasonalMemoryLevel: number): number {
-  if (seasonalMemoryLevel <= 0) return 1;
-  const idx = Math.min(
-    seasonalMemoryLevel,
-    SEASONAL_MEMORY_ZONES.length - 1,
-  );
-  return SEASONAL_MEMORY_ZONES[idx] ?? 1;
+export function getStartingZone(
+  seasonalMemoryLevel: number,
+  acceleratedSeasonsLevel: number = 0,
+): number {
+  let zone = 1;
+  if (seasonalMemoryLevel > 0) {
+    const idx = Math.min(
+      seasonalMemoryLevel,
+      SEASONAL_MEMORY_ZONES.length - 1,
+    );
+    zone = SEASONAL_MEMORY_ZONES[idx] ?? 1;
+  }
+  return zone + acceleratedSeasonsLevel * 5;
 }
 
 /**

@@ -38,13 +38,14 @@ export const TRANSCENDENCE_MIN_ZONE = 150;
  * Formula: floor(1 * (totalNectarSpent / 50)^1.8)
  */
 export function calculateEssenceEarned(
-  state: Pick<PrestigeState, "totalNectarSpent">
+  state: Pick<PrestigeState, "totalNectarSpent">,
+  essenceConduitLevel: number = 0,
 ): number {
   const totalSpent = state.totalNectarSpent;
   if (totalSpent < ESSENCE_THRESHOLD) return 0;
-  return Math.floor(
-    ESSENCE_BASE * Math.pow(totalSpent / ESSENCE_THRESHOLD, ESSENCE_EXPONENT)
-  );
+  const raw = ESSENCE_BASE * Math.pow(totalSpent / ESSENCE_THRESHOLD, ESSENCE_EXPONENT);
+  const conduitMult = 1 + essenceConduitLevel * 0.15;
+  return Math.floor(raw * conduitMult);
 }
 
 /**

@@ -173,11 +173,15 @@ export function totalSunlightPerSecondFromRegistry(
 ): number {
   const idleLevel = state.upgrades["idle_production"]?.level ?? 0;
   const idleMult = 1 + idleLevel * 0.10;
+  const enrichedSoilLevel = state.upgrades["enriched_soil"]?.level ?? 0;
+  const enrichedSoilMult = 1 + enrichedSoilLevel * 0.25;
+  const primordialVigorLevel = state.upgrades["primordial_vigor"]?.level ?? 0;
+  const primordialVigorMult = Math.pow(2, primordialVigorLevel);
   return totalSunlightPerSecond(
     state,
     (templateId) => getBloomlingTemplate(templateId)?.baseProduction ?? 1,
     getBloomlingTemplate
-  ) * idleMult;
+  ) * idleMult * enrichedSoilMult * primordialVigorMult;
 }
 
 /**
@@ -226,9 +230,10 @@ export function getBaseTapValue(state: Pick<GameStore, "upgrades">): number {
  * Starts at 1.0 -- real implementation would sum Nectar "Stronger Roots" effects.
  */
 export function getTapMultiplier(
-  _state: Pick<GameStore, "upgrades" | "prestige">
+  state: Pick<GameStore, "upgrades" | "prestige">
 ): number {
-  return 1.0;
+  const strongerRootsLevel = state.upgrades["stronger_roots"]?.level ?? 0;
+  return 1 + strongerRootsLevel * 0.20;
 }
 
 /**
