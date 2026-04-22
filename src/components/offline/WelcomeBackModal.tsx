@@ -198,6 +198,7 @@ export function WelcomeBackModal() {
                 </Pressable>
 
                 <Pressable
+                  testID="welcome-back-watch-ad"
                   style={[
                     styles.button,
                     styles.adButton,

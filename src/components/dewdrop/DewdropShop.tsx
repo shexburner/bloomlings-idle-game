@@ -44,7 +44,7 @@ export function DewdropShop() {
       100
     );
     return (
-      <View style={[styles.container, { paddingTop: insets.top }]}>
+      <View testID="dewdrop-shop-screen" style={[styles.container, { paddingTop: insets.top }]}>
         <Text style={styles.header}>Dewdrops</Text>
         <View style={styles.lockedContainer}>
           <Text style={styles.lockedIcon}>💧</Text>
@@ -75,7 +75,7 @@ export function DewdropShop() {
   const consumables = PERK_TEMPLATES.filter((t) => t.category === "consumable");
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View testID="dewdrop-shop-screen" style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.headerRow}>
         <Text style={styles.header}>Dewdrops</Text>
         <Text style={styles.balance}>💧 {formatNumber(dewdrops)}</Text>
