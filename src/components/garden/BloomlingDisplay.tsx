@@ -38,7 +38,7 @@ export function BloomlingDisplay() {
   const stageLabel = displayStage.charAt(0).toUpperCase() + displayStage.slice(1);
 
   return (
-    <View style={styles.container}>
+    <View testID="bloomling-display" style={styles.container}>
       {/* Halo glow ring */}
       <View style={styles.haloRing}>
         <Animated.View style={[styles.spriteArea, { transform: [{ translateY: bounceAnim }] }]}>

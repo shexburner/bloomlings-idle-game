@@ -52,21 +52,26 @@
 | Daily login + streaks | Engine Developer | `src/engine/dailyRewards.ts` | DONE |
 | Notifications | Engine Developer | `src/services/notificationService.ts` | DONE |
 | Sound + haptics | UI/UX Developer | `src/services/audioService.ts` | DONE |
-| Performance pass | QA Tester | — | NOT STARTED |
+| Performance pass | QA Tester | various | DONE |
 
 ## Phase 7: Prestige Layer 2 & Endgame
 | Task | Persona | Output File | Status |
 |---|---|---|---|
 | Transcendence system | Engine Developer | `src/engine/transcendence.ts` | DONE |
-| Essence shop | UI/UX Developer | — | NOT STARTED |
-| Biomes 5-8 content | Content Creator | — | NOT STARTED |
-| Legendary/Mythic Bloomlings | Content Creator | — | NOT STARTED |
+| Essence shop | UI/UX Developer | `src/components/prestige/EssenceShop.tsx` | DONE |
+| Biomes 3-8 content | Content Creator | `docs/content/05-10` | DONE |
+| Legendary/Mythic Bloomlings | Content Creator | `docs/content/11-legendary-mythic-bloomlings.md` | DONE |
+| Performance pass | QA Tester | various | DONE |
 
 ## Phase 8: Launch Prep
 | Task | Persona | Output File | Status |
 |---|---|---|---|
+| Beta testing checklist | Project Manager | `docs/launch/beta-checklist.md` | DONE |
+| Soft launch plan | Project Manager | `docs/launch/soft-launch-plan.md` | DONE |
 | Full QA pass | QA Tester | — | NOT STARTED |
-| Beta testing | QA Tester | — | NOT STARTED |
 | App store assets | UI/UX Developer | — | NOT STARTED |
 | Analytics integration | Engine Developer | — | NOT STARTED |
-| Soft launch | Project Manager | — | NOT STARTED |
+| Production ad ID swap | Engine Developer | `src/services/adManager.ts` | NOT STARTED |
+| Beta distribution (TestFlight + Play Internal) | Project Manager | — | NOT STARTED |
+| Soft launch (NZ + PH) | Project Manager | — | NOT STARTED |
+| Global launch | Project Manager | — | NOT STARTED |

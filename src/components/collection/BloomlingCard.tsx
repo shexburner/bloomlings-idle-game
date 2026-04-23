@@ -2,6 +2,7 @@
 // BloomlingCard — Parchment card with heraldic rarity ring
 // =============================================================================
 
+import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -39,7 +40,7 @@ interface BloomlingCardProps {
   onPress: (template: BloomlingTemplate, instance: Bloomling) => void;
 }
 
-export function BloomlingCard({ template, instance, onPress }: BloomlingCardProps) {
+export const BloomlingCard = React.memo(function BloomlingCard({ template, instance, onPress }: BloomlingCardProps) {
   const discovered = instance !== null && instance.unlocked;
   const rarityColor = RARITY_COLORS[template.rarity];
 
@@ -95,7 +96,7 @@ export function BloomlingCard({ template, instance, onPress }: BloomlingCardProp
       </LinearGradient>
     </Pressable>
   );
-}
+});
 
 const styles = StyleSheet.create({
   cardWrap: {

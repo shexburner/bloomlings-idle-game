@@ -29,6 +29,7 @@ import {
 import { getUpgradeLevel } from "~/engine/rebirth";
 import { calculateLevelUpCost } from "../selectors";
 import { getBloomlingTemplate } from "~/data/bloomlingTemplates";
+import { trackEvent } from "~/services/analyticsService";
 
 const EVOLUTION_SHARD_PERK_ID = PERK_ID.EvolutionShard;
 
@@ -204,6 +205,7 @@ export const createBloomlingSlice: StateCreator<
         perks: newPerks,
       };
     });
+    trackEvent("bloomling_evolved", { bloomling_id: instanceId, new_stage: get().bloomlings[instanceId]?.evolutionStage ?? "" });
     // Reaching Elder stage can unlock new tag synergies.
     get().recomputeActiveSynergies();
     // Evolution may complete growth achievements (Bloom/Elder stage).

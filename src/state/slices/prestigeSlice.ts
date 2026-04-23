@@ -5,7 +5,6 @@ import type { StateCreator } from "zustand";
 import type { PrestigeState } from "~/types/game";
 import { initialResources } from "./resourceSlice";
 import { initialCombo } from "./comboSlice";
-import { initialUpgrades } from "./upgradeSlice";
 import type { GameStore } from "../store";
 import {
   calculateEssenceEarned,
@@ -23,11 +22,13 @@ import {
   SEASONAL_MEMORY_ID,
   COMBO_MEMORY_ID,
   NECTAR_ROOTS_ID,
+  ESSENCE_UPGRADE_IDS,
 } from "~/engine/rebirth";
 import {
   PERK_ID,
   REBIRTH_BOOST_MULTIPLIER,
 } from "~/data/perkTemplates";
+import { trackEvent } from "~/services/analyticsService";
 
 export interface PrestigeSlice {
   prestige: PrestigeState;
@@ -81,12 +82,15 @@ export const createPrestigeSlice: StateCreator<
     const luckySproutNectarBonus = state.pendingNectarBonus ?? 1;
 
     const highestZone = state.prestige.currentRunHighestZone;
+    const ancientWisdomLevel = getUpgradeLevel(state.upgrades, "ancient_wisdom");
     const nectarEarned = calculateNectarEarned(
       highestZone,
       nectarRootsLevel,
       rebirthBoostMultiplier * luckySproutNectarBonus,
+      ancientWisdomLevel,
     );
-    const startingZone = getStartingZone(seasonalLevel);
+    const acceleratedSeasonsLevel = getUpgradeLevel(state.upgrades, "accelerated_seasons");
+    const startingZone = getStartingZone(seasonalLevel, acceleratedSeasonsLevel);
     const startingCombo = getStartingComboCount(comboMemLevel);
 
     // Build the updated perks object — only changes if we consumed the boost.
@@ -161,6 +165,7 @@ export const createPrestigeSlice: StateCreator<
       },
       lastTickAt: Date.now(),
     }));
+    trackEvent("rebirth", { season_number: state.prestige.currentSeason + 1, nectar_earned: nectarEarned, highest_zone: highestZone });
     // Zone/upgrade changes affect garden capacity; Nectar upgrades persist.
     get().syncGardenCapacity();
     // Seasonal Memory can start a rebirth at zone > 1, which may have
@@ -172,7 +177,8 @@ export const createPrestigeSlice: StateCreator<
 
   executeTranscendence: () => {
     const state = get();
-    const essenceEarned = calculateEssenceEarned(state.prestige);
+    const essenceConduitLevel = getUpgradeLevel(state.upgrades, "essence_conduit");
+    const essenceEarned = calculateEssenceEarned(state.prestige, essenceConduitLevel);
 
     set(() => ({
       resources: {
@@ -188,7 +194,9 @@ export const createPrestigeSlice: StateCreator<
         activeSynergyIds: [],
         specialMeterProgress: 0,
       },
-      upgrades: initialUpgrades,
+      upgrades: Object.fromEntries(
+        Object.entries(state.upgrades).filter(([id]) => ESSENCE_UPGRADE_IDS.has(id))
+      ),
       zoneProgress: {
         currentZone: 1,
         currentZoneProgress: 0,
@@ -222,6 +230,7 @@ export const createPrestigeSlice: StateCreator<
       },
       lastTickAt: Date.now(),
     }));
+    trackEvent("transcendence", { transcendence_number: state.prestige.transcendenceCount + 1, essence_earned: essenceEarned });
     get().syncGardenCapacity();
     get().discoverBloomlingsForZone(1);
     get().checkAndGrantAchievements();
