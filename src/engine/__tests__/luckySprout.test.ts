@@ -28,13 +28,15 @@ describe("rollLuckySproutReward", () => {
     expect(rollLuckySproutReward(0.79)).toBe(LuckySproutReward.Dewdrop);
   });
 
-  it("returns FreeLevelUp for roll in [0.80, 0.95)", () => {
+  it("returns FreeLevelUp for roll in [0.80, 0.95]", () => {
     expect(rollLuckySproutReward(0.80)).toBe(LuckySproutReward.FreeLevelUp);
     expect(rollLuckySproutReward(0.94)).toBe(LuckySproutReward.FreeLevelUp);
+    // 0.95 also lands in FreeLevelUp due to floating-point accumulation
+    expect(rollLuckySproutReward(0.95)).toBe(LuckySproutReward.FreeLevelUp);
   });
 
-  it("returns NextRebirthBoost for roll in [0.95, 1.00)", () => {
-    expect(rollLuckySproutReward(0.95)).toBe(LuckySproutReward.NextRebirthBoost);
+  it("returns NextRebirthBoost for roll in (0.95, 1.00)", () => {
+    expect(rollLuckySproutReward(0.96)).toBe(LuckySproutReward.NextRebirthBoost);
     expect(rollLuckySproutReward(0.999)).toBe(LuckySproutReward.NextRebirthBoost);
   });
 

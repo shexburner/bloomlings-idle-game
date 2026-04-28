@@ -1,0 +1,1310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1777317400516" clover="3.2.0">
+  <project timestamp="1777317400516" name="All files">
+    <metrics statements="1214" coveredstatements="1013" conditionals="456" coveredconditionals="349" methods="192" coveredmethods="155" elements="1862" coveredelements="1517" complexity="0" loc="1214" ncloc="1214" packages="6" files="24" classes="24"/>
+    <package name="data">
+      <metrics statements="59" coveredstatements="59" conditionals="0" coveredconditionals="0" methods="6" coveredmethods="6"/>
+      <file name="achievementTemplates.ts" path="/Users/dulan.manujaya/bloomlings-idle-game/src/data/achievementTemplates.ts">
+        <metrics statements="46" coveredstatements="46" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="3"/>
+        <line num="8" count="1" type="stmt"/>
+        <line num="21" count="36" type="stmt"/>
+        <line num="40" count="1" type="stmt"/>
+        <line num="51" count="1" type="stmt"/>
+        <line num="62" count="1" type="stmt"/>
+        <line num="73" count="1" type="stmt"/>
+        <line num="84" count="1" type="stmt"/>
+        <line num="95" count="1" type="stmt"/>
+        <line num="106" count="1" type="stmt"/>
+        <line num="117" count="1" type="stmt"/>
+        <line num="132" count="1" type="stmt"/>
+        <line num="143" count="1" type="stmt"/>
+        <line num="154" count="1" type="stmt"/>
+        <line num="165" count="1" type="stmt"/>
+        <line num="176" count="1" type="stmt"/>
+        <line num="187" count="1" type="stmt"/>
+        <line num="198" count="1" type="stmt"/>
+        <line num="209" count="1" type="stmt"/>
+        <line num="220" count="1" type="stmt"/>
+        <line num="235" count="1" type="stmt"/>
+        <line num="246" count="1" type="stmt"/>
+        <line num="257" count="1" type="stmt"/>
+        <line num="268" count="1" type="stmt"/>
+        <line num="279" count="1" type="stmt"/>
+        <line num="290" count="1" type="stmt"/>
+        <line num="301" count="1" type="stmt"/>
+        <line num="316" count="1" type="stmt"/>
+        <line num="327" count="1" type="stmt"/>
+        <line num="338" count="1" type="stmt"/>
+        <line num="349" count="1" type="stmt"/>
+        <line num="360" count="1" type="stmt"/>
+        <line num="371" count="1" type="stmt"/>
+        <line num="386" count="1" type="stmt"/>
+        <line num="397" count="1" type="stmt"/>
+        <line num="408" count="1" type="stmt"/>
+        <line num="419" count="1" type="stmt"/>
+        <line num="430" count="1" type="stmt"/>
+        <line num="441" count="1" type="stmt"/>
+        <line num="456" count="1" type="stmt"/>
+        <line num="501" count="1" type="stmt"/>
+        <line num="502" count="36" type="stmt"/>
+        <line num="505" count="1" type="stmt"/>
+        <line num="506" count="2" type="stmt"/>
+        <line num="507" count="2" type="stmt"/>
+        <line num="508" count="72" type="stmt"/>
+        <line num="510" count="2" type="stmt"/>
+      </file>
+      <file name="bloomlingTemplates.ts" path="/Users/dulan.manujaya/bloomlings-idle-game/src/data/bloomlingTemplates.ts">
+        <metrics statements="6" coveredstatements="6" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="2"/>
+        <line num="9" count="5" type="stmt"/>
+        <line num="18" count="5" type="stmt"/>
+        <line num="617" count="5" type="stmt"/>
+        <line num="620" count="175" type="stmt"/>
+        <line num="624" count="5" type="stmt"/>
+        <line num="627" count="6" type="stmt"/>
+      </file>
+      <file name="perkTemplates.ts" path="/Users/dulan.manujaya/bloomlings-idle-game/src/data/perkTemplates.ts">
+        <metrics statements="7" coveredstatements="7" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="21" count="3" type="stmt"/>
+        <line num="45" count="3" type="stmt"/>
+        <line num="48" count="3" type="stmt"/>
+        <line num="51" count="3" type="stmt"/>
+        <line num="53" count="3" type="stmt"/>
+        <line num="122" count="3" type="stmt"/>
+        <line num="123" count="21" type="stmt"/>
+      </file>
+    </package>
+    <package name="engine">
+      <metrics statements="927" coveredstatements="748" conditionals="387" coveredconditionals="286" methods="137" coveredmethods="108"/>
+      <file name="abilities.ts" path="/Users/dulan.manujaya/bloomlings-idle-game/src/engine/abilities.ts">
+        <metrics statements="46" coveredstatements="39" conditionals="23" coveredconditionals="13" methods="4" coveredmethods="4"/>
+        <line num="13" count="4" type="stmt"/>
+        <line num="44" count="4" type="stmt"/>
+        <line num="45" count="4" type="stmt"/>
+        <line num="51" count="4" type="stmt"/>
+        <line num="52" count="14" type="cond" truecount="3" falsecount="0"/>
+        <line num="54" count="10" type="stmt"/>
+        <line num="56" count="2" type="stmt"/>
+        <line num="58" count="2" type="stmt"/>
+        <line num="62" count="4" type="stmt"/>
+        <line num="66" count="9" type="stmt"/>
+        <line num="67" count="9" type="stmt"/>
+        <line num="68" count="11" type="stmt"/>
+        <line num="69" count="11" type="cond" truecount="1" falsecount="0"/>
+        <line num="70" count="2" type="stmt"/>
+        <line num="71" count="2" type="cond" truecount="0" falsecount="1"/>
+        <line num="72" count="2" type="stmt"/>
+        <line num="80" count="9" type="stmt"/>
+        <line num="83" count="4" type="stmt"/>
+        <line num="87" count="11" type="stmt"/>
+        <line num="89" count="11" type="stmt"/>
+        <line num="90" count="48" type="stmt"/>
+        <line num="91" count="48" type="cond" truecount="1" falsecount="1"/>
+        <line num="93" count="48" type="cond" truecount="4" falsecount="2"/>
+        <line num="95" count="2" type="cond" truecount="2" falsecount="2"/>
+        <line num="96" count="2" type="stmt"/>
+        <line num="98" count="0" type="stmt"/>
+        <line num="101" count="2" type="stmt"/>
+        <line num="103" count="30" type="cond" truecount="1" falsecount="1"/>
+        <line num="104" count="30" type="stmt"/>
+        <line num="106" count="0" type="stmt"/>
+        <line num="108" count="30" type="stmt"/>
+        <line num="110" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="111" count="1" type="stmt"/>
+        <line num="113" count="0" type="stmt"/>
+        <line num="115" count="1" type="stmt"/>
+        <line num="117" count="15" type="stmt"/>
+        <line num="118" count="15" type="stmt"/>
+        <line num="120" count="0" type="stmt"/>
+        <line num="121" count="0" type="stmt"/>
+        <line num="123" count="0" type="stmt"/>
+        <line num="124" count="0" type="stmt"/>
+        <line num="128" count="11" type="stmt"/>
+        <line num="129" count="11" type="stmt"/>
+        <line num="134" count="11" type="stmt"/>
+        <line num="137" count="4" type="stmt"/>
+        <line num="138" count="24" type="stmt"/>
+      </file>
+      <file name="achievements.ts" path="/Users/dulan.manujaya/bloomlings-idle-game/src/engine/achievements.ts">
+        <metrics statements="48" coveredstatements="46" conditionals="54" coveredconditionals="52" methods="11" coveredmethods="9"/>
+        <line num="14" count="1" type="stmt"/>
+        <line num="40" count="1" type="stmt"/>
+        <line num="55" count="1" type="stmt"/>
+        <line num="59" count="42" type="stmt"/>
+        <line num="60" count="42" type="stmt"/>
+        <line num="62" count="42" type="cond" truecount="35" falsecount="2"/>
+        <line num="65" count="2" type="stmt"/>
+        <line num="68" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="70" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="77" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="78" count="2" type="stmt"/>
+        <line num="84" count="0" type="stmt"/>
+        <line num="87" count="0" type="stmt"/>
+        <line num="90" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="94" count="1" type="stmt"/>
+        <line num="97" count="1" type="stmt"/>
+        <line num="98" count="3" type="stmt"/>
+        <line num="105" count="4" type="stmt"/>
+        <line num="109" count="7" type="stmt"/>
+        <line num="113" count="1" type="stmt"/>
+        <line num="117" count="1" type="stmt"/>
+        <line num="127" count="7" type="stmt"/>
+        <line num="133" count="3" type="stmt"/>
+        <line num="136" count="1" type="stmt"/>
+        <line num="140" count="1" type="stmt"/>
+        <line num="143" count="1" type="stmt"/>
+        <line num="150" count="5" type="stmt"/>
+        <line num="154" count="1" type="stmt"/>
+        <line num="155" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="157" count="1" type="stmt"/>
+        <line num="161" count="1" type="stmt"/>
+        <line num="176" count="1" type="stmt"/>
+        <line num="177" count="6" type="stmt"/>
+        <line num="179" count="6" type="stmt"/>
+        <line num="180" count="7" type="cond" truecount="1" falsecount="0"/>
+        <line num="181" count="6" type="cond" truecount="1" falsecount="0"/>
+        <line num="183" count="4" type="stmt"/>
+        <line num="184" count="4" type="cond" truecount="1" falsecount="0"/>
+        <line num="185" count="3" type="stmt"/>
+        <line num="189" count="6" type="stmt"/>
+        <line num="200" count="1" type="stmt"/>
+        <line num="201" count="4" type="stmt"/>
+        <line num="202" count="4" type="stmt"/>
+        <line num="203" count="5" type="cond" truecount="2" falsecount="0"/>
+        <line num="204" count="1" type="stmt"/>
+        <line num="206" count="4" type="stmt"/>
+        <line num="207" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="210" count="4" type="stmt"/>
+      </file>
+      <file name="autoTap.ts" path="/Users/dulan.manujaya/bloomlings-idle-game/src/engine/autoTap.ts">
+        <metrics statements="8" coveredstatements="8" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="5" count="1" type="stmt"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="8" count="1" type="stmt"/>
+        <line num="9" count="4" type="cond" truecount="1" falsecount="0"/>
+        <line num="10" count="2" type="cond" truecount="1" falsecount="0"/>
+        <line num="11" count="1" type="stmt"/>
+      </file>
+      <file name="biomeMechanics.ts" path="/Users/dulan.manujaya/bloomlings-idle-game/src/engine/biomeMechanics.ts">
+        <metrics statements="127" coveredstatements="78" conditionals="57" coveredconditionals="21" methods="20" coveredmethods="9"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="3" count="1" type="cond" truecount="2" falsecount="0"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="5" count="1" type="stmt"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="7" count="1" type="stmt"/>
+        <line num="8" count="1" type="stmt"/>
+        <line num="9" count="1" type="stmt"/>
+        <line num="10" count="1" type="stmt"/>
+        <line num="11" count="1" type="stmt"/>
+        <line num="32" count="1" type="stmt"/>
+        <line num="33" count="16" type="stmt"/>
+        <line num="52" count="1" type="stmt"/>
+        <line num="63" count="1" type="stmt"/>
+        <line num="64" count="18" type="stmt"/>
+        <line num="65" count="88" type="cond" truecount="3" falsecount="0"/>
+        <line num="67" count="2" type="stmt"/>
+        <line num="70" count="1" type="stmt"/>
+        <line num="82" count="1" type="stmt"/>
+        <line num="83" count="24" type="stmt"/>
+        <line num="94" count="15" type="stmt"/>
+        <line num="101" count="0" type="stmt"/>
+        <line num="102" count="0" type="stmt"/>
+        <line num="103" count="0" type="cond" truecount="0" falsecount="3"/>
+        <line num="104" count="0" type="stmt"/>
+        <line num="106" count="0" type="cond" truecount="0" falsecount="3"/>
+        <line num="107" count="0" type="stmt"/>
+        <line num="109" count="0" type="cond" truecount="0" falsecount="3"/>
+        <line num="110" count="0" type="stmt"/>
+        <line num="111" count="0" type="stmt"/>
+        <line num="113" count="0" type="stmt"/>
+        <line num="122" count="0" type="stmt"/>
+        <line num="123" count="0" type="stmt"/>
+        <line num="124" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="125" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="126" count="0" type="stmt"/>
+        <line num="128" count="0" type="stmt"/>
+        <line num="131" count="0" type="stmt"/>
+        <line num="132" count="0" type="stmt"/>
+        <line num="133" count="0" type="stmt"/>
+        <line num="140" count="4" type="stmt"/>
+        <line num="141" count="4" type="stmt"/>
+        <line num="142" count="4" type="cond" truecount="1" falsecount="0"/>
+        <line num="143" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="144" count="1" type="stmt"/>
+        <line num="145" count="1" type="stmt"/>
+        <line num="146" count="1" type="stmt"/>
+        <line num="148" count="1" type="stmt"/>
+        <line num="150" count="2" type="stmt"/>
+        <line num="152" count="2" type="cond" truecount="1" falsecount="0"/>
+        <line num="153" count="1" type="stmt"/>
+        <line num="154" count="1" type="stmt"/>
+        <line num="155" count="1" type="stmt"/>
+        <line num="157" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="158" count="1" type="stmt"/>
+        <line num="159" count="1" type="stmt"/>
+        <line num="160" count="1" type="stmt"/>
+        <line num="162" count="0" type="stmt"/>
+        <line num="164" count="1" type="stmt"/>
+        <line num="173" count="3" type="stmt"/>
+        <line num="174" count="3" type="stmt"/>
+        <line num="175" count="3" type="cond" truecount="1" falsecount="0"/>
+        <line num="176" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="177" count="0" type="stmt"/>
+        <line num="179" count="1" type="stmt"/>
+        <line num="182" count="2" type="stmt"/>
+        <line num="183" count="2" type="cond" truecount="1" falsecount="0"/>
+        <line num="184" count="1" type="stmt"/>
+        <line num="185" count="1" type="stmt"/>
+        <line num="186" count="1" type="stmt"/>
+        <line num="188" count="2" type="stmt"/>
+        <line num="195" count="0" type="stmt"/>
+        <line num="196" count="0" type="stmt"/>
+        <line num="197" count="0" type="cond" truecount="0" falsecount="3"/>
+        <line num="198" count="0" type="stmt"/>
+        <line num="199" count="0" type="stmt"/>
+        <line num="201" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="202" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="203" count="0" type="stmt"/>
+        <line num="204" count="0" type="stmt"/>
+        <line num="205" count="0" type="stmt"/>
+        <line num="206" count="0" type="stmt"/>
+        <line num="209" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="210" count="0" type="stmt"/>
+        <line num="212" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="213" count="0" type="stmt"/>
+        <line num="214" count="0" type="stmt"/>
+        <line num="217" count="0" type="stmt"/>
+        <line num="218" count="0" type="stmt"/>
+        <line num="227" count="6" type="stmt"/>
+        <line num="228" count="6" type="stmt"/>
+        <line num="229" count="6" type="stmt"/>
+        <line num="230" count="6" type="stmt"/>
+        <line num="231" count="6" type="cond" truecount="1" falsecount="0"/>
+        <line num="232" count="3" type="stmt"/>
+        <line num="233" count="3" type="stmt"/>
+        <line num="235" count="6" type="cond" truecount="1" falsecount="0"/>
+        <line num="236" count="1" type="stmt"/>
+        <line num="237" count="1" type="stmt"/>
+        <line num="238" count="1" type="stmt"/>
+        <line num="240" count="6" type="cond" truecount="1" falsecount="0"/>
+        <line num="241" count="1" type="stmt"/>
+        <line num="243" count="6" type="stmt"/>
+        <line num="246" count="1" type="stmt"/>
+        <line num="254" count="15" type="stmt"/>
+        <line num="255" count="15" type="cond" truecount="5" falsecount="3"/>
+        <line num="257" count="0" type="stmt"/>
+        <line num="259" count="0" type="stmt"/>
+        <line num="261" count="1" type="stmt"/>
+        <line num="263" count="4" type="stmt"/>
+        <line num="265" count="3" type="stmt"/>
+        <line num="267" count="0" type="stmt"/>
+        <line num="269" count="6" type="stmt"/>
+        <line num="271" count="1" type="stmt"/>
+        <line num="287" count="1" type="stmt"/>
+        <line num="298" count="1" type="stmt"/>
+        <line num="299" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="302" count="1" type="stmt"/>
+        <line num="303" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="304" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="307" count="1" type="stmt"/>
+        <line num="310" count="1" type="stmt"/>
+        <line num="311" count="0" type="stmt"/>
+        <line num="312" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="313" count="0" type="stmt"/>
+        <line num="317" count="1" type="stmt"/>
+        <line num="318" count="0" type="cond" truecount="0" falsecount="2"/>
+      </file>
+      <file name="bossFight.ts" path="/Users/dulan.manujaya/bloomlings-idle-game/src/engine/bossFight.ts">
+        <metrics statements="36" coveredstatements="36" conditionals="8" coveredconditionals="8" methods="9" coveredmethods="9"/>
+        <line num="3" count="2" type="stmt"/>
+        <line num="4" count="2" type="stmt"/>
+        <line num="5" count="2" type="stmt"/>
+        <line num="6" count="2" type="stmt"/>
+        <line num="7" count="2" type="stmt"/>
+        <line num="8" count="2" type="stmt"/>
+        <line num="9" count="2" type="stmt"/>
+        <line num="10" count="2" type="stmt"/>
+        <line num="12" count="2" type="stmt"/>
+        <line num="13" count="11" type="cond" truecount="2" falsecount="0"/>
+        <line num="16" count="2" type="stmt"/>
+        <line num="17" count="3" type="stmt"/>
+        <line num="20" count="2" type="stmt"/>
+        <line num="21" count="4" type="stmt"/>
+        <line num="24" count="2" type="stmt"/>
+        <line num="25" count="1" type="stmt"/>
+        <line num="28" count="2" type="stmt"/>
+        <line num="29" count="1" type="stmt"/>
+        <line num="30" count="1" type="stmt"/>
+        <line num="33" count="2" type="stmt"/>
+        <line num="40" count="5" type="stmt"/>
+        <line num="41" count="5" type="stmt"/>
+        <line num="42" count="5" type="cond" truecount="1" falsecount="0"/>
+        <line num="43" count="3" type="cond" truecount="1" falsecount="0"/>
+        <line num="44" count="2" type="stmt"/>
+        <line num="47" count="2" type="stmt"/>
+        <line num="48" count="1" type="stmt"/>
+        <line num="51" count="2" type="stmt"/>
+        <line num="52" count="1" type="stmt"/>
+        <line num="55" count="2" type="stmt"/>
+        <line num="56" count="9" type="cond" truecount="1" falsecount="0"/>
+        <line num="57" count="8" type="stmt"/>
+        <line num="58" count="8" type="cond" truecount="1" falsecount="0"/>
+        <line num="59" count="6" type="cond" truecount="1" falsecount="0"/>
+        <line num="60" count="4" type="cond" truecount="1" falsecount="0"/>
+        <line num="61" count="2" type="stmt"/>
+      </file>
+      <file name="dailyRewards.ts" path="/Users/dulan.manujaya/bloomlings-idle-game/src/engine/dailyRewards.ts">
+        <metrics statements="14" coveredstatements="14" conditionals="8" coveredconditionals="8" methods="2" coveredmethods="2"/>
+        <line num="14" count="1" type="stmt"/>
+        <line num="33" count="1" type="stmt"/>
+        <line num="37" count="16" type="stmt"/>
+        <line num="38" count="16" type="stmt"/>
+        <line num="40" count="16" type="cond" truecount="1" falsecount="0"/>
+        <line num="42" count="6" type="stmt"/>
+        <line num="43" count="6" type="stmt"/>
+        <line num="45" count="6" type="stmt"/>
+        <line num="53" count="1" type="stmt"/>
+        <line num="54" count="7" type="stmt"/>
+        <line num="55" count="7" type="cond" truecount="1" falsecount="0"/>
+        <line num="56" count="7" type="cond" truecount="3" falsecount="0"/>
+        <line num="57" count="7" type="cond" truecount="1" falsecount="0"/>
+        <line num="58" count="7" type="cond" truecount="2" falsecount="0"/>
+      </file>
+      <file name="discovery.ts" path="/Users/dulan.manujaya/bloomlings-idle-game/src/engine/discovery.ts">
+        <metrics statements="31" coveredstatements="31" conditionals="18" coveredconditionals="17" methods="3" coveredmethods="3"/>
+        <line num="14" count="1" type="stmt"/>
+        <line num="16" count="1" type="stmt"/>
+        <line num="36" count="1" type="stmt"/>
+        <line num="39" count="147" type="stmt"/>
+        <line num="40" count="147" type="cond" truecount="3" falsecount="0"/>
+        <line num="41" count="140" type="stmt"/>
+        <line num="42" count="140" type="cond" truecount="3" falsecount="0"/>
+        <line num="43" count="139" type="stmt"/>
+        <line num="45" count="1" type="stmt"/>
+        <line num="48" count="7" type="stmt"/>
+        <line num="49" count="7" type="cond" truecount="3" falsecount="0"/>
+        <line num="50" count="3" type="stmt"/>
+        <line num="51" count="3" type="cond" truecount="3" falsecount="0"/>
+        <line num="52" count="2" type="stmt"/>
+        <line num="54" count="1" type="stmt"/>
+        <line num="57" count="4" type="stmt"/>
+        <line num="69" count="1" type="stmt"/>
+        <line num="70" count="6" type="stmt"/>
+        <line num="96" count="1" type="stmt"/>
+        <line num="100" count="6" type="stmt"/>
+        <line num="101" count="6" type="stmt"/>
+        <line num="102" count="2" type="stmt"/>
+        <line num="105" count="6" type="stmt"/>
+        <line num="106" count="6" type="stmt"/>
+        <line num="107" count="210" type="cond" truecount="1" falsecount="0"/>
+        <line num="108" count="138" type="cond" truecount="1" falsecount="0"/>
+        <line num="110" count="136" type="stmt"/>
+        <line num="111" count="136" type="cond" truecount="2" falsecount="1"/>
+        <line num="112" count="136" type="cond" truecount="1" falsecount="0"/>
+        <line num="114" count="27" type="stmt"/>
+        <line num="116" count="6" type="stmt"/>
+      </file>
+      <file name="evolution.ts" path="/Users/dulan.manujaya/bloomlings-idle-game/src/engine/evolution.ts">
+        <metrics statements="41" coveredstatements="41" conditionals="15" coveredconditionals="15" methods="5" coveredmethods="5"/>
+        <line num="9" count="1" type="stmt"/>
+        <line num="11" count="1" type="stmt"/>
+        <line num="18" count="1" type="stmt"/>
+        <line num="28" count="1" type="stmt"/>
+        <line num="38" count="1" type="stmt"/>
+        <line num="48" count="1" type="stmt"/>
+        <line num="70" count="1" type="stmt"/>
+        <line num="74" count="13" type="stmt"/>
+        <line num="75" count="13" type="cond" truecount="1" falsecount="0"/>
+        <line num="76" count="1" type="stmt"/>
+        <line num="79" count="12" type="stmt"/>
+        <line num="81" count="15" type="stmt"/>
+        <line num="83" count="12" type="cond" truecount="3" falsecount="0"/>
+        <line num="85" count="7" type="stmt"/>
+        <line num="90" count="4" type="stmt"/>
+        <line num="95" count="1" type="stmt"/>
+        <line num="111" count="1" type="stmt"/>
+        <line num="117" count="9" type="cond" truecount="1" falsecount="0"/>
+        <line num="118" count="1" type="stmt"/>
+        <line num="122" count="8" type="cond" truecount="1" falsecount="0"/>
+        <line num="123" count="1" type="stmt"/>
+        <line num="127" count="7" type="stmt"/>
+        <line num="128" count="7" type="cond" truecount="1" falsecount="0"/>
+        <line num="129" count="1" type="stmt"/>
+        <line num="133" count="6" type="stmt"/>
+        <line num="134" count="6" type="cond" truecount="1" falsecount="0"/>
+        <line num="135" count="2" type="stmt"/>
+        <line num="137" count="4" type="cond" truecount="1" falsecount="0"/>
+        <line num="138" count="1" type="stmt"/>
+        <line num="141" count="3" type="stmt"/>
+        <line num="149" count="1" type="stmt"/>
+        <line num="152" count="7" type="cond" truecount="3" falsecount="0"/>
+        <line num="154" count="3" type="stmt"/>
+        <line num="156" count="2" type="stmt"/>
+        <line num="158" count="2" type="stmt"/>
+        <line num="175" count="1" type="stmt"/>
+        <line num="176" count="4" type="stmt"/>
+        <line num="177" count="4" type="cond" truecount="1" falsecount="0"/>
+        <line num="178" count="1" type="stmt"/>
+        <line num="181" count="3" type="stmt"/>
+        <line num="192" count="1" type="stmt"/>
+      </file>
+      <file name="gameLoop.ts" path="/Users/dulan.manujaya/bloomlings-idle-game/src/engine/gameLoop.ts">
+        <metrics statements="150" coveredstatements="68" conditionals="46" coveredconditionals="23" methods="15" coveredmethods="5"/>
+        <line num="9" count="2" type="stmt"/>
+        <line num="10" count="2" type="stmt"/>
+        <line num="11" count="2" type="stmt"/>
+        <line num="12" count="2" type="stmt"/>
+        <line num="19" count="2" type="stmt"/>
+        <line num="23" count="2" type="stmt"/>
+        <line num="24" count="2" type="stmt"/>
+        <line num="25" count="2" type="stmt"/>
+        <line num="26" count="2" type="stmt"/>
+        <line num="30" count="2" type="stmt"/>
+        <line num="40" count="2" type="stmt"/>
+        <line num="43" count="2" type="stmt"/>
+        <line num="46" count="2" type="stmt"/>
+        <line num="49" count="2" type="stmt"/>
+        <line num="52" count="2" type="stmt"/>
+        <line num="55" count="2" type="stmt"/>
+        <line num="56" count="2" type="stmt"/>
+        <line num="59" count="2" type="stmt"/>
+        <line num="65" count="2" type="stmt"/>
+        <line num="91" count="2" type="stmt"/>
+        <line num="105" count="8" type="stmt"/>
+        <line num="108" count="8" type="stmt"/>
+        <line num="109" count="8" type="stmt"/>
+        <line num="110" count="8" type="stmt"/>
+        <line num="113" count="8" type="stmt"/>
+        <line num="114" count="8" type="cond" truecount="1" falsecount="0"/>
+        <line num="119" count="1" type="stmt"/>
+        <line num="123" count="8" type="cond" truecount="0" falsecount="1"/>
+        <line num="129" count="0" type="stmt"/>
+        <line num="133" count="8" type="stmt"/>
+        <line num="136" count="8" type="stmt"/>
+        <line num="137" count="8" type="stmt"/>
+        <line num="138" count="8" type="stmt"/>
+        <line num="140" count="8" type="stmt"/>
+        <line num="152" count="2" type="stmt"/>
+        <line num="167" count="7" type="cond" truecount="1" falsecount="0"/>
+        <line num="168" count="1" type="stmt"/>
+        <line num="169" count="1" type="stmt"/>
+        <line num="173" count="7" type="cond" truecount="1" falsecount="0"/>
+        <line num="174" count="1" type="stmt"/>
+        <line num="178" count="7" type="cond" truecount="1" falsecount="0"/>
+        <line num="183" count="1" type="stmt"/>
+        <line num="187" count="7" type="cond" truecount="1" falsecount="0"/>
+        <line num="188" count="1" type="stmt"/>
+        <line num="189" count="2" type="stmt"/>
+        <line num="191" count="1" type="stmt"/>
+        <line num="195" count="7" type="cond" truecount="1" falsecount="0"/>
+        <line num="196" count="1" type="stmt"/>
+        <line num="200" count="7" type="stmt"/>
+        <line num="215" count="2" type="stmt"/>
+        <line num="216" count="13" type="stmt"/>
+        <line num="219" count="13" type="cond" truecount="1" falsecount="0"/>
+        <line num="221" count="11" type="stmt"/>
+        <line num="223" count="11" type="cond" truecount="1" falsecount="0"/>
+        <line num="224" count="9" type="stmt"/>
+        <line num="225" count="9" type="stmt"/>
+        <line num="228" count="11" type="cond" truecount="3" falsecount="0"/>
+        <line num="229" count="7" type="stmt"/>
+        <line num="237" count="11" type="cond" truecount="1" falsecount="0"/>
+        <line num="238" count="9" type="cond" truecount="1" falsecount="0"/>
+        <line num="239" count="1" type="stmt"/>
+        <line num="241" count="9" type="stmt"/>
+        <line num="242" count="9" type="cond" truecount="3" falsecount="0"/>
+        <line num="243" count="8" type="stmt"/>
+        <line num="249" count="8" type="stmt"/>
+        <line num="253" count="11" type="stmt"/>
+        <line num="254" count="11" type="stmt"/>
+        <line num="256" count="11" type="stmt"/>
+        <line num="272" count="2" type="stmt"/>
+        <line num="273" count="0" type="stmt"/>
+        <line num="274" count="0" type="stmt"/>
+        <line num="275" count="0" type="stmt"/>
+        <line num="276" count="0" type="stmt"/>
+        <line num="279" count="0" type="stmt"/>
+        <line num="281" count="0" type="stmt"/>
+        <line num="282" count="0" type="stmt"/>
+        <line num="283" count="0" type="stmt"/>
+        <line num="284" count="0" type="stmt"/>
+        <line num="287" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="290" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="291" count="0" type="stmt"/>
+        <line num="292" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="295" count="0" type="stmt"/>
+        <line num="296" count="0" type="stmt"/>
+        <line num="297" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="302" count="0" type="stmt"/>
+        <line num="304" count="0" type="stmt"/>
+        <line num="309" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="310" count="0" type="stmt"/>
+        <line num="311" count="0" type="stmt"/>
+        <line num="313" count="0" type="stmt"/>
+        <line num="314" count="0" type="stmt"/>
+        <line num="315" count="0" type="stmt"/>
+        <line num="317" count="0" type="stmt"/>
+        <line num="318" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="319" count="0" type="stmt"/>
+        <line num="320" count="0" type="stmt"/>
+        <line num="324" count="0" type="stmt"/>
+        <line num="325" count="0" type="stmt"/>
+        <line num="327" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="328" count="0" type="stmt"/>
+        <line num="329" count="0" type="stmt"/>
+        <line num="332" count="0" type="stmt"/>
+        <line num="335" count="0" type="stmt"/>
+        <line num="336" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="337" count="0" type="stmt"/>
+        <line num="338" count="0" type="stmt"/>
+        <line num="339" count="0" type="stmt"/>
+        <line num="342" count="0" type="stmt"/>
+        <line num="343" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="344" count="0" type="stmt"/>
+        <line num="345" count="0" type="stmt"/>
+        <line num="346" count="0" type="stmt"/>
+        <line num="350" count="0" type="stmt"/>
+        <line num="351" count="0" type="stmt"/>
+        <line num="352" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="355" count="0" type="stmt"/>
+        <line num="357" count="0" type="stmt"/>
+        <line num="358" count="0" type="stmt"/>
+        <line num="359" count="0" type="stmt"/>
+        <line num="362" count="0" type="stmt"/>
+        <line num="363" count="0" type="stmt"/>
+        <line num="364" count="0" type="stmt"/>
+        <line num="366" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="367" count="0" type="stmt"/>
+        <line num="371" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="372" count="0" type="stmt"/>
+        <line num="375" count="0" type="stmt"/>
+        <line num="376" count="0" type="stmt"/>
+        <line num="377" count="0" type="stmt"/>
+        <line num="378" count="0" type="stmt"/>
+        <line num="379" count="0" type="stmt"/>
+        <line num="380" count="0" type="cond" truecount="0" falsecount="3"/>
+        <line num="381" count="0" type="stmt"/>
+        <line num="383" count="0" type="stmt"/>
+        <line num="384" count="0" type="stmt"/>
+        <line num="385" count="0" type="stmt"/>
+        <line num="386" count="0" type="stmt"/>
+        <line num="387" count="0" type="stmt"/>
+        <line num="391" count="0" type="stmt"/>
+        <line num="399" count="0" type="stmt"/>
+        <line num="400" count="0" type="stmt"/>
+        <line num="401" count="0" type="stmt"/>
+        <line num="402" count="0" type="stmt"/>
+        <line num="403" count="0" type="stmt"/>
+        <line num="404" count="0" type="stmt"/>
+        <line num="406" count="0" type="stmt"/>
+        <line num="408" count="0" type="stmt"/>
+        <line num="409" count="0" type="stmt"/>
+        <line num="410" count="0" type="stmt"/>
+      </file>
+      <file name="garden.ts" path="/Users/dulan.manujaya/bloomlings-idle-game/src/engine/garden.ts">
+        <metrics statements="102" coveredstatements="102" conditionals="39" coveredconditionals="38" methods="14" coveredmethods="14"/>
+        <line num="31" count="2" type="stmt"/>
+        <line num="34" count="2" type="stmt"/>
+        <line num="37" count="2" type="stmt"/>
+        <line num="47" count="2" type="stmt"/>
+        <line num="50" count="2" type="stmt"/>
+        <line num="80" count="2" type="stmt"/>
+        <line num="83" count="25" type="stmt"/>
+        <line num="84" count="25" type="stmt"/>
+        <line num="85" count="75" type="stmt"/>
+        <line num="88" count="25" type="stmt"/>
+        <line num="89" count="25" type="stmt"/>
+        <line num="90" count="25" type="stmt"/>
+        <line num="91" count="75" type="cond" truecount="2" falsecount="0"/>
+        <line num="92" count="75" type="stmt"/>
+        <line num="93" count="75" type="stmt"/>
+        <line num="96" count="25" type="cond" truecount="2" falsecount="0"/>
+        <line num="99" count="25" type="stmt"/>
+        <line num="100" count="25" type="stmt"/>
+        <line num="102" count="25" type="stmt"/>
+        <line num="117" count="2" type="stmt"/>
+        <line num="118" count="18" type="stmt"/>
+        <line num="134" count="2" type="stmt"/>
+        <line num="138" count="11" type="cond" truecount="1" falsecount="0"/>
+        <line num="139" count="4" type="stmt"/>
+        <line num="141" count="7" type="cond" truecount="1" falsecount="0"/>
+        <line num="142" count="3" type="stmt"/>
+        <line num="143" count="3" type="stmt"/>
+        <line num="144" count="5" type="stmt"/>
+        <line num="146" count="3" type="stmt"/>
+        <line num="148" count="4" type="stmt"/>
+        <line num="166" count="2" type="stmt"/>
+        <line num="169" count="5" type="stmt"/>
+        <line num="170" count="5" type="stmt"/>
+        <line num="172" count="5" type="cond" truecount="1" falsecount="0"/>
+        <line num="173" count="1" type="stmt"/>
+        <line num="180" count="4" type="cond" truecount="1" falsecount="0"/>
+        <line num="181" count="1" type="stmt"/>
+        <line num="189" count="3" type="stmt"/>
+        <line num="191" count="4" type="stmt"/>
+        <line num="192" count="3" type="cond" truecount="1" falsecount="0"/>
+        <line num="193" count="1" type="stmt"/>
+        <line num="200" count="2" type="stmt"/>
+        <line num="201" count="2" type="stmt"/>
+        <line num="202" count="2" type="stmt"/>
+        <line num="203" count="2" type="cond" truecount="1" falsecount="0"/>
+        <line num="204" count="2" type="stmt"/>
+        <line num="212" count="2" type="stmt"/>
+        <line num="243" count="2" type="stmt"/>
+        <line num="248" count="12" type="stmt"/>
+        <line num="249" count="12" type="cond" truecount="1" falsecount="0"/>
+        <line num="250" count="10" type="cond" truecount="1" falsecount="0"/>
+        <line num="252" count="8" type="stmt"/>
+        <line num="254" count="8" type="cond" truecount="1" falsecount="0"/>
+        <line num="255" count="4" type="cond" truecount="3" falsecount="0"/>
+        <line num="256" count="2" type="stmt"/>
+        <line num="258" count="2" type="stmt"/>
+        <line num="261" count="4" type="stmt"/>
+        <line num="262" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="266" count="2" type="stmt"/>
+        <line num="271" count="6" type="stmt"/>
+        <line num="275" count="2" type="stmt"/>
+        <line num="279" count="8" type="stmt"/>
+        <line num="280" count="8" type="stmt"/>
+        <line num="281" count="8" type="cond" truecount="1" falsecount="0"/>
+        <line num="283" count="5" type="stmt"/>
+        <line num="287" count="2" type="stmt"/>
+        <line num="291" count="5" type="stmt"/>
+        <line num="292" count="5" type="stmt"/>
+        <line num="293" count="6" type="cond" truecount="1" falsecount="0"/>
+        <line num="295" count="3" type="cond" truecount="1" falsecount="0"/>
+        <line num="296" count="2" type="stmt"/>
+        <line num="321" count="2" type="stmt"/>
+        <line num="326" count="5" type="stmt"/>
+        <line num="327" count="5" type="cond" truecount="1" falsecount="0"/>
+        <line num="329" count="4" type="stmt"/>
+        <line num="330" count="4" type="cond" truecount="3" falsecount="0"/>
+        <line num="333" count="3" type="stmt"/>
+        <line num="334" count="3" type="stmt"/>
+        <line num="337" count="3" type="stmt"/>
+        <line num="338" count="3" type="cond" truecount="3" falsecount="0"/>
+        <line num="339" count="1" type="stmt"/>
+        <line num="340" count="1" type="cond" truecount="1" falsecount="0"/>
+        <line num="341" count="1" type="stmt"/>
+        <line num="350" count="3" type="stmt"/>
+        <line num="351" count="3" type="cond" truecount="3" falsecount="0"/>
+        <line num="352" count="1" type="stmt"/>
+        <line num="356" count="3" type="stmt"/>
+        <line num="357" count="3" type="stmt"/>
+        <line num="363" count="3" type="stmt"/>
+        <line num="377" count="2" type="stmt"/>
+        <line num="381" count="3" type="stmt"/>
+        <line num="382" count="3" type="cond" truecount="3" falsecount="0"/>
+        <line num="384" count="1" type="stmt"/>
+        <line num="385" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="388" count="1" type="stmt"/>
+        <line num="412" count="2" type="stmt"/>
+        <line num="415" count="3" type="stmt"/>
+        <line num="416" count="3" type="stmt"/>
+        <line num="417" count="5" type="cond" truecount="1" falsecount="0"/>
+        <line num="418" count="3" type="stmt"/>
+        <line num="419" count="3" type="cond" truecount="1" falsecount="0"/>
+        <line num="421" count="3" type="stmt"/>
+      </file>
+      <file name="luckySprout.ts" path="/Users/dulan.manujaya/bloomlings-idle-game/src/engine/luckySprout.ts">
+        <metrics statements="30" coveredstatements="30" conditionals="12" coveredconditionals="10" methods="4" coveredmethods="4"/>
+        <line num="11" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="13" count="3" type="stmt"/>
+        <line num="15" count="3" type="stmt"/>
+        <line num="17" count="3" type="stmt"/>
+        <line num="19" count="3" type="stmt"/>
+        <line num="21" count="3" type="stmt"/>
+        <line num="25" count="3" type="stmt"/>
+        <line num="28" count="3" type="stmt"/>
+        <line num="31" count="3" type="stmt"/>
+        <line num="34" count="3" type="stmt"/>
+        <line num="37" count="3" type="stmt"/>
+        <line num="40" count="3" type="stmt"/>
+        <line num="43" count="3" type="stmt"/>
+        <line num="51" count="3" type="stmt"/>
+        <line num="63" count="3" type="stmt"/>
+        <line num="66" count="12" type="stmt"/>
+        <line num="67" count="12" type="stmt"/>
+        <line num="68" count="39" type="stmt"/>
+        <line num="69" count="39" type="cond" truecount="1" falsecount="0"/>
+        <line num="72" count="1" type="stmt"/>
+        <line num="79" count="3" type="stmt"/>
+        <line num="82" count="4" type="stmt"/>
+        <line num="83" count="4" type="stmt"/>
+        <line num="87" count="3" type="stmt"/>
+        <line num="91" count="6" type="cond" truecount="5" falsecount="0"/>
+        <line num="93" count="1" type="stmt"/>
+        <line num="95" count="1" type="stmt"/>
+        <line num="97" count="1" type="stmt"/>
+        <line num="99" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="103" count="1" type="stmt"/>
+      </file>
+      <file name="offlineProgress.ts" path="/Users/dulan.manujaya/bloomlings-idle-game/src/engine/offlineProgress.ts">
+        <metrics statements="30" coveredstatements="30" conditionals="10" coveredconditionals="10" methods="3" coveredmethods="3"/>
+        <line num="15" count="2" type="stmt"/>
+        <line num="19" count="2" type="stmt"/>
+        <line num="27" count="2" type="stmt"/>
+        <line num="30" count="2" type="stmt"/>
+        <line num="33" count="2" type="stmt"/>
+        <line num="36" count="2" type="stmt"/>
+        <line num="39" count="2" type="stmt"/>
+        <line num="42" count="2" type="stmt"/>
+        <line num="76" count="2" type="stmt"/>
+        <line num="79" count="15" type="stmt"/>
+        <line num="84" count="15" type="stmt"/>
+        <line num="85" count="15" type="cond" truecount="2" falsecount="0"/>
+        <line num="86" count="15" type="stmt"/>
+        <line num="87" count="15" type="stmt"/>
+        <line num="94" count="2" type="stmt"/>
+        <line num="97" count="10" type="stmt"/>
+        <line num="101" count="10" type="stmt"/>
+        <line num="115" count="2" type="stmt"/>
+        <line num="121" count="8" type="stmt"/>
+        <line num="122" count="8" type="stmt"/>
+        <line num="123" count="8" type="stmt"/>
+        <line num="124" count="8" type="stmt"/>
+        <line num="126" count="8" type="cond" truecount="1" falsecount="0"/>
+        <line num="127" count="2" type="stmt"/>
+        <line num="130" count="6" type="stmt"/>
+        <line num="131" count="6" type="stmt"/>
+        <line num="132" count="6" type="stmt"/>
+        <line num="133" count="6" type="cond" truecount="2" falsecount="0"/>
+        <line num="136" count="6" type="stmt"/>
+        <line num="138" count="6" type="stmt"/>
+      </file>
+      <file name="rebirth.ts" path="/Users/dulan.manujaya/bloomlings-idle-game/src/engine/rebirth.ts">
+        <metrics statements="54" coveredstatements="54" conditionals="33" coveredconditionals="32" methods="11" coveredmethods="11"/>
+        <line num="16" count="4" type="stmt"/>
+        <line num="24" count="4" type="stmt"/>
+        <line num="30" count="4" type="stmt"/>
+        <line num="36" count="4" type="stmt"/>
+        <line num="39" count="4" type="stmt"/>
+        <line num="46" count="4" type="stmt"/>
+        <line num="64" count="4" type="stmt"/>
+        <line num="80" count="4" type="stmt"/>
+        <line num="81" count="4" type="stmt"/>
+        <line num="82" count="4" type="stmt"/>
+        <line num="83" count="4" type="stmt"/>
+        <line num="84" count="4" type="stmt"/>
+        <line num="87" count="4" type="stmt"/>
+        <line num="90" count="4" type="stmt"/>
+        <line num="109" count="4" type="stmt"/>
+        <line num="115" count="63" type="cond" truecount="1" falsecount="0"/>
+        <line num="118" count="56" type="stmt"/>
+        <line num="119" count="56" type="stmt"/>
+        <line num="120" count="56" type="stmt"/>
+        <line num="121" count="56" type="stmt"/>
+        <line num="135" count="4" type="stmt"/>
+        <line num="139" count="4" type="stmt"/>
+        <line num="158" count="4" type="stmt"/>
+        <line num="164" count="9" type="stmt"/>
+        <line num="171" count="9" type="cond" truecount="2" falsecount="0"/>
+        <line num="179" count="9" type="cond" truecount="2" falsecount="0"/>
+        <line num="183" count="9" type="stmt"/>
+        <line num="184" count="36" type="stmt"/>
+        <line num="193" count="9" type="stmt"/>
+        <line num="208" count="4" type="stmt"/>
+        <line num="213" count="14" type="cond" truecount="3" falsecount="0"/>
+        <line num="214" count="3" type="stmt"/>
+        <line num="216" count="11" type="cond" truecount="1" falsecount="0"/>
+        <line num="221" count="3" type="stmt"/>
+        <line num="223" count="8" type="stmt"/>
+        <line num="234" count="4" type="stmt"/>
+        <line num="239" count="5" type="stmt"/>
+        <line num="240" count="6" type="stmt"/>
+        <line num="267" count="4" type="stmt"/>
+        <line num="270" count="5" type="stmt"/>
+        <line num="271" count="5" type="stmt"/>
+        <line num="272" count="7" type="cond" truecount="3" falsecount="0"/>
+        <line num="273" count="4" type="stmt"/>
+        <line num="276" count="5" type="stmt"/>
+        <line num="289" count="4" type="stmt"/>
+        <line num="293" count="6" type="stmt"/>
+        <line num="294" count="6" type="cond" truecount="1" falsecount="0"/>
+        <line num="295" count="5" type="stmt"/>
+        <line num="299" count="5" type="cond" truecount="1" falsecount="1"/>
+        <line num="301" count="6" type="stmt"/>
+        <line num="309" count="4" type="stmt"/>
+        <line num="310" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="320" count="4" type="stmt"/>
+        <line num="324" count="2" type="cond" truecount="2" falsecount="0"/>
+      </file>
+      <file name="synergies.ts" path="/Users/dulan.manujaya/bloomlings-idle-game/src/engine/synergies.ts">
+        <metrics statements="91" coveredstatements="90" conditionals="25" coveredconditionals="22" methods="14" coveredmethods="13"/>
+        <line num="37" count="4" type="stmt"/>
+        <line num="45" count="4" type="stmt"/>
+        <line num="48" count="4" type="stmt"/>
+        <line num="51" count="4" type="stmt"/>
+        <line num="59" count="4" type="stmt"/>
+        <line num="96" count="4" type="stmt"/>
+        <line num="441" count="4" type="stmt"/>
+        <line num="442" count="160" type="stmt"/>
+        <line num="455" count="4" type="stmt"/>
+        <line num="456" count="13" type="cond" truecount="1" falsecount="0"/>
+        <line num="457" count="11" type="cond" truecount="1" falsecount="0"/>
+        <line num="458" count="9" type="cond" truecount="1" falsecount="0"/>
+        <line num="459" count="2" type="stmt"/>
+        <line num="522" count="4" type="stmt"/>
+        <line num="526" count="18" type="cond" truecount="1" falsecount="1"/>
+        <line num="528" count="28" type="stmt"/>
+        <line num="532" count="18" type="cond" truecount="1" falsecount="0"/>
+        <line num="535" count="8" type="stmt"/>
+        <line num="536" count="8" type="stmt"/>
+        <line num="537" count="17" type="stmt"/>
+        <line num="538" count="17" type="cond" truecount="1" falsecount="0"/>
+        <line num="539" count="16" type="stmt"/>
+        <line num="540" count="31" type="stmt"/>
+        <line num="541" count="31" type="cond" truecount="2" falsecount="0"/>
+        <line num="542" count="8" type="stmt"/>
+        <line num="544" count="23" type="stmt"/>
+        <line num="549" count="8" type="stmt"/>
+        <line num="550" count="8" type="stmt"/>
+        <line num="551" count="23" type="stmt"/>
+        <line num="552" count="23" type="cond" truecount="1" falsecount="0"/>
+        <line num="553" count="7" type="stmt"/>
+        <line num="561" count="8" type="stmt"/>
+        <line num="570" count="4" type="stmt"/>
+        <line num="573" count="18" type="cond" truecount="1" falsecount="0"/>
+        <line num="577" count="9" type="stmt"/>
+        <line num="578" count="9" type="stmt"/>
+        <line num="579" count="19" type="cond" truecount="1" falsecount="0"/>
+        <line num="580" count="19" type="stmt"/>
+        <line num="584" count="9" type="stmt"/>
+        <line num="585" count="9" type="stmt"/>
+        <line num="586" count="360" type="stmt"/>
+        <line num="587" count="360" type="stmt"/>
+        <line num="588" count="360" type="stmt"/>
+        <line num="589" count="398" type="stmt"/>
+        <line num="590" count="398" type="cond" truecount="1" falsecount="0"/>
+        <line num="591" count="351" type="stmt"/>
+        <line num="592" count="351" type="stmt"/>
+        <line num="594" count="47" type="stmt"/>
+        <line num="596" count="360" type="cond" truecount="1" falsecount="0"/>
+        <line num="597" count="9" type="stmt"/>
+        <line num="600" count="9" type="stmt"/>
+        <line num="608" count="20" type="stmt"/>
+        <line num="615" count="4" type="stmt"/>
+        <line num="619" count="12" type="stmt"/>
+        <line num="620" count="12" type="stmt"/>
+        <line num="622" count="12" type="stmt"/>
+        <line num="623" count="12" type="stmt"/>
+        <line num="625" count="12" type="stmt"/>
+        <line num="626" count="18" type="cond" truecount="2" falsecount="0"/>
+        <line num="627" count="18" type="stmt"/>
+        <line num="632" count="12" type="stmt"/>
+        <line num="633" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="634" count="2" type="stmt"/>
+        <line num="637" count="12" type="stmt"/>
+        <line num="638" count="5" type="stmt"/>
+        <line num="639" count="10" type="stmt"/>
+        <line num="643" count="12" type="stmt"/>
+        <line num="644" count="5" type="cond" truecount="1" falsecount="0"/>
+        <line num="645" count="4" type="stmt"/>
+        <line num="646" count="4" type="stmt"/>
+        <line num="647" count="8" type="stmt"/>
+        <line num="650" count="5" type="cond" truecount="1" falsecount="0"/>
+        <line num="651" count="1" type="stmt"/>
+        <line num="652" count="1" type="stmt"/>
+        <line num="653" count="2" type="stmt"/>
+        <line num="658" count="12" type="stmt"/>
+        <line num="659" count="5" type="stmt"/>
+        <line num="660" count="5" type="stmt"/>
+        <line num="663" count="12" type="stmt"/>
+        <line num="676" count="4" type="stmt"/>
+        <line num="680" count="8" type="cond" truecount="2" falsecount="0"/>
+        <line num="687" count="4" type="stmt"/>
+        <line num="691" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="715" count="4" type="stmt"/>
+        <line num="719" count="5" type="stmt"/>
+        <line num="720" count="5" type="stmt"/>
+        <line num="721" count="5" type="stmt"/>
+        <line num="722" count="5" type="cond" truecount="1" falsecount="0"/>
+        <line num="723" count="3" type="stmt"/>
+        <line num="724" count="3" type="stmt"/>
+        <line num="727" count="5" type="stmt"/>
+      </file>
+      <file name="tapSystem.ts" path="/Users/dulan.manujaya/bloomlings-idle-game/src/engine/tapSystem.ts">
+        <metrics statements="73" coveredstatements="35" conditionals="29" coveredconditionals="7" methods="8" coveredmethods="4"/>
+        <line num="8" count="1" type="stmt"/>
+        <line num="9" count="1" type="stmt"/>
+        <line num="10" count="1" type="stmt"/>
+        <line num="16" count="1" type="stmt"/>
+        <line num="23" count="1" type="stmt"/>
+        <line num="26" count="1" type="stmt"/>
+        <line num="29" count="1" type="stmt"/>
+        <line num="32" count="1" type="stmt"/>
+        <line num="35" count="1" type="stmt"/>
+        <line num="38" count="1" type="stmt"/>
+        <line num="67" count="1" type="stmt"/>
+        <line num="75" count="19" type="stmt"/>
+        <line num="76" count="19" type="cond" truecount="1" falsecount="1"/>
+        <line num="77" count="19" type="stmt"/>
+        <line num="80" count="19" type="stmt"/>
+        <line num="85" count="19" type="stmt"/>
+        <line num="97" count="1" type="stmt"/>
+        <line num="98" count="11" type="cond" truecount="1" falsecount="0"/>
+        <line num="99" count="9" type="stmt"/>
+        <line num="107" count="1" type="stmt"/>
+        <line num="114" count="7" type="cond" truecount="1" falsecount="0"/>
+        <line num="115" count="2" type="stmt"/>
+        <line num="119" count="5" type="cond" truecount="1" falsecount="0"/>
+        <line num="120" count="1" type="stmt"/>
+        <line num="123" count="4" type="stmt"/>
+        <line num="139" count="1" type="stmt"/>
+        <line num="141" count="5" type="stmt"/>
+        <line num="142" count="5" type="stmt"/>
+        <line num="143" count="5" type="stmt"/>
+        <line num="144" count="70" type="stmt"/>
+        <line num="145" count="70" type="cond" truecount="0" falsecount="1"/>
+        <line num="146" count="70" type="cond" truecount="1" falsecount="0"/>
+        <line num="147" count="69" type="stmt"/>
+        <line num="150" count="5" type="stmt"/>
+        <line num="173" count="1" type="stmt"/>
+        <line num="174" count="0" type="stmt"/>
+        <line num="175" count="0" type="stmt"/>
+        <line num="177" count="0" type="stmt"/>
+        <line num="178" count="0" type="stmt"/>
+        <line num="180" count="0" type="stmt"/>
+        <line num="181" count="0" type="stmt"/>
+        <line num="182" count="0" type="stmt"/>
+        <line num="185" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="186" count="0" type="stmt"/>
+        <line num="190" count="0" type="stmt"/>
+        <line num="191" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="192" count="0" type="stmt"/>
+        <line num="195" count="0" type="stmt"/>
+        <line num="198" count="0" type="stmt"/>
+        <line num="206" count="0" type="stmt"/>
+        <line num="208" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="209" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="210" count="0" type="stmt"/>
+        <line num="211" count="0" type="stmt"/>
+        <line num="213" count="0" type="stmt"/>
+        <line num="214" count="0" type="stmt"/>
+        <line num="215" count="0" type="stmt"/>
+        <line num="219" count="0" type="stmt"/>
+        <line num="229" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="231" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="236" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="237" count="0" type="stmt"/>
+        <line num="238" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="239" count="0" type="stmt"/>
+        <line num="242" count="0" type="stmt"/>
+        <line num="247" count="0" type="cond" truecount="0" falsecount="3"/>
+        <line num="248" count="0" type="stmt"/>
+        <line num="250" count="0" type="stmt"/>
+        <line num="253" count="0" type="stmt"/>
+        <line num="256" count="0" type="stmt"/>
+        <line num="259" count="0" type="stmt"/>
+        <line num="269" count="0" type="stmt"/>
+        <line num="272" count="0" type="stmt"/>
+      </file>
+      <file name="transcendence.ts" path="/Users/dulan.manujaya/bloomlings-idle-game/src/engine/transcendence.ts">
+        <metrics statements="20" coveredstatements="20" conditionals="4" coveredconditionals="4" methods="5" coveredmethods="5"/>
+        <line num="10" count="1" type="stmt"/>
+        <line num="18" count="1" type="stmt"/>
+        <line num="21" count="1" type="stmt"/>
+        <line num="24" count="1" type="stmt"/>
+        <line num="27" count="1" type="stmt"/>
+        <line num="30" count="1" type="stmt"/>
+        <line num="40" count="1" type="stmt"/>
+        <line num="44" count="13" type="stmt"/>
+        <line num="45" count="13" type="cond" truecount="1" falsecount="0"/>
+        <line num="46" count="11" type="stmt"/>
+        <line num="47" count="11" type="stmt"/>
+        <line num="48" count="11" type="stmt"/>
+        <line num="55" count="1" type="stmt"/>
+        <line num="58" count="10" type="stmt"/>
+        <line num="79" count="1" type="stmt"/>
+        <line num="82" count="5" type="stmt"/>
+        <line num="83" count="5" type="stmt"/>
+        <line num="99" count="1" type="stmt"/>
+        <line num="102" count="4" type="stmt"/>
+        <line num="103" count="4" type="stmt"/>
+      </file>
+      <file name="zoneGates.ts" path="/Users/dulan.manujaya/bloomlings-idle-game/src/engine/zoneGates.ts">
+        <metrics statements="26" coveredstatements="26" conditionals="4" coveredconditionals="4" methods="8" coveredmethods="7"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="5" count="1" type="stmt"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="7" count="1" type="stmt"/>
+        <line num="8" count="1" type="stmt"/>
+        <line num="9" count="1" type="stmt"/>
+        <line num="10" count="1" type="stmt"/>
+        <line num="11" count="1" type="stmt"/>
+        <line num="13" count="1" type="stmt"/>
+        <line num="15" count="1" type="stmt"/>
+        <line num="16" count="8" type="cond" truecount="3" falsecount="0"/>
+        <line num="19" count="1" type="stmt"/>
+        <line num="20" count="1" type="stmt"/>
+        <line num="23" count="1" type="stmt"/>
+        <line num="24" count="5" type="stmt"/>
+        <line num="27" count="1" type="stmt"/>
+        <line num="28" count="1" type="stmt"/>
+        <line num="31" count="1" type="stmt"/>
+        <line num="32" count="3" type="stmt"/>
+        <line num="33" count="3" type="cond" truecount="1" falsecount="0"/>
+        <line num="34" count="1" type="stmt"/>
+        <line num="37" count="1" type="stmt"/>
+        <line num="38" count="1" type="stmt"/>
+        <line num="41" count="1" type="stmt"/>
+        <line num="42" count="1" type="stmt"/>
+      </file>
+    </package>
+    <package name="services">
+      <metrics statements="54" coveredstatements="35" conditionals="10" coveredconditionals="6" methods="13" coveredmethods="6"/>
+      <file name="analyticsService.ts" path="/Users/dulan.manujaya/bloomlings-idle-game/src/services/analyticsService.ts">
+        <metrics statements="54" coveredstatements="35" conditionals="10" coveredconditionals="6" methods="13" coveredmethods="6"/>
+        <line num="8" count="2" type="stmt"/>
+        <line num="25" count="2" type="stmt"/>
+        <line num="26" count="2" type="stmt"/>
+        <line num="27" count="2" type="stmt"/>
+        <line num="28" count="2" type="stmt"/>
+        <line num="30" count="2" type="stmt"/>
+        <line num="32" count="1050" type="cond" truecount="1" falsecount="0"/>
+        <line num="33" count="1" type="stmt"/>
+        <line num="35" count="1050" type="stmt"/>
+        <line num="39" count="526" type="stmt"/>
+        <line num="40" count="526" type="cond" truecount="1" falsecount="0"/>
+        <line num="41" count="520" type="stmt"/>
+        <line num="42" count="520" type="stmt"/>
+        <line num="44" count="0" type="stmt"/>
+        <line num="49" count="524" type="stmt"/>
+        <line num="57" count="2" type="stmt"/>
+        <line num="61" count="519" type="stmt"/>
+        <line num="62" count="519" type="stmt"/>
+        <line num="64" count="519" type="cond" truecount="2" falsecount="0"/>
+        <line num="68" count="2" type="stmt"/>
+        <line num="69" count="5" type="stmt"/>
+        <line num="70" count="5" type="stmt"/>
+        <line num="71" count="5" type="stmt"/>
+        <line num="75" count="2" type="stmt"/>
+        <line num="76" count="2" type="stmt"/>
+        <line num="77" count="2" type="stmt"/>
+        <line num="78" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="80" count="2" type="stmt"/>
+        <line num="88" count="2" type="stmt"/>
+        <line num="89" count="0" type="stmt"/>
+        <line num="90" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="91" count="0" type="stmt"/>
+        <line num="92" count="0" type="stmt"/>
+        <line num="96" count="2" type="stmt"/>
+        <line num="97" count="0" type="stmt"/>
+        <line num="105" count="2" type="stmt"/>
+        <line num="106" count="0" type="stmt"/>
+        <line num="114" count="2" type="stmt"/>
+        <line num="118" count="0" type="stmt"/>
+        <line num="126" count="2" type="stmt"/>
+        <line num="127" count="0" type="stmt"/>
+        <line num="135" count="2" type="stmt"/>
+        <line num="140" count="0" type="stmt"/>
+        <line num="147" count="2" type="stmt"/>
+        <line num="153" count="2" type="stmt"/>
+        <line num="154" count="0" type="stmt"/>
+        <line num="155" count="0" type="stmt"/>
+        <line num="156" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="157" count="0" type="stmt"/>
+        <line num="158" count="0" type="stmt"/>
+        <line num="160" count="0" type="stmt"/>
+        <line num="163" count="0" type="stmt"/>
+        <line num="164" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="165" count="0" type="stmt"/>
+      </file>
+    </package>
+    <package name="state">
+      <metrics statements="92" coveredstatements="90" conditionals="32" coveredconditionals="31" methods="24" coveredmethods="23"/>
+      <file name="selectors.ts" path="/Users/dulan.manujaya/bloomlings-idle-game/src/state/selectors.ts">
+        <metrics statements="92" coveredstatements="90" conditionals="32" coveredconditionals="31" methods="24" coveredmethods="23"/>
+        <line num="8" count="3" type="stmt"/>
+        <line num="11" count="3" type="stmt"/>
+        <line num="12" count="3" type="stmt"/>
+        <line num="17" count="3" type="stmt"/>
+        <line num="23" count="3" type="stmt"/>
+        <line num="31" count="3" type="stmt"/>
+        <line num="32" count="3" type="stmt"/>
+        <line num="35" count="3" type="stmt"/>
+        <line num="42" count="3" type="stmt"/>
+        <line num="47" count="13" type="stmt"/>
+        <line num="51" count="3" type="stmt"/>
+        <line num="54" count="3" type="stmt"/>
+        <line num="57" count="3" type="stmt"/>
+        <line num="64" count="3" type="stmt"/>
+        <line num="69" count="5" type="stmt"/>
+        <line num="74" count="5" type="stmt"/>
+        <line num="78" count="5" type="stmt"/>
+        <line num="89" count="3" type="stmt"/>
+        <line num="94" count="16" type="stmt"/>
+        <line num="95" count="16" type="stmt"/>
+        <line num="109" count="27" type="stmt"/>
+        <line num="110" count="27" type="stmt"/>
+        <line num="111" count="15" type="cond" truecount="1" falsecount="0"/>
+        <line num="112" count="14" type="stmt"/>
+        <line num="113" count="14" type="cond" truecount="1" falsecount="0"/>
+        <line num="115" count="27" type="stmt"/>
+        <line num="126" count="3" type="stmt"/>
+        <line num="131" count="17" type="stmt"/>
+        <line num="132" count="17" type="cond" truecount="1" falsecount="0"/>
+        <line num="134" count="9" type="cond" truecount="2" falsecount="0"/>
+        <line num="138" count="9" type="cond" truecount="2" falsecount="0"/>
+        <line num="142" count="9" type="stmt"/>
+        <line num="143" count="9" type="stmt"/>
+        <line num="144" count="11" type="stmt"/>
+        <line num="145" count="11" type="stmt"/>
+        <line num="150" count="11" type="cond" truecount="2" falsecount="0"/>
+        <line num="153" count="11" type="cond" truecount="2" falsecount="0"/>
+        <line num="154" count="11" type="stmt"/>
+        <line num="156" count="9" type="stmt"/>
+        <line num="165" count="3" type="stmt"/>
+        <line num="168" count="1" type="stmt"/>
+        <line num="178" count="3" type="stmt"/>
+        <line num="181" count="12" type="cond" truecount="2" falsecount="0"/>
+        <line num="182" count="12" type="stmt"/>
+        <line num="183" count="12" type="cond" truecount="2" falsecount="0"/>
+        <line num="184" count="12" type="stmt"/>
+        <line num="185" count="12" type="cond" truecount="2" falsecount="0"/>
+        <line num="186" count="12" type="stmt"/>
+        <line num="187" count="12" type="stmt"/>
+        <line num="189" count="6" type="cond" truecount="1" falsecount="1"/>
+        <line num="199" count="3" type="stmt"/>
+        <line num="202" count="0" type="stmt"/>
+        <line num="203" count="0" type="stmt"/>
+        <line num="220" count="3" type="stmt"/>
+        <line num="224" count="4" type="stmt"/>
+        <line num="230" count="3" type="stmt"/>
+        <line num="231" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="232" count="4" type="stmt"/>
+        <line num="239" count="3" type="stmt"/>
+        <line num="242" count="5" type="cond" truecount="2" falsecount="0"/>
+        <line num="243" count="5" type="stmt"/>
+        <line num="249" count="3" type="stmt"/>
+        <line num="252" count="2" type="stmt"/>
+        <line num="262" count="3" type="cond" truecount="1" falsecount="0"/>
+        <line num="263" count="16" type="stmt"/>
+        <line num="269" count="3" type="stmt"/>
+        <line num="272" count="10" type="stmt"/>
+        <line num="273" count="10" type="stmt"/>
+        <line num="274" count="10" type="stmt"/>
+        <line num="280" count="3" type="stmt"/>
+        <line num="281" count="10" type="stmt"/>
+        <line num="282" count="10" type="cond" truecount="1" falsecount="0"/>
+        <line num="283" count="2" type="stmt"/>
+        <line num="284" count="2" type="stmt"/>
+        <line num="295" count="3" type="stmt"/>
+        <line num="302" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="303" count="4" type="cond" truecount="3" falsecount="0"/>
+        <line num="305" count="3" type="stmt"/>
+        <line num="310" count="3" type="stmt"/>
+        <line num="322" count="3" type="stmt"/>
+        <line num="325" count="2" type="stmt"/>
+        <line num="326" count="2" type="cond" truecount="1" falsecount="0"/>
+        <line num="328" count="1" type="stmt"/>
+        <line num="341" count="3" type="stmt"/>
+        <line num="342" count="7" type="stmt"/>
+        <line num="343" count="7" type="stmt"/>
+        <line num="353" count="3" type="stmt"/>
+        <line num="357" count="23" type="stmt"/>
+        <line num="363" count="3" type="stmt"/>
+        <line num="367" count="12" type="stmt"/>
+        <line num="368" count="12" type="cond" truecount="1" falsecount="0"/>
+        <line num="369" count="5" type="stmt"/>
+      </file>
+    </package>
+    <package name="types">
+      <metrics statements="63" coveredstatements="63" conditionals="20" coveredconditionals="20" methods="10" coveredmethods="10"/>
+      <file name="game.ts" path="/Users/dulan.manujaya/bloomlings-idle-game/src/types/game.ts">
+        <metrics statements="63" coveredstatements="63" conditionals="20" coveredconditionals="20" methods="10" coveredmethods="10"/>
+        <line num="14" count="14" type="cond" truecount="2" falsecount="0"/>
+        <line num="15" count="14" type="stmt"/>
+        <line num="16" count="14" type="stmt"/>
+        <line num="17" count="14" type="stmt"/>
+        <line num="18" count="14" type="stmt"/>
+        <line num="19" count="14" type="stmt"/>
+        <line num="20" count="14" type="stmt"/>
+        <line num="24" count="14" type="cond" truecount="2" falsecount="0"/>
+        <line num="26" count="14" type="stmt"/>
+        <line num="28" count="14" type="stmt"/>
+        <line num="30" count="14" type="stmt"/>
+        <line num="34" count="14" type="cond" truecount="2" falsecount="0"/>
+        <line num="35" count="14" type="stmt"/>
+        <line num="36" count="14" type="stmt"/>
+        <line num="37" count="14" type="stmt"/>
+        <line num="38" count="14" type="stmt"/>
+        <line num="40" count="14" type="stmt"/>
+        <line num="41" count="14" type="stmt"/>
+        <line num="42" count="14" type="stmt"/>
+        <line num="43" count="14" type="stmt"/>
+        <line num="44" count="14" type="stmt"/>
+        <line num="48" count="14" type="cond" truecount="2" falsecount="0"/>
+        <line num="50" count="14" type="stmt"/>
+        <line num="52" count="14" type="stmt"/>
+        <line num="54" count="14" type="stmt"/>
+        <line num="56" count="14" type="stmt"/>
+        <line num="60" count="14" type="cond" truecount="2" falsecount="0"/>
+        <line num="62" count="14" type="stmt"/>
+        <line num="64" count="14" type="stmt"/>
+        <line num="66" count="14" type="stmt"/>
+        <line num="68" count="14" type="stmt"/>
+        <line num="70" count="14" type="stmt"/>
+        <line num="72" count="14" type="stmt"/>
+        <line num="76" count="14" type="cond" truecount="2" falsecount="0"/>
+        <line num="78" count="14" type="stmt"/>
+        <line num="80" count="14" type="stmt"/>
+        <line num="82" count="14" type="stmt"/>
+        <line num="84" count="14" type="stmt"/>
+        <line num="86" count="14" type="stmt"/>
+        <line num="88" count="14" type="stmt"/>
+        <line num="90" count="14" type="stmt"/>
+        <line num="94" count="14" type="cond" truecount="2" falsecount="0"/>
+        <line num="96" count="14" type="stmt"/>
+        <line num="98" count="14" type="stmt"/>
+        <line num="100" count="14" type="stmt"/>
+        <line num="102" count="14" type="stmt"/>
+        <line num="104" count="14" type="stmt"/>
+        <line num="106" count="14" type="stmt"/>
+        <line num="110" count="14" type="cond" truecount="2" falsecount="0"/>
+        <line num="111" count="14" type="stmt"/>
+        <line num="112" count="14" type="stmt"/>
+        <line num="113" count="14" type="stmt"/>
+        <line num="114" count="14" type="stmt"/>
+        <line num="115" count="14" type="stmt"/>
+        <line num="119" count="14" type="cond" truecount="2" falsecount="0"/>
+        <line num="120" count="14" type="stmt"/>
+        <line num="121" count="14" type="stmt"/>
+        <line num="122" count="14" type="stmt"/>
+        <line num="123" count="14" type="stmt"/>
+        <line num="124" count="14" type="stmt"/>
+        <line num="128" count="14" type="cond" truecount="2" falsecount="0"/>
+        <line num="129" count="14" type="stmt"/>
+        <line num="130" count="14" type="stmt"/>
+      </file>
+    </package>
+    <package name="utils">
+      <metrics statements="19" coveredstatements="18" conditionals="7" coveredconditionals="6" methods="2" coveredmethods="2"/>
+      <file name="formatNumber.ts" path="/Users/dulan.manujaya/bloomlings-idle-game/src/utils/formatNumber.ts">
+        <metrics statements="19" coveredstatements="18" conditionals="7" coveredconditionals="6" methods="2" coveredmethods="2"/>
+        <line num="9" count="1" type="stmt"/>
+        <line num="39" count="1" type="cond" truecount="1" falsecount="0"/>
+        <line num="40" count="25" type="cond" truecount="1" falsecount="0"/>
+        <line num="41" count="2" type="stmt"/>
+        <line num="44" count="23" type="cond" truecount="1" falsecount="0"/>
+        <line num="46" count="11" type="cond" truecount="1" falsecount="0"/>
+        <line num="47" count="6" type="stmt"/>
+        <line num="49" count="5" type="stmt"/>
+        <line num="52" count="12" type="stmt"/>
+        <line num="53" count="12" type="stmt"/>
+        <line num="55" count="12" type="cond" truecount="2" falsecount="0"/>
+        <line num="56" count="22" type="stmt"/>
+        <line num="57" count="22" type="stmt"/>
+        <line num="60" count="12" type="stmt"/>
+        <line num="61" count="12" type="cond" truecount="0" falsecount="1"/>
+        <line num="62" count="0" type="stmt"/>
+        <line num="65" count="12" type="stmt"/>
+        <line num="78" count="1" type="stmt"/>
+        <line num="79" count="4" type="stmt"/>
+      </file>
+    </package>
+  </project>
+</coverage>

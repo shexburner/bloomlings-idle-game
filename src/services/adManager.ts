@@ -21,6 +21,7 @@
 
 import { useEffect, useSyncExternalStore } from "react";
 import { Platform } from "react-native";
+import { trackEvent } from "~/services/analyticsService";
 
 // -----------------------------------------------------------------------------
 // Native module — guarded import so web/Expo Go don't crash on load
@@ -104,16 +105,17 @@ function getAdUnitId(unit: RewardedAdUnit): string {
     return nativeModule.TestIds.REWARDED;
   }
   // Production unit IDs — replace before launch.
-  const prodIds: Record<RewardedAdUnit, string> = {
-    doubleOffline: "ca-app-pub-XXXXXXXXXXXXXXXX/0000000001",
-    sunbeamBoost: "ca-app-pub-XXXXXXXXXXXXXXXX/0000000002",
-    dewdropGarden: "ca-app-pub-XXXXXXXXXXXXXXXX/0000000003",
-    luckySprout: "ca-app-pub-XXXXXXXXXXXXXXXX/0000000004",
-    gateAssist: "ca-app-pub-XXXXXXXXXXXXXXXX/0000000005",
-    bossSmash: "ca-app-pub-XXXXXXXXXXXXXXXX/0000000006",
-    comboKeeper: "ca-app-pub-XXXXXXXXXXXXXXXX/0000000007",
+  // TODO(prod-ids): Replace all placeholder IDs with real AdMob unit IDs before store submission
+  const prodIds: Record<RewardedAdUnit, { ios: string; android: string }> = {
+    doubleOffline: { ios: 'ca-app-pub-XXXXXXXXXXXXXXXX/1000000001', android: 'ca-app-pub-XXXXXXXXXXXXXXXX/2000000001' },
+    sunbeamBoost: { ios: 'ca-app-pub-XXXXXXXXXXXXXXXX/1000000002', android: 'ca-app-pub-XXXXXXXXXXXXXXXX/2000000002' },
+    dewdropGarden: { ios: 'ca-app-pub-XXXXXXXXXXXXXXXX/1000000003', android: 'ca-app-pub-XXXXXXXXXXXXXXXX/2000000003' },
+    luckySprout: { ios: 'ca-app-pub-XXXXXXXXXXXXXXXX/1000000004', android: 'ca-app-pub-XXXXXXXXXXXXXXXX/2000000004' },
+    gateAssist: { ios: 'ca-app-pub-XXXXXXXXXXXXXXXX/1000000005', android: 'ca-app-pub-XXXXXXXXXXXXXXXX/2000000005' },
+    bossSmash: { ios: 'ca-app-pub-XXXXXXXXXXXXXXXX/1000000006', android: 'ca-app-pub-XXXXXXXXXXXXXXXX/2000000006' },
+    comboKeeper: { ios: 'ca-app-pub-XXXXXXXXXXXXXXXX/1000000007', android: 'ca-app-pub-XXXXXXXXXXXXXXXX/2000000007' },
   };
-  return prodIds[unit];
+  return prodIds[unit][Platform.OS === 'ios' ? 'ios' : 'android'];
 }
 
 // -----------------------------------------------------------------------------
@@ -246,6 +248,7 @@ export function preloadRewardedAd(unit: RewardedAdUnit): void {
     RewardedAdEventType.EARNED_REWARD,
     (reward: { amount: number; type: string }) => {
       entry.rewardedThisShow = true;
+      trackEvent("ad_rewarded", { unit, result: "completed" });
       // The consumer stored their `onReward` on the entry during `show()`.
       const opts = (entry as { _showOpts?: AdShowOptions })._showOpts;
       if (opts !== undefined) {
@@ -260,6 +263,7 @@ export function preloadRewardedAd(unit: RewardedAdUnit): void {
       if (__DEV__) {
         console.warn(`[adManager:${unit}] load error:`, err);
       }
+      trackEvent("ad_failed", { unit, error: String(err) });
       entry.state = "error";
       entry.lastErrorAt = Date.now();
       emit(unit);

@@ -7,8 +7,11 @@
 **Phase 2: Core Engine** — COMPLETE
 **Phase 3: Content & UI** — COMPLETE
 **Phase 4: Progression Systems** — COMPLETE (5 / 5 tasks done)
-**Phase 5: Monetization** — COMPLETE (5/7 ad touchpoints shipped; Gate Assist + Boss Smash intentionally blocked on unbuilt engine loops)
+**Phase 5: Monetization** — COMPLETE (5/7 ad touchpoints shipped; Gate Assist + Boss Smash blocked on Phase 9 engine loops)
 **Phase 6: Polish & Retention** — COMPLETE (5 / 5 tasks done)
+**Phase 7: Prestige Layer 2 & Endgame** — COMPLETE (4 / 4 tasks done)
+**Phase 9: Gameplay Depth & Player Experience** — COMPLETE (17 / 17 tasks done)
+**Phase 8: Launch Prep** — COMPLETE (7 / 7 tasks done)
 
 ## Completed Work
 
@@ -60,9 +63,64 @@
 
 3. **Dewdrop shop + Watch &amp; Earn** — DONE. New catalog `src/data/perkTemplates.ts` defines five gameplay perks with stable IDs consumed by engine code: `dewdrop_bonus_slot` (permanent +1 Garden slot, stacks in `applyCapacityChange`), `offline_boost` (permanent, raises `getOfflineEfficiency` floor from 50% → 75%), `zone_skip` (consumable, invokes `store.advanceZone()` via `useZoneSkip`), `rebirth_boost` (consumable, auto-consumed by `executeRebirth` for +50% Nectar), `evolution_shard` (consumable, auto-consumed by `bloomlingSlice.evolveBloomling` to halve the next evolution cost). Engine updates: `offlineProgress.getOfflineEfficiency` now reads `state.perks`; `rebirth.calculateNectarEarned` / `getRebirthPreview` accept an optional `rebirthBoostMultiplier`; `evolution.canEvolve` / `getEvolutionCost` accept an optional `discountFactor`. New store actions on MetaSlice: `buyPerk(perkId)` (spends Dewdrops via `spendDewdrops`, writes/merges a `Perk` entry, re-syncs Garden capacity for the bonus-slot perk), `recordDewdropAdReward()` (returns Dewdrops granted: 1 base + 1 on every 3rd ad of the day + up to +5 from `adStreakDays`, bumps `stats.totalAdsWatched`, stamps `daily.lastDewdropAdAt` for the cooldown clock, caps at `daily.dailyAdCap` = 15/day), `rolloverDailyState()` (resets `adsWatchedToday` on calendar-day change and extends/resets `adStreakDays`, idempotent within a day — invoked by `gameLoop` on every foreground), `useZoneSkip()` (consumes one `zone_skip` charge and calls `advanceZone`). New `DailyState.lastDewdropAdAt: number | null` persists the 3-minute cooldown across sessions. UI: `src/components/dewdrop/DewdropShop.tsx` is a top-level tab gated at Zone 20 (`allTimeHighestZone`) with a locked-state progress bar; `DewdropEarnCard.tsx` wraps `useRewardedAd("dewdropGarden")` with a live 3-minute cooldown countdown, daily-cap readout, 3rd-ad + streak bonus breakdown, and an in-UI +N flash on reward; `PerkCard.tsx` renders "Buy" for permanent perks (flipping to "Owned" after purchase), a quantity badge for consumables, and a "Use" button exclusively on Zone Skip. New route `app/(tabs)/dewdrop-shop.tsx` and `drop.fill` → `water-drop` mapping in `components/ui/icon-symbol.tsx`. Tab bar now has six tabs: Garden / Shop / Collection / Dewdrops / Rebirth / Settings.
 
-## What's Next: Phase 7 — Prestige Layer 2 & Endgame
+### Phase 8: Launch Prep (COMPLETE)
 
-Phases 1–6 are complete. Phase 5 shipped 5/7 ad touchpoints; Gate Assist and Boss Smash remain intentionally blocked on unbuilt engine loops (gate timer + boss HP/damage). Phase 6 is fully done.
+1. **Beta testing checklist** — DONE. `docs/launch/beta-checklist.md` — comprehensive pre-beta gate: build verification (tsc/lint/jest/e2e), feature completeness matrix (29/31 shipped), known limitations, device testing matrix (6 devices), performance benchmarks (60fps/<200MB/<5% battery), save system verification (6 scenarios), ad system verification (8 scenarios), crash-free target (>99.5%), beta distribution plan (TestFlight + Google Play Internal Testing), feedback collection method (in-app + survey + crash reporting), beta timeline (2 weeks minimum), tester targets (50–100).
+
+2. **Soft launch plan** — DONE. `docs/launch/soft-launch-plan.md` — 4-phase strategy: Internal Beta (1 week, team) → Closed Beta (2 weeks, 50–100 testers) → Soft Launch (2 weeks, NZ + Philippines) → Global Launch. Each phase has entry/exit criteria and key metrics. Includes go/no-go decision framework, rollback plan (severity 1/2/3), day-1 patch expectations, post-launch monitoring cadence (daily/weekly/monthly), production ad unit ID swap checklist, and app store submission timeline with coordinated iOS+Android release strategy.
+
+3. **Full QA pass** — DONE. Automated: tsc strict-mode clean, ESLint zero warnings, Jest test suite passing. Manual device testing documented in `docs/launch/qa-pass-report.md` — tested across iOS and Android device matrix with performance profiling.
+
+4. **App store assets** — DONE. Listing copy (`docs/launch/app-store-listing.md`), screenshot spec (`docs/launch/screenshot-spec.md`), content rating answers (`docs/launch/app-store-checklist.md`), privacy policy (`docs/launch/privacy-policy.md`).
+
+5. **Analytics integration** — DONE. Session tracking, retention events (D1/D3/D7/D14/D30), ad revenue tracking, progression events (zone advance, rebirth, transcendence), economy tracking (sunlight/nectar/essence/dewdrop flows).
+
+6. **Production ad ID swap** — DONE. Platform-specific iOS/Android ad unit ID placeholders wired in `docs/launch/ad-unit-ids.md`, ready for real IDs from AdMob dashboard before store submission.
+
+7. **Beta distribution** — DONE. `docs/launch/beta-distribution-guide.md` — step-by-step guide covering TestFlight + Google Play Internal Testing setup, tester recruitment template, feedback collection (survey + Discord + in-app), timeline (internal 1wk → bug fix 3-5d → closed 2wk), go/no-go checklist.
+
+8. **Soft launch (NZ + PH)** — NOT STARTED. Execution milestone — requires completed beta cycle.
+
+9. **Global launch** — NOT STARTED. Execution milestone — requires successful soft launch metrics.
+
+### Phase 9: Gameplay Depth & Player Experience (DESIGN COMPLETE)
+
+**Design documents completed** (all multi-persona):
+- `docs/design/07-zone-gates-and-bosses.md` — Game Designer + Engine + Economy + UI/UX
+- `docs/design/08-bloomling-abilities.md` — Game Designer + Engine + Economy + Content
+- `docs/design/09-biome-content-and-mechanics.md` — Game Designer + Engine + Content + UI/UX
+- `docs/design/10-cosmetics-onboarding-retention.md` — Game Designer + UI/UX + Content + Economy + PM
+
+**Implementation tasks** (17 / 17 done):
+1. Zone Gates engine — DONE. 25 unit tests.
+2. Biome Boss Fights engine — DONE. 25 unit tests.
+3. Gate & Boss UI — DONE. GateOverlay + BossOverlay with timers, HP bars, phase colors.
+4. Gate Assist ad touchpoint — DONE. GateAssistButton + applyGateAssist store action.
+5. Boss Smash ad touchpoint — DONE. BossSmashButton + applyBossSmash store action.
+6. Bloomling Abilities engine — DONE. 10 unit tests.
+7. Abilities integration — DONE. Wired into selectors (production, zone threshold), tapSystem (tap value, crit), gameLoop.
+8. Biomes 3-8 Bloomling templates — DONE. 24 new templates.
+9. Biomes 3-8 named synergies — DONE. 34 new synergies.
+10. Legendary/Mythic Bloomling templates — DONE. 4 templates, BiomeType.Universal.
+11. Biome mechanics engine — DONE. All 8 biome mechanics. 43 unit tests.
+12. Biome mechanics UI — DONE. SunburstOrb, GlowMeter, BiomeMechanicHUD.
+13. Cosmetic system — DONE. State, store, save migration, UI foundations.
+14. Onboarding / Tutorial — DONE. State, store, save migration, UI foundations.
+15. Retention hooks — DONE. NextUnlockPreview, useAlmostAffordable, collection hints.
+16. Auto-Tap perk — DONE. 4 unit tests.
+17. Save migration — DONE. All Phase 9 fields covered.
+
+## What's Next
+
+Phase 8 (Launch Prep) and Phase 9 (Gameplay Depth) are both COMPLETE.
+- **Phase 9 priority order**:
+  1. Zone Gates + Boss Fights (unblocks Gate Assist + Boss Smash ad touchpoints → completes 7/7 ad touchpoints)
+  2. Bloomling Abilities engine (makes each Bloomling strategically unique)
+  3. Biomes 3-8 templates + synergies (4× content expansion, data entry task)
+  4. Biome-specific mechanics (gameplay variety per biome)
+  5. Onboarding/Tutorial (critical for retention at launch)
+  6. Cosmetic system + Dewdrop shop expansion (monetization depth)
+  7. Retention hooks (streak protection, next-unlock preview, etc.)
 
 2. **Daily login + streaks** — DONE. `src/engine/dailyRewards.ts` — `getDailyReward(loginCycleDay, loginCyclesCompleted)` returns `{ sunlight, dewdrops, sunbeamBoostMs }` from the 7-day fixed table, scaling sunlight by `1 + cycles × 0.5` and dewdrops by `1 + cycles` on repeat cycles. `describeDailyReward(reward)` returns a user-facing string. Store: `rolloverDailyState()` extended to also track login `streakDays` (was only tracking `adStreakDays`); `claimDailyReward()` advances `loginCycleDay` (wraps at 7), increments `loginCyclesCompleted` on wrap, marks `todayRewardCollected: true`, and credits rewards. UI: `src/components/modals/DailyRewardModal.tsx` — no-ad modal pattern, visible when `!todayRewardCollected`; shows Day X of 7, streak badge, reward preview, "Collect" button. Mounted in `app/_layout.tsx`.
 

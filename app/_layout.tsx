@@ -24,6 +24,7 @@ import {
 
 import { useGameLoop } from "~/engine/gameLoop";
 import { initializeAds } from "~/services/adManager";
+import { initAnalytics } from "~/services/analyticsService";
 import * as audioService from "~/services/audioService";
 import { useAutoSave, initializeFromDisk } from "~/services/saveManager";
 import { useGameStore } from "~/state/store";
@@ -68,6 +69,7 @@ export default function RootLayout() {
     initializeFromDisk();
     useGameStore.getState().ensureInitialDiscoveries();
     void initializeAds();
+    void initAnalytics();
     void audioService.init().then(() => audioService.syncMusic());
     void requestNotificationPermissions();
   }, []);

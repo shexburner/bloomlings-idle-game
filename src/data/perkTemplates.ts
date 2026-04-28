@@ -24,6 +24,8 @@ export const PERK_ID = {
   ZoneSkip: "zone_skip",
   RebirthBoost: "rebirth_boost",
   EvolutionShard: "evolution_shard",
+  AutoTapSlow: "auto_tap_slow",
+  AutoTapFast: "auto_tap_fast",
 } as const;
 
 export type PerkCategory = "permanent" | "consumable";
@@ -95,6 +97,25 @@ export const PERK_TEMPLATES: readonly PerkTemplate[] = [
     cost: 8,
     category: "consumable",
     badge: "One-Time",
+  },
+  // --- Auto-Tap perks ---------------------------------------------------
+  {
+    id: PERK_ID.AutoTapSlow,
+    name: "Auto-Tap (Slow)",
+    description:
+      "Automatically taps 2 times per second while the app is open. Does not build combo.",
+    cost: 50,
+    category: "permanent",
+    badge: "QoL",
+  },
+  {
+    id: PERK_ID.AutoTapFast,
+    name: "Auto-Tap (Fast)",
+    description:
+      "Automatically taps 5 times per second. Replaces Slow. Does not build combo.",
+    cost: 150,
+    category: "permanent",
+    badge: "QoL",
   },
 ];
 

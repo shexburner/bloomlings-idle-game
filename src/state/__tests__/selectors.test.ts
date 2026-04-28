@@ -1,5 +1,6 @@
 import { EvolutionStage, AdTouchpoint } from "~/types/game";
 import type { Bloomling, GardenState, ActiveBoost } from "~/types/game";
+import type { GameStore } from "../store";
 import {
   calculateUpgradeCost,
   calculateLevelUpCost,
@@ -244,17 +245,21 @@ describe("getZoneThreshold", () => {
 describe("hasReachedZoneThreshold", () => {
   it("returns false when progress is below threshold", () => {
     const state = {
+      bloomlings: {} as GameStore["bloomlings"],
+      garden: { maxSlots: 4, slots: [], activeSynergyIds: [], specialMeterProgress: 0 } as GameStore["garden"],
       zoneProgress: {
         currentZone: 1,
         currentZoneProgress: 0,
         gateActive: false,
         gateTimerRemainingMs: null,
         gateFailCount: 0,
+        gateAssistUsed: false,
         bossActive: false,
         bossHpRemaining: null,
         bossHpMax: null,
         bossTimerRemainingMs: null,
         bossFailCount: 0,
+        bossSmashUsed: false,
       },
     };
     expect(hasReachedZoneThreshold(state)).toBe(false);
@@ -263,17 +268,21 @@ describe("hasReachedZoneThreshold", () => {
   it("returns true when progress >= threshold", () => {
     const threshold = getZoneThreshold(1);
     const state = {
+      bloomlings: {} as GameStore["bloomlings"],
+      garden: { maxSlots: 4, slots: [], activeSynergyIds: [], specialMeterProgress: 0 } as GameStore["garden"],
       zoneProgress: {
         currentZone: 1,
         currentZoneProgress: threshold,
         gateActive: false,
         gateTimerRemainingMs: null,
         gateFailCount: 0,
+        gateAssistUsed: false,
         bossActive: false,
         bossHpRemaining: null,
         bossHpMax: null,
         bossTimerRemainingMs: null,
         bossFailCount: 0,
+        bossSmashUsed: false,
       },
     };
     expect(hasReachedZoneThreshold(state)).toBe(true);

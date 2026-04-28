@@ -2,11 +2,14 @@
 // BloomlingCard — Parchment card with heraldic rarity ring
 // =============================================================================
 
+import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 
 import type { BloomlingTemplate, Bloomling } from "~/types/game";
 import { Rarity, EvolutionStage } from "~/types/game";
+import { useGameStore } from "~/state/store";
+import { hasReachedBiome, getBiomeNameByType } from "~/engine/biomeMechanics";
 import { COLORS, FONTS, RADII, SHADOWS } from "@/constants/theme";
 
 const RARITY_COLORS: Record<Rarity, string> = {
@@ -39,11 +42,17 @@ interface BloomlingCardProps {
   onPress: (template: BloomlingTemplate, instance: Bloomling) => void;
 }
 
-export function BloomlingCard({ template, instance, onPress }: BloomlingCardProps) {
+export const BloomlingCard = React.memo(function BloomlingCard({ template, instance, onPress }: BloomlingCardProps) {
   const discovered = instance !== null && instance.unlocked;
   const rarityColor = RARITY_COLORS[template.rarity];
+  const currentZone = useGameStore((s) => s.zoneProgress.currentZone);
 
   if (!discovered) {
+    const reachedBiome = hasReachedBiome(currentZone, template.biome);
+    const hintText = reachedBiome
+      ? `Hiding in ${getBiomeNameByType(template.biome)}`
+      : "Found in distant lands…";
+
     return (
       <View
         testID={`bloomling-card-${template.id}-locked`}
@@ -55,7 +64,7 @@ export function BloomlingCard({ template, instance, onPress }: BloomlingCardProp
               <Text style={styles.silhouetteQ}>?</Text>
             </View>
           </View>
-          <Text style={styles.undiscoveredName}>???</Text>
+          <Text style={styles.undiscoveredName}>{hintText}</Text>
           <Text style={[styles.rarityLabel, { color: rarityColor }]}>
             {RARITY_LABELS[template.rarity]}
           </Text>
@@ -95,7 +104,7 @@ export function BloomlingCard({ template, instance, onPress }: BloomlingCardProp
       </LinearGradient>
     </Pressable>
   );
-}
+});
 
 const styles = StyleSheet.create({
   cardWrap: {

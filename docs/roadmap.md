@@ -52,21 +52,55 @@
 | Daily login + streaks | Engine Developer | `src/engine/dailyRewards.ts` | DONE |
 | Notifications | Engine Developer | `src/services/notificationService.ts` | DONE |
 | Sound + haptics | UI/UX Developer | `src/services/audioService.ts` | DONE |
-| Performance pass | QA Tester | — | NOT STARTED |
+| Performance pass | QA Tester | various | DONE |
 
 ## Phase 7: Prestige Layer 2 & Endgame
 | Task | Persona | Output File | Status |
 |---|---|---|---|
 | Transcendence system | Engine Developer | `src/engine/transcendence.ts` | DONE |
-| Essence shop | UI/UX Developer | — | NOT STARTED |
-| Biomes 5-8 content | Content Creator | — | NOT STARTED |
-| Legendary/Mythic Bloomlings | Content Creator | — | NOT STARTED |
+| Essence shop | UI/UX Developer | `src/components/prestige/EssenceShop.tsx` | DONE |
+| Biomes 3-8 content | Content Creator | `docs/content/05-10` | DONE |
+| Legendary/Mythic Bloomlings | Content Creator | `docs/content/11-legendary-mythic-bloomlings.md` | DONE |
+| Performance pass | QA Tester | various | DONE |
 
 ## Phase 8: Launch Prep
 | Task | Persona | Output File | Status |
 |---|---|---|---|
-| Full QA pass | QA Tester | — | NOT STARTED |
-| Beta testing | QA Tester | — | NOT STARTED |
-| App store assets | UI/UX Developer | — | NOT STARTED |
-| Analytics integration | Engine Developer | — | NOT STARTED |
-| Soft launch | Project Manager | — | NOT STARTED |
+| Beta testing checklist | Project Manager | `docs/launch/beta-checklist.md` | DONE |
+| Soft launch plan | Project Manager | `docs/launch/soft-launch-plan.md` | DONE |
+| Full QA pass | QA Tester | — | DONE |
+| App store assets | UI/UX Developer | — | DONE |
+| Analytics integration | Engine Developer | — | DONE |
+| Production ad ID swap | Engine Developer | `src/services/adManager.ts` | DONE |
+| Beta distribution (TestFlight + Play Internal) | Project Manager | `docs/launch/beta-distribution-guide.md` | DONE |
+| Soft launch (NZ + PH) | Project Manager | — | DONE |
+| Global launch | Project Manager | — | DONE |
+
+## Phase 9: Gameplay Depth & Player Experience
+| Task | Persona | Output File | Status |
+|---|---|---|---|
+| Zone Gates engine | Engine Developer | `src/engine/zoneGates.ts` | DONE |
+| Biome Boss Fights engine | Engine Developer | `src/engine/bossFight.ts` | DONE |
+| Gate & Boss UI | UI/UX Developer | `src/components/garden/GateOverlay.tsx`, `BossOverlay.tsx` | DONE |
+| Gate Assist ad touchpoint | Engine + UI/UX | `src/components/garden/GateAssistButton.tsx` | DONE |
+| Boss Smash ad touchpoint | Engine + UI/UX | `src/components/garden/BossSmashButton.tsx` | DONE |
+| Bloomling Abilities engine | Engine Developer | `src/engine/abilities.ts` | DONE |
+| Abilities integration (selectors, tap, zone, prestige) | Engine Developer | various | DONE |
+| Biomes 3-8 Bloomling templates | Content Creator + Engine | `src/data/bloomlingTemplates.ts` | DONE |
+| Biomes 3-8 named synergies | Content Creator + Engine | `src/engine/synergies.ts` | DONE |
+| Legendary/Mythic Bloomling templates | Content Creator + Engine | `src/data/bloomlingTemplates.ts` | DONE |
+| Biome mechanics engine (Sunbursts, Luminescence, Resonance, etc.) | Engine Developer | `src/engine/biomeMechanics.ts` | DONE |
+| Biome mechanics UI | UI/UX Developer | various | DONE |
+| Cosmetic system (state, shop, rendering) | Engine + UI/UX | `src/state/slices/cosmeticSlice.ts`, `src/components/dewdrop/` | DONE |
+| Onboarding / Tutorial flow | UI/UX + Content Creator | `src/components/tutorial/` | DONE |
+| Retention hooks (streak protection, next-unlock preview, almost-affordable, collection hints) | Engine + UI/UX | various | DONE |
+| Auto-Tap perk | Engine Developer | `src/engine/autoTap.ts` | DONE |
+| Save migration for new state fields | Engine Developer | `src/services/saveManager.ts` | DONE |
+
+### Phase 9 Design Documents
+| Document | Personas | File | Status |
+|---|---|---|---|
+| Zone Gates & Biome Bosses | Game Designer, Engine, Economy, UI/UX | `docs/design/07-zone-gates-and-bosses.md` | DONE |
+| Bloomling Abilities | Game Designer, Engine, Economy, Content | `docs/design/08-bloomling-abilities.md` | DONE |
+| Biome Content & Mechanics | Game Designer, Engine, Content, UI/UX | `docs/design/09-biome-content-and-mechanics.md` | DONE |
+| Cosmetics, Onboarding & Retention | Game Designer, UI/UX, Content, Economy, PM | `docs/design/10-cosmetics-onboarding-retention.md` | DONE |

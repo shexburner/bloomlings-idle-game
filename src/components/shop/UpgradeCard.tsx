@@ -2,7 +2,7 @@
 // UpgradeCard — Parchment card: gilt hairline, icon well, italic desc, buy btn
 // =============================================================================
 
-import { useRef } from "react";
+import React, { useRef } from "react";
 import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -55,7 +55,7 @@ function calculateMaxLevels(
   return count;
 }
 
-export function UpgradeCard({ template, buyCount }: UpgradeCardProps) {
+export const UpgradeCard = React.memo(function UpgradeCard({ template, buyCount }: UpgradeCardProps) {
   const currentLevel = useGameStore((s) => s.upgrades[template.id]?.level ?? 0);
   const sunlight = useGameStore((s) => s.resources.sunlight);
   const buyUpgrade = useGameStore((s) => s.buyUpgrade);
@@ -159,7 +159,7 @@ export function UpgradeCard({ template, buyCount }: UpgradeCardProps) {
       </LinearGradient>
     </Animated.View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   cardWrap: {

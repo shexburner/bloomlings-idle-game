@@ -2,7 +2,7 @@
 
 **Owner:** Quality Engineer Lead
 **Last updated:** 2026-04-17
-**Scope:** Phases 1–5 (all shipped ad touchpoints covered; Gate Assist and Boss Smash excluded — engine loops not yet built).
+**Scope:** Phases 1–7 (all shipped ad touchpoints covered; Gate Assist and Boss Smash excluded — engine loops not yet built). Phase 6–7 additions: Achievements, Daily Rewards, Transcendence & Essence Shop, Offline Progress upgrades, Save Migration.
 
 Priority key: **P0** = critical path, automated in `.maestro/`. **P1** = important, automated where feasible. **P2** = manual only.
 Automation key: `auto` (covered by a Maestro flow), `manual` (exploratory/manual only), `planned` (P1 flow stubbed with TODO).
@@ -170,6 +170,72 @@ IDs use `TC-<AREA>-<NNN>`.
 
 ---
 
+## 13. Achievements (`TC-ACH`)
+
+| ID | Title | Pre | Steps | Expected | Pri | Auto |
+|----|-------|-----|-------|----------|-----|------|
+| TC-ACH-001 | Achievement granted on milestone | Seed totalTaps=1000, `tap_dancer` target=1000 | Trigger `checkAchievements` | `tap_dancer` returned as newly completed | P0 | auto |
+| TC-ACH-002 | Hidden achievement triggered by event | Active game session | Call `triggerHiddenAchievement("patient_gardener")` | Achievement marked completed, reward granted | P0 | auto |
+| TC-ACH-003 | Progress tracks correctly for zone achievements | Seed allTimeHighestZone=42 | Read `computeProgress("first_steps")` | Returns 42 | P0 | auto |
+| TC-ACH-004 | Reward delivery adds sunlight on completion | Seed achievement with sunlightReward=500 | Grant achievement | `currency-sunlight` increases by 500 | P1 | planned |
+| TC-ACH-005 | Completed achievements excluded from check | Seed `tap_dancer` already completed | Run `checkAchievements` | `tap_dancer` not in result | P0 | auto |
+| TC-ACH-006 | Event-driven achievements skipped by passive check | Seed `patient_gardener` uncompleted | Run `checkAchievements` | `patient_gardener` not in result | P1 | auto |
+| TC-ACH-007 | Completionist counts other completed achievements | Seed 5 achievements completed | Read `computeProgress("completionist")` | Returns 5 | P1 | auto |
+| TC-ACH-008 | Achievement toast displays on grant | Playing | Earn an achievement | Toast/banner appears with achievement name | P2 | manual |
+
+## 14. Daily Rewards (`TC-DAILY`)
+
+| ID | Title | Pre | Steps | Expected | Pri | Auto |
+|----|-------|-----|-------|----------|-----|------|
+| TC-DAILY-001 | Day 1 reward is 500 sunlight | Fresh cycle (day 1, cycle 0) | Claim daily reward | 500 sunlight added, no dewdrops | P0 | auto |
+| TC-DAILY-002 | Day 3 reward is 1 dewdrop | Cycle day 3 | Claim daily reward | 1 dewdrop added, 0 sunlight | P0 | auto |
+| TC-DAILY-003 | Day 7 reward is 5 dewdrops | Cycle day 7 | Claim daily reward | 5 dewdrops added | P0 | auto |
+| TC-DAILY-004 | Day 6 includes Sunbeam Boost | Cycle day 6 | Claim daily reward | 5000 sunlight + 30-min Sunbeam Boost active | P1 | planned |
+| TC-DAILY-005 | Streak advances day counter | Claimed day 1 yesterday | Login today | Daily screen shows day 2 | P1 | planned |
+| TC-DAILY-006 | Cycle wraps after day 7 | Claimed day 7 | Login next day | Resets to day 1, `loginCyclesCompleted` increments | P0 | auto |
+| TC-DAILY-007 | Cycle 2 scales sunlight by 1.5× | Cycle 2 day 1 (loginCyclesCompleted=1) | Claim reward | 750 sunlight (500 × 1.5) | P1 | auto |
+| TC-DAILY-008 | Cycle 2 scales dewdrops by 2× | Cycle 2 day 3 (loginCyclesCompleted=1) | Claim reward | 2 dewdrops (1 × 2) | P1 | auto |
+| TC-DAILY-009 | Cannot claim twice in same day | Already claimed today | Tap claim button | Button disabled or hidden | P0 | manual |
+| TC-DAILY-010 | Missed day does not advance streak | Skipped a day | Login after gap | Day counter resets to 1 or stays (per design) | P1 | manual |
+
+## 15. Transcendence & Essence Shop (`TC-TRANS`)
+
+| ID | Title | Pre | Steps | Expected | Pri | Auto |
+|----|-------|-----|-------|----------|-----|------|
+| TC-TRANS-001 | Transcendence locked below requirements | Seed rebirthCount=5, zone=100 | Open Transcendence tab | `transcendence-screen-locked` visible | P0 | auto |
+| TC-TRANS-002 | Transcendence unlocks at 10 rebirths + zone 150 | Seed rebirthCount=10, allTimeHighestZone=150 | Open Transcendence tab | `transcendence-screen` visible (not locked) | P0 | auto |
+| TC-TRANS-003 | Essence earned matches formula | Seed totalNectarSpent=200 | View preview | Essence shown = floor((200/50)^1.8) | P0 | auto |
+| TC-TRANS-004 | Transcendence resets bloomlings to Sprout Lv.1 | Seed Elder Lv.100 bloomlings | Confirm transcendence | All bloomlings Sprout Lv.1, out of garden | P0 | auto |
+| TC-TRANS-005 | Transcendence resets nectar upgrades | Seed nectar upgrades purchased | Confirm transcendence | Nectar upgrade levels reset to 0 | P1 | planned |
+| TC-TRANS-006 | Essence balance persists across transcendence | Seed 10 Essence | Transcend | Essence balance = previous + earned | P0 | auto |
+| TC-TRANS-007 | Essence shop renders items | Post-transcendence with Essence | Open Essence shop | `essence-shop` visible with upgrade items | P1 | planned |
+| TC-TRANS-008 | Essence shop purchase deducts Essence | Seed 5 Essence | Buy Cosmic Roots | Essence decremented, upgrade level increments | P1 | planned |
+| TC-TRANS-009 | Essence shop item disabled when unaffordable | Seed 0 Essence | View Essence shop | Buy buttons disabled | P0 | auto |
+| TC-TRANS-010 | Transcendence preview shows correct totals | Seed totalEssenceEarned=5, totalNectarSpent=200 | View preview | `totalEssenceAfter` = 5 + earned | P1 | auto |
+
+## 16. Offline Progress (Phase 6–7 additions) (`TC-OFFLINE`)
+
+| ID | Title | Pre | Steps | Expected | Pri | Auto |
+|----|-------|-----|-------|----------|-----|------|
+| TC-OFF-007 | Cosmic Roots raises offline efficiency | Seed cosmic_roots level 1 | Background 1h, relaunch | Efficiency shown > 50% (~66.7%) | P1 | auto |
+| TC-OFF-008 | Cosmic Roots max level reaches 100% efficiency | Seed cosmic_roots level 3 | Background 1h, relaunch | Efficiency shown = 100% | P1 | auto |
+| TC-OFF-009 | Deep Roots multiplier boosts offline yield | Seed deep_roots level 5 | Background 1h, relaunch | Yield = base × 1.5 | P1 | auto |
+| TC-OFF-010 | Offline Boost perk raises efficiency floor to 75% | Seed Offline Boost perk purchased | Background 1h, relaunch | Efficiency shown ≥ 75% | P1 | auto |
+| TC-OFF-011 | Ad double-offline doubles earnings | Offline session pending | Tap "Watch Ad to Double" | Sunlight earned = 2× collect amount | P1 | manual |
+| TC-OFF-012 | 48h offline still caps at 24h with correct efficiency | Seed lastActiveAt 48h ago + cosmic_roots 2 | Launch | Duration capped at 24h, efficiency reflects upgrades | P1 | auto |
+
+## 17. Save Migration (`TC-MIG`)
+
+| ID | Title | Pre | Steps | Expected | Pri | Auto |
+|----|-------|-----|-------|----------|-----|------|
+| TC-MIG-001 | Old save without achievements field loads correctly | v1 save missing `achievements` | Load save | Achievements populated from templates, no crash | P0 | auto |
+| TC-MIG-002 | Old save without nightOwlOfflineCollections defaults to 0 | v1 save missing stat field | Load save | `nightOwlOfflineCollections` = 0 | P1 | auto |
+| TC-MIG-003 | Old save without daily field loads with defaults | v1 save missing `daily` | Load save | Daily state initialized, no crash | P1 | planned |
+| TC-MIG-004 | New achievements added post-save appear uncompleted | Save with 5 achievements, templates now have 10 | Load save | 5 extra achievements present, uncompleted | P0 | auto |
+| TC-MIG-005 | Checksum mismatch rejects corrupted save | Tampered save JSON | Import | Returns null / shows "Invalid save data" | P1 | planned |
+
+---
+
 ## Summary
 
 | Area | Cases | P0 | P1 | P2 | auto | planned | manual |
@@ -183,10 +249,14 @@ IDs use `TC-<AREA>-<NNN>`.
 | Evolution | 4 | 0 | 2 | 2 | 0 | 2 | 2 |
 | Rebirth | 10 | 6 | 4 | 0 | 6 | 1 | 3 |
 | Nectar shop | 6 | 2 | 2 | 2 | 2 | 1 | 3 |
-| Offline progress | 6 | 2 | 3 | 1 | 2 | 1 | 3 |
+| Offline progress | 12 | 2 | 8 | 1 | 7 | 1 | 4 |
 | Ad touchpoints | 6 | 0 | 6 | 0 | 2 | 0 | 4 |
 | Settings | 8 | 3 | 2 | 3 | 3 | 2 | 3 |
-| **Total** | **91** | **35** | **40** | **16** | **38** | **21** | **32** |
+| Achievements | 8 | 3 | 3 | 2 | 5 | 1 | 2 |
+| Daily rewards | 10 | 3 | 5 | 2 | 3 | 2 | 5 |
+| Transcendence & Essence | 10 | 5 | 5 | 0 | 6 | 3 | 1 |
+| Save migration | 5 | 2 | 3 | 0 | 3 | 2 | 0 |
+| **Total** | **130** | **48** | **61** | **20** | **60** | **29** | **41** |
 
 ---
 
@@ -195,3 +265,5 @@ IDs use `TC-<AREA>-<NNN>`.
 - **Idle production shows 0/s until the idle/evolution fix lands.** TC-GRD-007 and several Evolution / Level-up cases will stay red until then. Do not mask them with skips — they are the regression canary.
 - **Ad touchpoints (Phase 5):** Lucky Sprout, Sunbeam Boost, and Combo Keeper are covered by TC-AD-001–006. Gate Assist and Boss Smash remain out of scope — their engine loops are not yet built.
 - **Seed-dependent cases** require MMKV save injection (see `.maestro/seeds/`). Manual-only cases that need mid-game state without a seed script are flagged explicitly.
+- **Essence Shop UI (Phase 7):** TC-TRANS-007/008/009 cover the Essence shop purchase flow. Maestro flows will be authored once the Essence shop screen is wired.
+- **Save migration (Phase 6–7):** Currently at v1 with no version bump needed — `applySaveToStore` handles missing fields via defaults and template merging. TC-MIG cases validate this forward-compatibility approach.

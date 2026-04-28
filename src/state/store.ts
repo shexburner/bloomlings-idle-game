@@ -25,11 +25,13 @@ import type {
   ActiveBoost,
   AdRewardConfig,
   Achievement,
+  CosmeticState,
   DailyState,
   GameStats,
   OfflineSessionSummary,
   Perk,
   Synergy,
+  TutorialState,
   ZoneProgressState,
 } from "~/types/game";
 import { AdTouchpoint } from "~/types/game";
@@ -47,6 +49,9 @@ import {
   LUCKY_SPROUT_TAP_BOOST_DURATION_MS,
 } from "~/engine/luckySprout";
 import { getDailyReward } from "~/engine/dailyRewards";
+import { trackEvent, trackProgression } from "~/services/analyticsService";
+import { GATE_ASSIST_TIMER_BONUS_MS } from "~/engine/zoneGates";
+import { getBossAdDamage } from "~/engine/bossFight";
 
 // -----------------------------------------------------------------------------
 // Touchpoint Constants (docs/design/05-ad-economy.md)
@@ -83,6 +88,10 @@ export interface MetaSlice {
   synergies: Record<string, Synergy>;
   // --- Stats ---
   stats: GameStats;
+  // --- Cosmetics ---
+  cosmetics: CosmeticState;
+  // --- Tutorial ---
+  tutorial: TutorialState;
   // --- Meta timing ---
   lastTickAt: number;
   lastActiveAt: number;
@@ -196,6 +205,10 @@ export interface MetaSlice {
    * cooldown is still active.
    */
   applyComboKeeper: () => boolean;
+  /** Apply Gate Assist ad reward: add 15s to gate timer. */
+  applyGateAssist: () => void;
+  /** Apply Boss Smash ad reward: deal 25% of bossHpMax as damage. */
+  applyBossSmash: () => void;
   /**
    * Mark a Lucky Sprout appearance as pending. Safe to call even if already
    * pending (idempotent). Records `lastLuckySproutAt` so the next interval
@@ -253,11 +266,13 @@ const initialZoneProgress: ZoneProgressState = {
   gateActive: false,
   gateTimerRemainingMs: null,
   gateFailCount: 0,
+  gateAssistUsed: false,
   bossActive: false,
   bossHpRemaining: null,
   bossHpMax: null,
   bossTimerRemainingMs: null,
   bossFailCount: 0,
+  bossSmashUsed: false,
 };
 
 const initialStats: GameStats = {
@@ -287,6 +302,8 @@ const initialDaily: DailyState = {
   adStreakDays: 0,
   streakShieldUsedThisWeek: false,
   lastDewdropAdAt: null,
+  streakFrozenAt: null,
+  lastStreakShieldAt: null,
 };
 
 const initialUnlockedFeatures: MetaSlice["unlockedFeatures"] = {
@@ -328,6 +345,18 @@ export const useGameStore = create<GameStore>()((...args) => {
     achievements: buildInitialAchievements(),
     synergies: {},
     stats: initialStats,
+    cosmetics: {
+      owned: {},
+      activeHatId: null,
+      activeThemeId: null,
+      activeTapEffectId: null,
+      activeDecorationIds: [],
+    },
+    tutorial: {
+      completed: false,
+      currentStep: 0,
+      seenTooltips: [],
+    },
     lastTickAt: Date.now(),
     lastActiveAt: Date.now(),
     engineRunning: false,
@@ -386,11 +415,13 @@ export const useGameStore = create<GameStore>()((...args) => {
             gateActive: false,
             gateTimerRemainingMs: null,
             gateFailCount: 0,
+            gateAssistUsed: false,
             bossActive: false,
             bossHpRemaining: null,
             bossHpMax: null,
             bossTimerRemainingMs: null,
             bossFailCount: 0,
+            bossSmashUsed: false,
           },
           prestige: {
             ...state.prestige,
@@ -412,6 +443,12 @@ export const useGameStore = create<GameStore>()((...args) => {
       // BUG-010: speed_demon — zone cleared in under 30 s
       if (now - zoneEnteredAt < 30_000) {
         get().triggerHiddenAchievement("speed_demon");
+      }
+      trackEvent("zone_cleared", { zone_number: get().zoneProgress.currentZone - 1 });
+      trackProgression("zone_reached", get().zoneProgress.currentZone);
+      const newZone = get().zoneProgress.currentZone;
+      if (newZone % 10 === 0) {
+        trackEvent("zone_advanced", { zone: newZone, biome: Math.ceil(newZone / 25) });
       }
       // BUG-010: stubborn_sprout — cleared a gate after at least one failure
       if (gateFailCount > 0) {
@@ -473,6 +510,7 @@ export const useGameStore = create<GameStore>()((...args) => {
           },
         };
       });
+      trackEvent("perk_purchased", { perk_id: perkId });
       // Purchasing the Extra Garden Slot perk immediately expands capacity.
       if (perkId === DEWDROP_SLOT_PERK_ID) {
         get().syncGardenCapacity();
@@ -508,6 +546,7 @@ export const useGameStore = create<GameStore>()((...args) => {
           totalAdsWatched: state.stats.totalAdsWatched + 1,
         },
       }));
+      trackEvent("ad_watched", { ad_unit: "dewdropGarden", reward_type: "dewdrops" });
       return total;
     },
 
@@ -560,6 +599,7 @@ export const useGameStore = create<GameStore>()((...args) => {
           todayRewardCollected: true,
         },
       }));
+      trackEvent("daily_reward_claimed", { day: daily.loginCycleDay, streak: daily.streakDays, cycle: daily.loginCyclesCompleted });
 
       if (reward.sunlight > 0) get().addSunlight(reward.sunlight);
       if (reward.dewdrops > 0) get().addDewdrops(reward.dewdrops);
@@ -625,6 +665,42 @@ export const useGameStore = create<GameStore>()((...args) => {
         },
       }));
       return true;
+    },
+
+    applyGateAssist: () => {
+      set((state) => ({
+        zoneProgress: {
+          ...state.zoneProgress,
+          gateTimerRemainingMs:
+            (state.zoneProgress.gateTimerRemainingMs ?? 0) +
+            GATE_ASSIST_TIMER_BONUS_MS,
+          gateAssistUsed: true,
+        },
+        stats: {
+          ...state.stats,
+          totalAdsWatched: state.stats.totalAdsWatched + 1,
+        },
+      }));
+    },
+
+    applyBossSmash: () => {
+      const { bossHpMax, bossHpRemaining } = get().zoneProgress;
+      if (bossHpMax === null || bossHpRemaining === null) return;
+      const damage = getBossAdDamage(bossHpMax);
+      set((state) => ({
+        zoneProgress: {
+          ...state.zoneProgress,
+          bossHpRemaining: Math.max(
+            0,
+            (state.zoneProgress.bossHpRemaining ?? 0) - damage
+          ),
+          bossSmashUsed: true,
+        },
+        stats: {
+          ...state.stats,
+          totalAdsWatched: state.stats.totalAdsWatched + 1,
+        },
+      }));
     },
 
     triggerLuckySprout: () => {
@@ -721,6 +797,7 @@ export const useGameStore = create<GameStore>()((...args) => {
       const state = get();
       const newlyCompleted = checkAchievements(state);
       if (newlyCompleted.length === 0) return;
+      for (const id of newlyCompleted) trackEvent("achievement_unlocked", { achievement_id: id });
 
       const now = Date.now();
       let totalSunlight = 0;

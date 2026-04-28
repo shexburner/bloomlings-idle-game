@@ -20,6 +20,8 @@ import {
   NECTAR_EXPONENT,
   REBIRTH_UNLOCK_ZONE,
 } from "~/engine/rebirth";
+import { getActiveAbilities, computeAbilityBonuses, emptyAbilityBonuses } from '~/engine/abilities';
+import type { AbilityBonuses } from '~/engine/abilities';
 
 // -----------------------------------------------------------------------------
 // Constants (from economy docs)
@@ -45,8 +47,8 @@ export function calculateUpgradeCost(
   return baseCost * Math.pow(scalingFactor, level);
 }
 
-/** Bloomling level-up cost scaling factor (matches Tap Power scaling). */
-export const BLOOMLING_LEVEL_UP_SCALING = 1.15;
+/** Bloomling level-up cost scaling factor (from docs/economy/02-upgrade-costs.md). */
+export const BLOOMLING_LEVEL_UP_SCALING = 1.10;
 
 /** Rapid Growth upgrade grants a 10% cost discount per level. */
 export const RAPID_GROWTH_DISCOUNT_PER_LEVEL = 0.10;
@@ -133,6 +135,10 @@ export function totalSunlightPerSecond(
     ? calculateActiveSynergies(gardenBloomlings, getTemplate)
     : null;
 
+  const bonuses: AbilityBonuses = getTemplate
+    ? computeAbilityBonuses(getActiveAbilities(gardenBloomlings, getTemplate), getTemplate)
+    : emptyAbilityBonuses();
+
   let total = 0;
   for (const bloomling of gardenBloomlings) {
     const baseProduction = getBaseProduction(bloomling.templateId);
@@ -144,7 +150,8 @@ export function totalSunlightPerSecond(
     const synergyMult = active
       ? getSynergyProductionMultiplier(bloomling.instanceId, active)
       : 1;
-    total += raw * synergyMult;
+    const abilityMult = 1 + bonuses.productionBoostAll + (bonuses.productionBoostSelf[bloomling.instanceId] ?? 0);
+    total += raw * synergyMult * abilityMult;
   }
   return total;
 }
@@ -173,11 +180,15 @@ export function totalSunlightPerSecondFromRegistry(
 ): number {
   const idleLevel = state.upgrades["idle_production"]?.level ?? 0;
   const idleMult = 1 + idleLevel * 0.10;
+  const enrichedSoilLevel = state.upgrades["enriched_soil"]?.level ?? 0;
+  const enrichedSoilMult = 1 + enrichedSoilLevel * 0.25;
+  const primordialVigorLevel = state.upgrades["primordial_vigor"]?.level ?? 0;
+  const primordialVigorMult = Math.pow(2, primordialVigorLevel);
   return totalSunlightPerSecond(
     state,
     (templateId) => getBloomlingTemplate(templateId)?.baseProduction ?? 1,
     getBloomlingTemplate
-  ) * idleMult;
+  ) * idleMult * enrichedSoilMult * primordialVigorMult;
 }
 
 /**
@@ -226,9 +237,10 @@ export function getBaseTapValue(state: Pick<GameStore, "upgrades">): number {
  * Starts at 1.0 -- real implementation would sum Nectar "Stronger Roots" effects.
  */
 export function getTapMultiplier(
-  _state: Pick<GameStore, "upgrades" | "prestige">
+  state: Pick<GameStore, "upgrades" | "prestige">
 ): number {
-  return 1.0;
+  const strongerRootsLevel = state.upgrades["stronger_roots"]?.level ?? 0;
+  return 1 + strongerRootsLevel * 0.20;
 }
 
 /**
@@ -247,18 +259,29 @@ export function selectEffectiveTapValue(
 /**
  * Zone threshold: 50 * 1.12^zoneNumber
  */
-export function getZoneThreshold(zoneNumber: number): number {
-  return ZONE_THRESHOLD_BASE * Math.pow(ZONE_THRESHOLD_SCALING, zoneNumber);
+export function getZoneThreshold(zoneNumber: number, abilityReduction: number = 0): number {
+  return ZONE_THRESHOLD_BASE * Math.pow(ZONE_THRESHOLD_SCALING, zoneNumber) * (1 - abilityReduction);
 }
 
 /**
  * Whether the current zone's threshold has been met.
  */
 export function hasReachedZoneThreshold(
-  state: Pick<GameStore, "zoneProgress">
+  state: Pick<GameStore, "zoneProgress" | "bloomlings" | "garden">
 ): boolean {
-  const threshold = getZoneThreshold(state.zoneProgress.currentZone);
+  const abilityBonuses = selectAbilityBonuses(state);
+  const threshold = getZoneThreshold(state.zoneProgress.currentZone, abilityBonuses.zoneThresholdReduction);
   return state.zoneProgress.currentZoneProgress >= threshold;
+}
+
+/**
+ * Compute ability bonuses for the current Garden using the real template registry.
+ */
+export function selectAbilityBonuses(state: Pick<GameStore, 'bloomlings' | 'garden'>): AbilityBonuses {
+  const gardenBloomlings = collectGardenBloomlings(state);
+  if (gardenBloomlings.length === 0) return emptyAbilityBonuses();
+  const activeAbilities = getActiveAbilities(gardenBloomlings, getBloomlingTemplate);
+  return computeAbilityBonuses(activeAbilities, getBloomlingTemplate);
 }
 
 // -----------------------------------------------------------------------------

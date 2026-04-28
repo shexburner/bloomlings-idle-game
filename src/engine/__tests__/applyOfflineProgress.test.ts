@@ -27,6 +27,14 @@ jest.mock("~/services/audioService", () => ({
   syncMusic: jest.fn(),
 }));
 
+jest.mock("react-native-mmkv", () => ({
+  createMMKV: jest.fn(() => ({
+    getString: jest.fn(),
+    set: jest.fn(),
+    delete: jest.fn(),
+  })),
+}));
+
 jest.mock("~/utils/haptics", () => ({
   zoneAdvanceHaptic: jest.fn(),
   achievementHaptic: jest.fn(),
@@ -135,7 +143,7 @@ function makeOfflineResult(overrides: Partial<ReturnType<typeof calculateOffline
 
 beforeEach(() => {
   jest.clearAllMocks();
-  mockStoreState = { lastTickAt: 1_000_000 };
+  mockStoreState = { lastTickAt: 1_000_000, stats: { nightOwlOfflineCollections: 0 } };
 });
 
 describe("applyOfflineProgress — brand-new save guard", () => {

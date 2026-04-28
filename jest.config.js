@@ -9,7 +9,7 @@ module.exports = {
     "^@/(.*)$": "<rootDir>/$1",
   },
   transform: {
-    "^.+\\.tsx?$": [
+    "^.+\\.[jt]sx?$": [
       "ts-jest",
       {
         tsconfig: "tsconfig.test.json",
@@ -18,5 +18,7 @@ module.exports = {
     ],
   },
   // Prevent ts-jest from choking on packages that ship ESM
-  transformIgnorePatterns: [],
+  transformIgnorePatterns: [
+    "node_modules/(?!(react-native-mmkv)/)",
+  ],
 };

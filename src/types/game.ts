@@ -41,6 +41,7 @@ export enum BiomeType {
   AbyssalDepths = "abyssal_depths",
   CelestialCanopy = "celestial_canopy",
   FrozenThicket = "frozen_thicket",
+  Universal = "universal",
 }
 
 /** Category of upgrade available in shops. */
@@ -449,6 +450,34 @@ export interface DailyState {
    * cooldown between Dewdrop earn ads. `null` if no ad has been watched yet.
    */
   lastDewdropAdAt: number | null;
+  /** Timestamp (ms) when the streak was frozen by a shield, or null. */
+  streakFrozenAt: number | null;
+  /** Timestamp (ms) of the last streak shield usage, or null. */
+  lastStreakShieldAt: number | null;
+}
+
+// -----------------------------------------------------------------------------
+// Cosmetic & Tutorial State
+// -----------------------------------------------------------------------------
+
+export interface CosmeticItem {
+  id: string;
+  category: 'hat' | 'theme' | 'tapEffect' | 'decoration';
+  purchasedAt: number;
+}
+
+export interface CosmeticState {
+  owned: Record<string, CosmeticItem>;
+  activeHatId: string | null;
+  activeThemeId: string | null;
+  activeTapEffectId: string | null;
+  activeDecorationIds: string[];
+}
+
+export interface TutorialState {
+  completed: boolean;
+  currentStep: number;
+  seenTooltips: string[];
 }
 
 // -----------------------------------------------------------------------------
@@ -534,6 +563,8 @@ export interface ZoneProgressState {
   gateTimerRemainingMs: number | null;
   /** Number of failed attempts on the current gate (for stacking 5% bonus). */
   gateFailCount: number;
+  /** Whether the Gate Assist ad has been used on the current gate. */
+  gateAssistUsed: boolean;
   /** Whether a boss fight is currently active. */
   bossActive: boolean;
   /** Boss HP remaining, or null if no boss fight. */
@@ -544,6 +575,8 @@ export interface ZoneProgressState {
   bossTimerRemainingMs: number | null;
   /** Number of failed attempts on the current boss (for stacking 5% bonus, max 50%). */
   bossFailCount: number;
+  /** Whether the Boss Smash ad has been used on the current boss. */
+  bossSmashUsed: boolean;
 }
 
 // -----------------------------------------------------------------------------
@@ -623,6 +656,14 @@ export interface GameState {
   // --- Stats ---
   /** Lifetime statistics for display and achievement tracking. */
   stats: GameStats;
+
+  // --- Cosmetics ---
+  /** Cosmetic item ownership and active selections. */
+  cosmetics: CosmeticState;
+
+  // --- Tutorial ---
+  /** Tutorial progression state. */
+  tutorial: TutorialState;
 
   // --- Settings ---
   /** Player-configurable settings. */

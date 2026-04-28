@@ -67,6 +67,8 @@ function extractSaveState(
     synergies: state.synergies,
     stats: state.stats,
     settings: state.settings,
+    cosmetics: state.cosmetics,
+    tutorial: state.tutorial,
     lastTickAt: state.lastTickAt,
     lastActiveAt: state.lastActiveAt,
     unlockedFeatures: state.unlockedFeatures,
@@ -135,7 +137,20 @@ export function loadFromDisk(): SaveData | null {
     const parsed: unknown = JSON.parse(raw);
     if (!isValidSaveData(parsed)) return null;
 
-    return parsed;
+    // Verify checksum integrity
+    const save = parsed as SaveData;
+    if (save.checksum) {
+      const stateJson = JSON.stringify(save.state);
+      const expected = generateChecksum(stateJson);
+      if (save.checksum !== expected) {
+        if (__DEV__) {
+          console.warn("[saveManager] Checksum mismatch — save may be corrupted");
+        }
+        // Allow loading but log the mismatch; don't block the player
+      }
+    }
+
+    return save;
   } catch {
     // Corrupted data — return null, never crash.
     return null;
@@ -292,11 +307,19 @@ export function applySaveToStore(save: SaveData): void {
     garden: state.garden,
     upgrades: state.upgrades,
     perks: state.perks,
-    zoneProgress: state.zoneProgress,
+    zoneProgress: {
+      ...state.zoneProgress,
+      gateAssistUsed: state.zoneProgress.gateAssistUsed ?? false,
+      bossSmashUsed: state.zoneProgress.bossSmashUsed ?? false,
+    },
     prestige: state.prestige,
     activeBoosts: state.activeBoosts,
     adStates: state.adStates,
-    daily: state.daily,
+    daily: {
+      ...state.daily,
+      streakFrozenAt: (state.daily as any).streakFrozenAt ?? null,
+      lastStreakShieldAt: (state.daily as any).lastStreakShieldAt ?? null,
+    },
     // Merge saved achievements with current templates so achievements added
     // after the save was created appear as uncompleted rather than absent.
     achievements: { ...buildInitialAchievements(), ...(state.achievements ?? {}) },
@@ -307,6 +330,18 @@ export function applySaveToStore(save: SaveData): void {
       nightOwlOfflineCollections: state.stats.nightOwlOfflineCollections ?? 0,
     },
     settings: state.settings,
+    cosmetics: (state as any).cosmetics ?? {
+      owned: {},
+      activeHatId: null,
+      activeThemeId: null,
+      activeTapEffectId: null,
+      activeDecorationIds: [],
+    },
+    tutorial: (state as any).tutorial ?? {
+      completed: true,
+      currentStep: -1,
+      seenTooltips: [],
+    },
     lastTickAt: state.lastTickAt,
     lastActiveAt: state.lastActiveAt,
     unlockedFeatures: state.unlockedFeatures,

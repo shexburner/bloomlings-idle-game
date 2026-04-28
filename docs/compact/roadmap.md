@@ -14,6 +14,8 @@
 - Phase 6: Polish & Retention
 - Phase 7: Prestige Layer 2 & Endgame
 - Phase 8: Launch Prep
+- Phase 9: Gameplay Depth & Player Experience
+  - Phase 9 Design Documents
 
 ## Key Points
 ### Phase 1: Foundation
@@ -38,4 +40,10 @@
 - (No concise bullet/summary found; use grep in source file for details.)
 
 ### Phase 8: Launch Prep
+- (No concise bullet/summary found; use grep in source file for details.)
+
+### Phase 9: Gameplay Depth & Player Experience
+- (No concise bullet/summary found; use grep in source file for details.)
+
+### Phase 9 Design Documents
 - (No concise bullet/summary found; use grep in source file for details.)

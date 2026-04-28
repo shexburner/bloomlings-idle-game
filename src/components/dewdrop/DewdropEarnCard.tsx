@@ -136,7 +136,7 @@ export function DewdropEarnCard() {
   })();
 
   return (
-    <View style={styles.card}>
+    <View testID="dewdrop-earn-card" style={styles.card}>
       <View style={styles.headerRow}>
         <Text style={styles.title}>Watch &amp; Earn</Text>
         <Text style={styles.capText}>
@@ -165,6 +165,7 @@ export function DewdropEarnCard() {
       </View>
 
       <Pressable
+        testID="dewdrop-earn-watch"
         style={[styles.button, disabled && styles.buttonDisabled]}
         onPress={handleWatch}
         disabled={disabled}

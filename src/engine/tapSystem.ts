@@ -10,6 +10,7 @@ import { useGameStore } from "~/state/store";
 import {
   selectEffectiveTapValue,
   getComboMultiplier,
+  selectAbilityBonuses,
 } from "~/state/selectors";
 import type { GameStore } from "~/state/store";
 import { LUCKY_SPROUT_TAP_BOOST_MULTIPLIER } from "./luckySprout";
@@ -209,13 +210,17 @@ export function useTapHandler(): TapHandler {
     const effectiveCritChance = BASE_CRIT_CHANCE + critChanceLevel * 0.02;
     const effectiveCritMultiplier = BASE_CRIT_MULTIPLIER + critDamageLevel * 0.50;
 
+    const abilityBonuses = selectAbilityBonuses(state);
+    const finalBaseTapValue = baseTapValue + abilityBonuses.tapValueFlat;
+    const finalCritChance = effectiveCritChance + abilityBonuses.critChanceBonus;
+
     // tapMultiplier is already folded into baseTapValue via selectEffectiveTapValue,
     // so we pass 1.0 as the tapMultiplier to avoid double-multiplying.
     const rawResult = calculateTapReward(
-      baseTapValue,
+      finalBaseTapValue,
       1.0,
       newComboCount,
-      effectiveCritChance,
+      finalCritChance,
       effectiveCritMultiplier
     );
 

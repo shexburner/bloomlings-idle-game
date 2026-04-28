@@ -15,8 +15,14 @@ import { TapFeedback, useTapFeedback } from "~/components/garden/TapFeedback";
 import { ComboMeter } from "~/components/garden/ComboMeter";
 import { ComboKeeperButton } from "~/components/garden/ComboKeeperButton";
 import { SunbeamBoostButton } from "~/components/garden/SunbeamBoostButton";
+import { GateOverlay } from "~/components/garden/GateOverlay";
+import { GateAssistButton } from "~/components/garden/GateAssistButton";
+import { BossOverlay } from "~/components/garden/BossOverlay";
+import { BossSmashButton } from "~/components/garden/BossSmashButton";
 import { ZoneProgress } from "~/components/garden/ZoneProgress";
 import { BloomlingDisplay } from "~/components/garden/BloomlingDisplay";
+import { BiomeMechanicHUD } from "~/components/garden/BiomeMechanicHUD";
+import { NextUnlockPreview } from "~/components/garden/NextUnlockPreview";
 import type { TapResult } from "~/engine/tapSystem";
 
 export default function GardenScreen() {
@@ -39,6 +45,9 @@ export default function GardenScreen() {
       {/* Currency display bar */}
       <CurrencyBar />
 
+      {/* Next unlock preview */}
+      <NextUnlockPreview />
+
       {/* Zone progress */}
       <View style={styles.zoneRow}>
         <ZoneProgress />
@@ -58,6 +67,17 @@ export default function GardenScreen() {
 
       {/* Sunbeam Boost FAB — absolutely positioned, visible from Zone 15 */}
       <SunbeamBoostButton />
+
+      {/* Biome mechanic overlay */}
+      <BiomeMechanicHUD />
+
+      {/* Gate overlay with ad assist button */}
+      <GateOverlay />
+      <GateAssistButton />
+
+      {/* Boss overlay with ad smash button */}
+      <BossOverlay />
+      <BossSmashButton />
     </LinearGradient>
   );
 }

@@ -35,14 +35,17 @@ export const createResourceSlice: StateCreator<
   resources: initialResources,
 
   addSunlight: (amount: number) =>
-    set((state) => ({
-      resources: {
-        ...state.resources,
-        sunlight: state.resources.sunlight + amount,
-        totalSunlightEarned: state.resources.totalSunlightEarned + amount,
-        runSunlightEarned: state.resources.runSunlightEarned + amount,
-      },
-    })),
+    set((state) => {
+      if (amount <= 0 || !Number.isFinite(amount)) return state;
+      return {
+        resources: {
+          ...state.resources,
+          sunlight: state.resources.sunlight + amount,
+          totalSunlightEarned: state.resources.totalSunlightEarned + amount,
+          runSunlightEarned: state.resources.runSunlightEarned + amount,
+        },
+      };
+    }),
 
   spendSunlight: (amount: number) => {
     let success = false;

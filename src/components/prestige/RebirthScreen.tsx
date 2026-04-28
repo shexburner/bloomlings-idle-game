@@ -11,15 +11,19 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useGameStore } from "~/state/store";
 import { REBIRTH_UNLOCK_ZONE } from "~/engine/rebirth";
+import { canTranscend } from "~/engine/transcendence";
 import { formatNumber } from "~/utils/formatNumber";
 import { RebirthPanel } from "./RebirthPanel";
 import { NectarShop } from "./NectarShop";
+import { TranscendencePanel } from "./TranscendencePanel";
+import { EssenceShop } from "./EssenceShop";
 
 const COLORS = {
   background: "#0d0a14",
   text: "#f3e5f5",
   textMuted: "#9b7fad",
   nectarIcon: "#e040fb",
+  essenceIcon: "#7c4dff",
   tabBar: "#1a1a2e",
   tabActive: "#e040fb",
   tabInactive: "#6b5b7e",
@@ -27,7 +31,7 @@ const COLORS = {
   lockedBorder: "#4a2d6e",
 };
 
-type PrestigeTab = "rebirth" | "shop";
+type PrestigeTab = "rebirth" | "shop" | "transcendence" | "essenceShop";
 
 export function RebirthScreen() {
   const insets = useSafeAreaInsets();
@@ -36,8 +40,13 @@ export function RebirthScreen() {
   const currentZone = useGameStore((s) => s.prestige.currentRunHighestZone);
   const allTimeHighest = useGameStore((s) => s.prestige.allTimeHighestZone);
   const nectar = useGameStore((s) => s.resources.nectar);
+  const essence = useGameStore((s) => s.resources.essence);
+  const prestige = useGameStore((s) => s.prestige);
 
   const hasReachedUnlock = allTimeHighest >= REBIRTH_UNLOCK_ZONE;
+  const showTranscendence =
+    canTranscend(prestige) || prestige.transcendenceCount >= 1;
+  const showEssenceShop = prestige.transcendenceCount >= 1;
 
   // Locked state: player hasn't reached Zone 40 in any run
   if (!hasReachedUnlock) {
@@ -75,16 +84,28 @@ export function RebirthScreen() {
 
   return (
     <View testID="rebirth-screen" style={[styles.container, { paddingTop: insets.top }]}>
-      {/* Header with Nectar balance */}
+      {/* Header with Nectar/Essence balance */}
       <View style={styles.headerRow}>
         <Text style={styles.header}>Rebirth</Text>
-        <Text testID="rebirth-nectar-balance" style={styles.nectarBalance}>
-          {"\u2727"} {formatNumber(nectar)}
-        </Text>
+        <View style={styles.balanceRow}>
+          <Text testID="rebirth-nectar-balance" style={styles.nectarBalance}>
+            {"\u2727"} {formatNumber(nectar)}
+          </Text>
+          {showEssenceShop && (
+            <Text testID="rebirth-essence-balance" style={styles.essenceBalance}>
+              {"\u2605"} {formatNumber(essence)}
+            </Text>
+          )}
+        </View>
       </View>
 
       {/* Tabs */}
-      <View style={styles.tabBar}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.tabBar}
+        contentContainerStyle={styles.tabBarContent}
+      >
         <Pressable
           testID="rebirth-tab-rebirth"
           style={[styles.tab, activeTab === "rebirth" && styles.tabActive]}
@@ -113,7 +134,45 @@ export function RebirthScreen() {
             Nectar Shop
           </Text>
         </Pressable>
-      </View>
+        {showTranscendence && (
+          <Pressable
+            testID="rebirth-tab-transcendence"
+            style={[
+              styles.tab,
+              activeTab === "transcendence" && styles.tabActiveEssence,
+            ]}
+            onPress={() => setActiveTab("transcendence")}
+          >
+            <Text
+              style={[
+                styles.tabText,
+                activeTab === "transcendence" && styles.tabTextActive,
+              ]}
+            >
+              Transcend
+            </Text>
+          </Pressable>
+        )}
+        {showEssenceShop && (
+          <Pressable
+            testID="rebirth-tab-essence-shop"
+            style={[
+              styles.tab,
+              activeTab === "essenceShop" && styles.tabActiveEssence,
+            ]}
+            onPress={() => setActiveTab("essenceShop")}
+          >
+            <Text
+              style={[
+                styles.tabText,
+                activeTab === "essenceShop" && styles.tabTextActive,
+              ]}
+            >
+              Essence Shop
+            </Text>
+          </Pressable>
+        )}
+      </ScrollView>
 
       {/* Content */}
       {activeTab === "rebirth" ? (
@@ -124,8 +183,18 @@ export function RebirthScreen() {
         >
           <RebirthPanel />
         </ScrollView>
-      ) : (
+      ) : activeTab === "shop" ? (
         <NectarShop />
+      ) : activeTab === "transcendence" ? (
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <TranscendencePanel />
+        </ScrollView>
+      ) : (
+        <EssenceShop />
       )}
     </View>
   );
@@ -155,21 +224,36 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: COLORS.nectarIcon,
   },
-  tabBar: {
+  balanceRow: {
     flexDirection: "row",
-    backgroundColor: COLORS.tabBar,
+    alignItems: "center",
+    gap: 12,
+  },
+  essenceBalance: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: COLORS.essenceIcon,
+  },
+  tabBar: {
+    maxHeight: 44,
     marginHorizontal: 16,
+    backgroundColor: COLORS.tabBar,
     borderRadius: 12,
+  },
+  tabBarContent: {
     padding: 4,
   },
   tab: {
-    flex: 1,
     paddingVertical: 10,
+    paddingHorizontal: 16,
     alignItems: "center",
     borderRadius: 10,
   },
   tabActive: {
     backgroundColor: COLORS.tabActive,
+  },
+  tabActiveEssence: {
+    backgroundColor: COLORS.essenceIcon,
   },
   tabText: {
     fontSize: 14,

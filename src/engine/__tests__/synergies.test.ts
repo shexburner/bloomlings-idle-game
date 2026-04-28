@@ -218,15 +218,15 @@ describe("calculateActiveSynergies", () => {
     expect(Object.keys(result.productionMultiplierByInstanceId)).toHaveLength(0);
   });
 
-  it("applies production multiplier from named synergy (Undergrowth Alliance = +15%)", () => {
+  it("applies stacked multiplier from named synergy + tag synergy (Undergrowth Alliance + Mossy tag)", () => {
     const blooms = [
       makeBloomling("a", "fernley"),
       makeBloomling("b", "mosswick"),
     ];
     const result = calculateActiveSynergies(blooms, getTemplate);
-    // Undergrowth Alliance → +15% production
-    expect(result.productionMultiplierByInstanceId["a"]).toBeCloseTo(1.15);
-    expect(result.productionMultiplierByInstanceId["b"]).toBeCloseTo(1.15);
+    // Undergrowth Alliance (+15%) × tag:Mossy (+15%) = 1.15 * 1.15 ≈ 1.3225
+    expect(result.productionMultiplierByInstanceId["a"]).toBeCloseTo(1.3225, 2);
+    expect(result.productionMultiplierByInstanceId["b"]).toBeCloseTo(1.3225, 2);
   });
 
   it("applies tap-value multiplier from Cradle Guard (+10% tap)", () => {
